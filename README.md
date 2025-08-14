@@ -23,7 +23,7 @@ Antes de comenzar, asegúrate de tener instalado en tu sistema:
 ### 1. Clonar el Repositorio
 
 ```bash
-git clone <URL_DEL_REPOSITORIO>
+git clone https://github.com/jazzzz0/sistema-gestion-academica.git
 cd sistema-gestion-academica
 ```
 
