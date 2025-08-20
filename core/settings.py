@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     'users',
     'careers',
     'students',
+
 ]
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
