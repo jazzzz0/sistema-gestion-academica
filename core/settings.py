@@ -37,7 +37,10 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'students',  # <-- Agregue app students
+    'base',
+    'users',
+    'careers',
+    'students',
 ]
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
