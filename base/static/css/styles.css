@@ -1,0 +1,117 @@
+/* ========================================================================== */
+/* Descripción: Hoja de estilos global (skeleton inicial).                     */
+/* Contiene variables de marca, estilos base y secciones preparadas            */
+/* para overrides y componentes futuros.                                       */
+/* ========================================================================== */
+
+
+/* ========================================================================== */
+/* 1. Variables de marca                                                      */
+/* ========================================================================== */
+
+/* Paleta de colores principal */
+:root {
+  --color-primary: #1a73e8;   /* Azul principal */
+  --color-secondary: #185abc; /* Azul más oscuro */
+  --color-accent: #ff9800;    /* Naranja de acento */
+  --color-bg: #f5f7fa;        /* Fondo claro general */
+  --color-text: #333333;      /* Texto principal */
+  --color-muted: #777777;     /* Texto secundario */
+
+  /* Tipografía */
+  --font-base: 'Roboto', sans-serif; /* Fuente base (hay que modificar segun se elija)  */
+  --font-headings: 'Leckerli One', cursive; /* Fuente para encabezados (hay que modificar segun se elija) */
+
+  /* Tamaños base */
+  --font-size-base: 16px;
+  --font-size-sm: 14px;
+  --font-size-lg: 18px;
+  --line-height: 1.6;
+}
+
+
+/* ========================================================================== */
+/* 2. Estilos globales mínimos                                                */
+/* ========================================================================== */
+
+/* Body general */
+body {
+  font-family: var(--font-base);
+  font-size: var(--font-size-base);
+  line-height: var(--line-height);
+  color: var(--color-text);
+  background-color: var(--color-bg);
+  margin: 0;
+  padding: 0;
+}
+
+/* Encabezados (h1-h6) */
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-headings);
+  margin-top: 0.5em;
+  margin-bottom: 0.5em;
+  color: var(--color-primary);
+}
+
+/* Párrafos */
+p {
+  margin-top: 0;
+  margin-bottom: 1em;
+  color: var(--color-text);
+}
+
+/* Enlaces */
+a {
+  color: var(--color-primary);
+  text-decoration: none;
+}
+a:hover {
+  color: var(--color-secondary);
+  text-decoration: underline;
+}
+
+/* Botones genéricos */
+button {
+  font-family: var(--font-base);
+  font-size: var(--font-size-base);
+  padding: 0.5em 1em;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  background-color: var(--color-primary);
+  color: #fff;
+  transition: background-color 0.2s ease;
+}
+button:hover {
+  background-color: var(--color-secondary);
+}
+
+
+/* ========================================================================== */
+/* 3. Overrides de Bootstrap (reservado para futuros ajustes)                                      */
+/* Nota: No se usa aún, se deja espacio para futuros ajustes                  */
+/* ========================================================================== */
+
+/* Ejemplo de override preparado (no esta activo) */
+/*
+.btn-primary {
+  background-color: var(--color-primary) !important;
+  border-color: var(--color-primary) !important;
+}
+*/
+
+
+/* ========================================================================== */
+/* 4. Componentes personalizados futuros (placeholder)                        */
+/* ========================================================================== */
+
+/* Ejemplo de sección reservada para tarjetas, menús, modales, etc. */
+/*
+.card-custom {
+  border-radius: 12px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+}
+*/
+
+
+/* Fin del archivo                                                            */
