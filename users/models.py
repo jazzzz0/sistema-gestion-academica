@@ -20,7 +20,9 @@ class User(AbstractUser):
         help_text="Documento Nacional de Identidad (único)",
     )
     email = models.EmailField(
-        unique=True, verbose_name="Email", help_text="Correo electrónico (único)"
+        unique=True,
+        verbose_name="Email",
+        help_text="Correo electrónico (único)",
     )
     role = models.CharField(
         choices=ROLE_CHOICES,
