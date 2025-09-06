@@ -13,10 +13,8 @@ class User(AbstractUser):
     ]
 
     # NOTA:
-    # - El campo 'dni' se usará como USERNAME_FIELD.
-    # - La contraseña inicial y la lógica para forzar el cambio se implementarán
-    #   más adelante cuando hagamos el flujo completo de autenticación.
-    # - Por ahora este modelo solo define la estructura y permite migraciones.
+    # - El email se usará como USERNAME_FIELD.
+    # - La contraseña inicial se seteará con el DNI desde Persona.
     dni = models.CharField(
         max_length=10,
         unique=True,
@@ -57,9 +55,11 @@ class User(AbstractUser):
 
     # No usamos el campo "username" de AbstractUser
     username = None
+    first_name = None
+    last_name = None
 
-    USERNAME_FIELD = "dni"
-    REQUIRED_FIELDS = ["email", "first_name", "last_name", "role"]
+    USERNAME_FIELD = "email"
+    REQUIRED_FIELDS = ["role"]
 
     def __str__(self):
         return f"{self.last_name}, {self.first_name}"
