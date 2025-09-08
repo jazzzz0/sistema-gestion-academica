@@ -17,6 +17,10 @@ Including another URLconf
 
 from django.contrib import admin
 from django.urls import path, include
+from django.http import HttpResponse  # Importa HttpResponse
+
+def home(request):
+    return HttpResponse("<h1>Página principal del sistema de gestión académica</h1>")
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -24,4 +28,6 @@ urlpatterns = [
     path('students/', include('students.urls')),
     path('careers/', include('careers.urls')),
     path("enrollments/", include("enrollments.urls")),
+    path('subjects/', include('subjects.urls')),
+    path('', home, name='home'),  # Ahora sí está definida
 ]
