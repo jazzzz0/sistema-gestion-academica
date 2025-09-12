@@ -1,6 +1,8 @@
 from django.contrib.auth.models import AbstractUser
 from django.db import models
 
+from .managers import UserManager
+
 
 class User(AbstractUser):
     """
@@ -8,9 +10,9 @@ class User(AbstractUser):
     """
 
     ROLE_CHOICES = [
-        ("admin", "Administrator"),
-        ("student", "Student"),
-        ("teacher", "Teacher"),
+        ("ADMIN", "Administrador"),
+        ("STUDENT", "Alumno"),
+        ("TEACHER", "Profesor"),
     ]
 
     # NOTA:
@@ -67,7 +69,9 @@ class User(AbstractUser):
     last_name = None
 
     USERNAME_FIELD = "email"
-    REQUIRED_FIELDS = ["role"]
+    REQUIRED_FIELDS = ["role", "person"]
+
+    objects = UserManager()
 
     def __str__(self):
         return f"{self.person.surname}, {self.person.name}"
