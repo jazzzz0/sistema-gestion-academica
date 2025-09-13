@@ -1,4 +1,6 @@
 from django.db import models
+from django.core.exceptions import ValidationError
+
 
 # Create your models here.
 class Career(models.Model):
@@ -24,8 +26,22 @@ class Career(models.Model):
         verbose_name="Activo",
         help_text="Indica si la carrera está activa."
     )
-    subjects = models.ManyToManyField("subjects.Subject", related_name="careers")
+    subjects = models.ManyToManyField(
+        "subjects.Subject", 
+        related_name="careers",
+        verbose_name="Materias",
+    )
     
+    class Meta:
+        ordering = ['name']
+
+    def deactivate(self):
+        if self.subjects.exists() or self.alumnos.exists():
+            raise ValidationError(
+            )
+        self.is_active = False
+        self.save()
+
     def __str__(self):
         return self.name
     
