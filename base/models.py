@@ -26,10 +26,19 @@ class Person(models.Model):
         help_text="Documento Nacional de Identidad (único)",
     )
 
-    email = models.EmailField(
-        unique=True,
-        verbose_name="Correo electrónico",
-        help_text="Dirección de correo electrónico (única)",
+    address = models.CharField(
+        max_length=200,
+        null=True,
+        blank=True,
+        verbose_name="Domicilio",
+        help_text="Domicilio"
+    )
+    
+    birth_date=models.DateField(
+        null=True,
+        blank=True,
+        verbose_name="Nacimiento",
+        help_text="Fecha de nacimiento (YYYY/MM/DD)"
     )
 
     # blank=True permite que sea opcional en los formularios (permite enviar un campo vacío al validar)
