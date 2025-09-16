@@ -5,10 +5,12 @@ from django.db.models.functions import Lower
 class Subject(models.Model):
     name = models.CharField(
         max_length=100, 
-        unique=True
     )
-    description = models.TextField()
-    quota = models.PositiveBigIntegerField()
+    description = models.TextField(
+        blank=True,
+        null=True
+    )
+    quota = models.PositiveIntegerField()
 
     class Meta:
         constraints = [
