@@ -1,5 +1,5 @@
+from django.core.exceptions import ValidationError
 from django.db import models
-from django.forms import ValidationError
 
 
 class Enrollment(models.Model):
@@ -21,9 +21,6 @@ class Enrollment(models.Model):
 
     grade = models.DecimalField(max_digits=4, decimal_places=2, null=True, blank=True)
 
-    def __str__(self):
-        return f"{self.student} - {self.subject} ({self.status})"
-
     class Meta:
         constraints = [
             models.UniqueConstraint(
@@ -31,6 +28,9 @@ class Enrollment(models.Model):
                 name="unique_enrollment",
             )
         ]
+
+    def __str__(self):
+        return f"{self.student} - {self.subject} ({self.status})"
 
     # Impedir inscripciones en materias que no pertenezcan a la carrera del estudiante
     # NOTA: Esto actúa solamente como una medida extra de seguridad,
