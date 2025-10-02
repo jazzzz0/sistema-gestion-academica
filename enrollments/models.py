@@ -1,5 +1,14 @@
+import re
+
 from django.core.exceptions import ValidationError
 from django.db import models
+
+
+def validate_semester(value):
+    if not re.match(r"^\d{4}-([12])$", value):
+        raise ValidationError(
+            f"{value} no es un semestre válido. Formato esperado: 'YYYY-1' o 'YYYY-2'."
+        )
 
 
 class Enrollment(models.Model):
@@ -13,6 +22,7 @@ class Enrollment(models.Model):
 
     student = models.ForeignKey("students.Student", on_delete=models.CASCADE)
     subject = models.ForeignKey("subjects.Subject", on_delete=models.CASCADE)
+    semester = models.CharField(max_length=6, validators=[validate_semester])
     enrolled_at = models.DateTimeField(auto_now_add=True)
     status = models.CharField(max_length=10, choices=STATUS_CHOICES, default="activa")
     grade = models.DecimalField(max_digits=4, decimal_places=2, null=True, blank=True)
