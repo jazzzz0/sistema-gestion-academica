@@ -11,6 +11,12 @@ def validate_semester(value):
         )
 
 
+def get_semester_from_date(date):
+    year = date.year
+    semester = 1 if date.month <= 6 else 2
+    return f"{year}-{semester}"
+
+
 class Enrollment(models.Model):
     STATUS_CHOICES = [
         ("activa", "Activa"),
@@ -22,7 +28,7 @@ class Enrollment(models.Model):
 
     student = models.ForeignKey("students.Student", on_delete=models.CASCADE)
     subject = models.ForeignKey("subjects.Subject", on_delete=models.CASCADE)
-    semester = models.CharField(max_length=6, validators=[validate_semester])
+    semester = models.CharField(max_length=6, validators=[validate_semester], editable=False)
     enrolled_at = models.DateTimeField(auto_now_add=True)
     status = models.CharField(max_length=10, choices=STATUS_CHOICES, default="activa")
     grade = models.DecimalField(max_digits=4, decimal_places=2, null=True, blank=True)
@@ -46,5 +52,8 @@ class Enrollment(models.Model):
             )
 
     def save(self, *args, **kwargs):
+        if not self.semester:
+            date = self.enrolled_at or timezone.now()
+            self.semester = get_semester_from_date(date)
         self.full_clean()  # ejecuta clean_fields, clean y validate_unique
         super().save(*args, **kwargs)
