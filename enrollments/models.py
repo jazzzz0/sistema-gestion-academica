@@ -2,19 +2,7 @@ import re
 
 from django.core.exceptions import ValidationError
 from django.db import models
-
-
-def validate_semester(value):
-    if not re.match(r"^\d{4}-([12])$", value):
-        raise ValidationError(
-            f"{value} no es un semestre válido. Formato esperado: 'YYYY-1' o 'YYYY-2'."
-        )
-
-
-def get_semester_from_date(date):
-    year = date.year
-    semester = 1 if date.month <= 6 else 2
-    return f"{year}-{semester}"
+from django.utils import timezone
 
 
 class Enrollment(models.Model):
@@ -28,7 +16,9 @@ class Enrollment(models.Model):
 
     student = models.ForeignKey("students.Student", on_delete=models.CASCADE)
     subject = models.ForeignKey("subjects.Subject", on_delete=models.CASCADE)
-    semester = models.CharField(max_length=6, validators=[validate_semester], editable=False)
+    semester = models.CharField(
+        max_length=6, validators=[validate_semester], editable=False
+    )
     enrolled_at = models.DateTimeField(auto_now_add=True)
     status = models.CharField(max_length=10, choices=STATUS_CHOICES, default="activa")
     grade = models.DecimalField(max_digits=4, decimal_places=2, null=True, blank=True)
@@ -40,6 +30,19 @@ class Enrollment(models.Model):
                 name="unique_enrollment",
             )
         ]
+
+    @staticmethod
+    def validate_semester(value):
+        if not re.match(r"^\d{4}-([12])$", value):
+            raise ValidationError(
+                f"{value} no es un semestre válido. Formato esperado: 'YYYY-1' o 'YYYY-2'."
+            )
+
+    @staticmethod
+    def get_semester_from_date(date):
+        year = date.year
+        semester = 1 if date.month <= 6 else 2
+        return f"{year}-{semester}"
 
     def __str__(self):
         return f"{self.student} - {self.subject} ({self.status})"
