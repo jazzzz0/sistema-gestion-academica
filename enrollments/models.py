@@ -5,6 +5,15 @@ from django.db import models
 from django.utils import timezone
 
 
+def validate_semester(value):
+    if not value:
+        return
+    if not re.match(r"^\d{4}-[12]$", value):
+        raise ValidationError(
+            f"{value} no es un semestre válido. Formato esperado: 'YYYY-1' o 'YYYY-2'."
+        )
+
+
 class Enrollment(models.Model):
     STATUS_CHOICES = [
         ("activa", "Activa"),
@@ -17,7 +26,10 @@ class Enrollment(models.Model):
     student = models.ForeignKey("students.Student", on_delete=models.CASCADE)
     subject = models.ForeignKey("subjects.Subject", on_delete=models.CASCADE)
     semester = models.CharField(
-        max_length=6, validators=[validate_semester], editable=False
+        max_length=6,
+        validators=[validate_semester],
+        editable=False,
+        help_text="Se genera automáticamente al crear la inscripción.",
     )
     enrolled_at = models.DateTimeField(auto_now_add=True)
     status = models.CharField(max_length=10, choices=STATUS_CHOICES, default="activa")
@@ -30,13 +42,9 @@ class Enrollment(models.Model):
                 name="unique_enrollment",
             )
         ]
-
-    @staticmethod
-    def validate_semester(value):
-        if not re.match(r"^\d{4}-([12])$", value):
-            raise ValidationError(
-                f"{value} no es un semestre válido. Formato esperado: 'YYYY-1' o 'YYYY-2'."
-            )
+        ordering = ["-enrolled_at", "student__last_name", "subject__name"]
+        verbose_name = "Inscripción"
+        verbose_name_plural = "Inscripciones"
 
     @staticmethod
     def get_semester_from_date(date):
@@ -57,6 +65,6 @@ class Enrollment(models.Model):
     def save(self, *args, **kwargs):
         if not self.semester:
             date = self.enrolled_at or timezone.now()
-            self.semester = get_semester_from_date(date)
+            self.semester = self.get_semester_from_date(date)
         self.full_clean()  # ejecuta clean_fields, clean y validate_unique
         super().save(*args, **kwargs)
