@@ -55,21 +55,13 @@ class User(AbstractUser):
         help_text="Fecha en que el usuario se unió al sistema",
     )
 
-    person = models.OneToOneField(
-        "Person",
-        on_delete=models.CASCADE,
-        related_name="user",
-        verbose_name="Persona",
-        help_text="Persona asociada al usuario",
-    )
-
     # No usamos el campo "username" de AbstractUser
     username = None
     first_name = None
     last_name = None
 
     USERNAME_FIELD = "email"
-    REQUIRED_FIELDS = ["role", "person"]
+    REQUIRED_FIELDS = ["role"]
 
     objects = UserManager()
 

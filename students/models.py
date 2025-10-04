@@ -5,6 +5,14 @@ from careers.models import Career
 
 
 class Student(Person):
+    user = models.OneToOneField(
+        "users.User",
+        on_delete=models.CASCADE,
+        related_name="student_profile",
+        verbose_name="Usuario",
+        help_text="Usuario asociado a este estudiante",
+    )
+
     career = models.ForeignKey(
         Career,
         on_delete=models.PROTECT,  # evita que se elimine una carrera si tiene estudiantes asociados

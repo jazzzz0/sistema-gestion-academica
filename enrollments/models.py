@@ -33,7 +33,6 @@ class Enrollment(models.Model):
     )
     enrolled_at = models.DateTimeField(auto_now_add=True)
     status = models.CharField(max_length=10, choices=STATUS_CHOICES, default="activa")
-    grade = models.DecimalField(max_digits=4, decimal_places=2, null=True, blank=True)
 
     class Meta:
         constraints = [

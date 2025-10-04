@@ -1,3 +1,4 @@
+from django.core.validators import RegexValidator
 from django.db import models
 
 
@@ -22,6 +23,7 @@ class Person(models.Model):
     dni = models.CharField(
         max_length=10,
         unique=True,
+        validators=[RegexValidator(r"^\d{7,8}$", "DNI inválido. Debe tener 7 u 8 dígitos.")],
         verbose_name="DNI",
         help_text="Documento Nacional de Identidad (único)",
     )
@@ -34,7 +36,7 @@ class Person(models.Model):
         help_text="Domicilio"
     )
     
-    birth_date=models.DateField(
+    birth_date = models.DateField(
         null=True,
         blank=True,
         verbose_name="Nacimiento",
@@ -59,3 +61,10 @@ class Person(models.Model):
 
     def __str__(self):
         return f"{self.surname}, {self.name}"
+
+    def save(self, *args, **kwargs):
+        if self.name:
+            self.name = self.name.strip().title()
+        if self.surname:
+            self.surname = self.surname.strip().title()
+        super().save(*args, **kwargs)
