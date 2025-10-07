@@ -1,7 +1,7 @@
 from django.contrib.auth.models import AbstractUser
 from django.db import models
 
-from .managers import UserManager
+from .managers import CustomUserManager
 
 
 class User(AbstractUser):
@@ -30,6 +30,8 @@ class User(AbstractUser):
     role = models.CharField(
         choices=ROLE_CHOICES,
         max_length=10,
+        default="STUDENT",
+        blank=True,
         verbose_name="Rol",
         help_text="Rol del usuario en el sistema",
     )
@@ -61,9 +63,9 @@ class User(AbstractUser):
     last_name = None
 
     USERNAME_FIELD = "email"
-    REQUIRED_FIELDS = ["role"]
+    REQUIRED_FIELDS = []
 
-    objects = UserManager()
+    objects: CustomUserManager = CustomUserManager()
 
     def __str__(self):
         return f"{self.email} ({self.role})"

@@ -1,46 +1,89 @@
-from django.contrib.auth.models import BaseUserManager
+from typing import TYPE_CHECKING, Optional
+
+from django.contrib.auth.models import UserManager as DjangoUserManager
+
+if TYPE_CHECKING:
+    from .models import User
 
 
-class UserManager(BaseUserManager):
-    def create_user(self, email, dni, role, password=None, **extra_fields):
+class CustomUserManager(DjangoUserManager):
+    def create_user(
+        self,
+        username_ignored: str = None,
+        email: str = None,
+        dni: Optional[str] = None,
+        role: str = None,
+        password: Optional[str] = None,
+        **extra_fields,
+    ) -> "User":
         """
-        Crea un usuario con email, persona y rol.
-        La contraseña inicial se establece con el DNI de la persona asociada.
+        Crea y guarda un usuario con el email, DNI, rol y contraseña proporcionados.
         """
         if not email:
             raise ValueError("El email debe ser proporcionado")
-        if not dni:
-            raise ValueError("El DNI debe ser proporcionado")
         if not role:
             raise ValueError("El rol debe ser proporcionado")
 
         email = self.normalize_email(email)
-        user = self.model(email=email, dni=dni, role=role, **extra_fields)
+        user = self.model(email=email, role=role, **extra_fields)
 
-        # Contraseña inicial = DNI
-        # Usamos set_password para hashear la contraseña
-        user.set_password(dni)
+        is_manual_password = bool(password)
+
+        # Lógica de Contraseña y Primer Login
+        # TODO: Terminar esta lógica
+
+        if role in ("STUDENT", "TEACHER") or not is_manual_password:
+            if not dni:
+                raise ValueError(
+                    "El DNI debe ser proporcionado para alumnos y profesores"
+                )
+            # Alumnos y Profesores sin contraseña manual:
+            # usar DNI y forzar cambio.
+            final_password = dni
+            user.is_first_login = True
+        elif role == "ADMIN" and not is_manual_password:
+
+        user.set_password(final_password)
+
+        # Lógica de permisos
+        # Solo se establece a True si se recibe desde create_superuser
+        user.is_staff = extra_fields.get("is_staff", False)
+        user.is_superuser = extra_fields.get("is_superuser", False)
+
         user.save(using=self._db)
         return user
 
-    def create_superuser(self, email, dni, password=None, **extra_fields):
+    def create_superuser(
+        self, email: str, password: Optional[str] = None, **extra_fields
+    ) -> "User":
         """
-        Crea y guarda un superusuario (admin total del sistema).
+        Crea un superusuario directamente, sin la lógica de DNI, y asigna 'ADMIN'.
         """
+        if not email:
+            raise ValueError("El email debe ser proporcionado")
+
+        # 1. Asignar todos los flags de superusuario y el rol
         extra_fields.setdefault("is_staff", True)
         extra_fields.setdefault("is_superuser", True)
-        extra_fields.setdefault("role", "admin")  # Aseguramos que el rol sea 'admin'
+        extra_fields.setdefault("is_active", True)  # Asegurar que esté activo
+        extra_fields.setdefault("role", "ADMIN")
+        extra_fields.setdefault(
+            "is_first_login", False
+        )  # No forzar cambio de contraseña
 
-        if extra_fields.get("is_staff") is not True:
-            raise ValueError("El superusuario debe tener is_staff=True")
-        if extra_fields.get("is_superuser") is not True:
-            raise ValueError("El superusuario debe tener is_superuser=True")
+        # 2. Verificar seguridad
+        if not extra_fields.get("is_staff"):
+            raise ValueError("El superusuario debe tener is_staff=True.")
+        if not extra_fields.get("is_superuser"):
+            raise ValueError("El superusuario debe tener is_superuser=True.")
 
-        if password:
-            user.set_password(password)
-        else:
-            user.set_password(dni)
+        # 3. Crear el objeto User directamente, usando el password.
+        email = self.normalize_email(email)
 
-        return self.create_user(
-            email=email, dni=dni, role="admin", password=password, **extra_fields
-        )
+        # Creamos el modelo. Django se encarga de que password esté hasheado.
+        user = self.model(email=email, **extra_fields)
+        user.set_password(password)
+
+        # 4. Guardar
+        user.save(using=self._db)
+        return user
