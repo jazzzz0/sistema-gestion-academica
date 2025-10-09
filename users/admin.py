@@ -6,6 +6,9 @@ from .models import User
 
 
 class CustomUserAdmin(UserAdmin):
+    # Campos de solo lectura
+    readonly_fields = ("last_login", "date_joined")
+
     # Campos que se muestran en el formulario de edición
     fieldsets = (
         # Identidad del usuario
@@ -14,6 +17,17 @@ class CustomUserAdmin(UserAdmin):
         ("Información personal", {"fields": ('role', 'is_first_login')}),
         ("Permisos de Sistema", {"fields": ("is_active", "is_staff", "is_superuser", "groups", "user_permissions")}),
         ("Fechas Importantes", {"fields": ("last_login", "date_joined")}),
+    )
+
+    # Campos para crear un nuevo usuario
+    add_fieldsets = (
+        (None, {
+            "classes": ("wide",),
+            "fields": ("email", "password1", "password2"),
+        }),
+        # Agregamos los campos de nuestro modelo que queremos configurar al crear
+        ("Información Personal", {"fields": ('role', 'is_first_login')}),
+        ("Permisos de Sistema", {"fields": ("is_active", "is_staff", "is_superuser", "groups", "user_permissions")}),
     )
 
     # Columnas que se muestran en el listado
