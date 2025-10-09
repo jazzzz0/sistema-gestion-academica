@@ -1,13 +1,23 @@
-from django.db import models
 from django.core.exceptions import ValidationError
+from django.db import models
+
 from base.models import Person
 from careers.models import Career
 
 
 class Student(Person):
+    user = models.OneToOneField(
+        "users.User",
+        on_delete=models.CASCADE,
+        related_name="student_profile",
+        verbose_name="Usuario",
+        help_text="Usuario asociado a este estudiante",
+    )
+
     career = models.ForeignKey(
         Career,
-        on_delete=models.PROTECT,  # evita que se elimine una carrera si tiene estudiantes asociados
+        on_delete=models.PROTECT,  # Evita borrar una carrera si tiene estudiantes asociados
+        related_name="students",
         verbose_name="Carrera",
         help_text="Carrera del estudiante",
     )
@@ -40,4 +50,3 @@ class Student(Person):
     class Meta:
         verbose_name = "Estudiante"
         verbose_name_plural = "Estudiantes"
-

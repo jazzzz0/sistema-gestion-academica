@@ -1,3 +1,4 @@
+from django.core.validators import RegexValidator
 from django.db import models
 
 
@@ -8,20 +9,19 @@ class Person(models.Model):
     """
 
     name = models.CharField(
-        max_length=100,
-        verbose_name="Nombre",
-        help_text="Nombre de la persona"
+        max_length=100, verbose_name="Nombre", help_text="Nombre de la persona"
     )
 
     surname = models.CharField(
-        max_length=100,
-        verbose_name="Apellido",
-        help_text="Apellido de la persona"
+        max_length=100, verbose_name="Apellido", help_text="Apellido de la persona"
     )
 
     dni = models.CharField(
         max_length=10,
         unique=True,
+        validators=[
+            RegexValidator(r"^\d{7,8}$", "DNI inválido. Debe tener 7 u 8 dígitos.")
+        ],
         verbose_name="DNI",
         help_text="Documento Nacional de Identidad (único)",
     )
@@ -31,17 +31,17 @@ class Person(models.Model):
         null=True,
         blank=True,
         verbose_name="Domicilio",
-        help_text="Domicilio"
+        help_text="Domicilio",
     )
-    
-    birth_date=models.DateField(
+
+    birth_date = models.DateField(
         null=True,
         blank=True,
         verbose_name="Nacimiento",
-        help_text="Fecha de nacimiento (YYYY/MM/DD)"
+        help_text="Fecha de nacimiento (YYYY/MM/DD)",
     )
 
-    # blank=True permite que sea opcional en los formularios (permite enviar un campo vacío al validar)
+    # blank=True permite que el campo sea opcional en los formularios
     # null=True permite que sea opcional en la base de datos (campo que acepta NULL)
     phone = models.CharField(
         max_length=20,
@@ -59,3 +59,10 @@ class Person(models.Model):
 
     def __str__(self):
         return f"{self.surname}, {self.name}"
+
+    def save(self, *args, **kwargs):
+        if self.name:
+            self.name = self.name.strip().title()
+        if self.surname:
+            self.surname = self.surname.strip().title()
+        super().save(*args, **kwargs)

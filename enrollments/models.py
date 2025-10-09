@@ -23,17 +23,43 @@ class Enrollment(models.Model):
         ("ausente", "Ausente"),
     ]
 
-    student = models.ForeignKey("students.Student", on_delete=models.CASCADE)
-    subject = models.ForeignKey("subjects.Subject", on_delete=models.CASCADE)
+    student = models.ForeignKey(
+        "students.Student",
+        on_delete=models.CASCADE,
+        related_name="enrollments",
+        verbose_name="Inscripción",
+        help_text="Estudiante que realiza la inscripción.",
+    )
+
+    subject = models.ForeignKey(
+        "subjects.Subject",
+        on_delete=models.CASCADE,
+        related_name="enrollments",
+        verbose_name="Materia",
+        help_text="Materia a la que se inscribe el estudiante.",
+    )
+
     semester = models.CharField(
         max_length=6,
         validators=[validate_semester],
         editable=False,
+        verbose_name="Semestre",
         help_text="Se genera automáticamente al crear la inscripción.",
     )
-    enrolled_at = models.DateTimeField(auto_now_add=True)
-    status = models.CharField(max_length=10, choices=STATUS_CHOICES, default="activa")
-    grade = models.DecimalField(max_digits=4, decimal_places=2, null=True, blank=True)
+
+    enrolled_at = models.DateTimeField(
+        auto_now_add=True,
+        verbose_name="Fecha de inscripción",
+        help_text="Fecha y hora en que se realizó la inscripción.",
+    )
+
+    status = models.CharField(
+        max_length=10,
+        choices=STATUS_CHOICES,
+        default="activa",
+        verbose_name="Estado",
+        help_text="Estado actual de la inscripción.",
+    )
 
     class Meta:
         constraints = [
@@ -42,7 +68,7 @@ class Enrollment(models.Model):
                 name="unique_enrollment",
             )
         ]
-        ordering = ["-enrolled_at", "student__last_name", "subject__name"]
+        ordering = ["-enrolled_at", "student__surname", "subject__name"]
         verbose_name = "Inscripción"
         verbose_name_plural = "Inscripciones"
 
