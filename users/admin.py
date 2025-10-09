@@ -1,7 +1,7 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
 from django.contrib.admin.sites import NotRegistered
-from django.contrib.admin.widgets import AdminHiddenInput  # type: ignore
+from django.forms.widgets import HiddenInput
 from .models import User
 
 
@@ -33,9 +33,9 @@ class CustomUserAdmin(UserAdmin):
 
             # Ocultar los flags críticos de permisos para evitar manipulaciones
             if "is_staff" in form.base_fields:
-                form.base_fields["is_staff"].widget = AdminHiddenInput()
+                form.base_fields["is_staff"].widget = HiddenInput()
             if "is_superuser" in form.base_fields:
-                form.base_fields["is_superuser"].widget = AdminHiddenInput()
+                form.base_fields["is_superuser"].widget = HiddenInput()
 
         return form
 
