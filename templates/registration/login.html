@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Iniciar sesión{% endblock %}
+
+{% block content %}
+<div class="container d-flex justify-content-center align-items-center vh-100">
+  <div class="card shadow p-4" style="max-width: 400px; width: 100%;">
+    <h3 class="text-center mb-4">Iniciar sesión</h3>
+
+    {% if form.errors %}
+      <div class="alert alert-danger" role="alert">
+        Credenciales incorrectas. Por favor, inténtalo nuevamente.
+      </div>
+    {% endif %}
+
+    <form method="post" novalidate>
+      {% csrf_token %}
+      <div class="mb-3">
+        <label for="id_username" class="form-label">Correo electrónico</label>
+        <input type="email" name="username" class="form-control" required id="id_username" placeholder="email@ejemplo.com">
+      </div>
+
+      <div class="mb-3">
+        <label for="id_password" class="form-label">Contraseña</label>
+        <input type="password" name="password" class="form-control" required id="id_password">
+      </div>
+
+      <div class="d-grid">
+        <button type="submit" class="btn btn-primary">Ingresar</button>
+      </div>
+    </form>
+
+    <div class="text-center mt-3">
+      <a href="{% url 'password_reset' %}">¿Olvidaste tu contraseña?</a>
+    </div>
+  </div>
+</div>
+{% endblock %}
