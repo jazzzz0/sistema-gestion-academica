@@ -15,10 +15,24 @@
   {% block head %}{% endblock %}
 </head>
 <body>
-
-  {% block content %}
-  <!-- Contenido que cada plantilla hija va a sobrescribir -->
-  {% endblock %}
+  <!-- Barra de navegación -->
+   <nav class="navbar navbar-expand-lg navbar-light bg-light px-3 shadow-sm">
+    <a class="navbar-brand fw-bold" href="/">Gestión Académica</a>
+    <div class="ms-auto">
+      {% if user.is_authenticated %}
+        <span class="me-3 text-muted">Hola, {{ user.email }}</span>
+        <a href="{% url 'logout' %}" class="btn btn-outline-danger btn-sm">Cerrar sesión</a>
+      {% else %}
+        <a href="{% url 'login' %}" class="btn btn-outline-primary btn-sm">Iniciar sesión</a>
+      {% endif %}
+    </div>
+  </nav>
+  <!-- Contenedor principal -->
+   <main class="container mt-4">
+    {% block content %}
+      <!-- Contenido que cada plantilla hija va a sobrescribir -->
+    {% endblock %}
+  </main>
 
   <!-- Bootstrap 5 JS (CDN) -->
   <script 
