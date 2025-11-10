@@ -1,7 +1,7 @@
 from django.contrib.auth.models import AbstractUser
 from django.db import models
 
-from .managers import UserManager
+from .managers import CustomUserManager
 
 
 class User(AbstractUser):
@@ -55,23 +55,15 @@ class User(AbstractUser):
         help_text="Fecha en que el usuario se unió al sistema",
     )
 
-    person = models.OneToOneField(
-        "Person",
-        on_delete=models.CASCADE,
-        related_name="user",
-        verbose_name="Persona",
-        help_text="Persona asociada al usuario",
-    )
-
     # No usamos el campo "username" de AbstractUser
     username = None
     first_name = None
     last_name = None
 
     USERNAME_FIELD = "email"
-    REQUIRED_FIELDS = ["role", "person"]
+    REQUIRED_FIELDS = ["role"]
 
-    objects = UserManager()
+    objects: CustomUserManager = CustomUserManager()
 
     def __str__(self):
         return f"{self.email} ({self.role})"
