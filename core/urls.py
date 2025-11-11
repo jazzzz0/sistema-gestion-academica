@@ -17,6 +17,8 @@ Including another URLconf
 
 from django.contrib import admin
 from django.urls import path, include
+from base.views import HomeView, DashboardView 
+
 
 
 urlpatterns = [
@@ -26,4 +28,6 @@ urlpatterns = [
     path('careers/', include('careers.urls')),
     path("enrollments/", include("enrollments.urls")),
     path('subjects/', include('subjects.urls')),
+    path("", HomeView.as_view(), name="home"),
+    path("dashboard/", DashboardView.as_view(), name="dashboard"),
 ]
