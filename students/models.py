@@ -1,7 +1,7 @@
 from django.core.exceptions import ValidationError
 from django.db import models
 
-from base.models import Person
+from users.models import Person
 from careers.models import Career
 
 
