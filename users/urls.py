@@ -1,7 +1,7 @@
 from django.urls import path
 from django.contrib.auth.views import LoginView, LogoutView
 
-from . import views
+app_name = "users"  # IMPORTANTE para el namespace
 
 urlpatterns = [
     path(
