@@ -113,5 +113,33 @@ button:hover {
 }
 */
 
+/* ========================================================================== */
+/* 5. Estilos específicos por rol de usuario                                 */
+
+/* Feedback visual según rol de usuario (placeholder) */
+
+.navbar-admin {
+  background-color: #d32f2f; /* Rojo para admin */
+}
+
+.navar-teacher {
+  background-color: #1976d2; /* Azul para teacher */
+}
+.navbar-student {
+  background-color: #388e3c; /* Verde para student */
+}
+
+/* visualizacion del rol (refuerzo) */
+.role-badge {
+  display: inline-block;
+  padding: 0.25em 0.5em;
+  border-radius: 4px;
+  font-size: var(--font-size-sm);
+  color: #fff;
+}   
+
+/* ========================================================================== */
+
+
 
 /* Fin del archivo                                                            */
