@@ -45,7 +45,8 @@ INSTALLED_APPS = [
     'careers',
     'students',
     'enrollments',
-    'subjects',     
+    'subjects',
+    'django_extensions'
 ]
 
 MIDDLEWARE = [
