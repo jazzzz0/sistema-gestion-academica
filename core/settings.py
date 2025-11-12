@@ -40,7 +40,6 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'base',
     'users',
     'careers',
     'students',
@@ -62,12 +61,10 @@ MIDDLEWARE = [
 ROOT_URLCONF = "core.urls"
 
 
-
 TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
-        # Agregás la carpeta "templates" del proyecto
-        "DIRS": [BASE_DIR / "templates"],  # o BASE_DIR + "/templates" si usas strings
+        "DIRS": [BASE_DIR / "templates"],
         "APP_DIRS": True,
         "OPTIONS": {
             "context_processors": [
