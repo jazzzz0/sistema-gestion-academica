@@ -1,13 +1,13 @@
 from django.core.exceptions import ValidationError
 from django.db import models
 
-from users.models import Person
+from users.models import Person, User
 from careers.models import Career
 
 
 class Student(Person):
     user = models.OneToOneField(
-        "users.User",
+        User,
         on_delete=models.CASCADE,
         related_name="student_profile",
         verbose_name="Usuario",
