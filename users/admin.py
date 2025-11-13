@@ -3,7 +3,7 @@ from django.contrib.auth.admin import UserAdmin
 from django.contrib.admin.sites import NotRegistered
 from django.forms.widgets import HiddenInput
 
-from users.models import User
+from users.models import User, Admin
 
 
 class CustomUserAdmin(UserAdmin):
@@ -59,6 +59,95 @@ class CustomUserAdmin(UserAdmin):
         return form
 
 
+class AdminAdmin(admin.ModelAdmin):
+    """
+    Configuración del Django Admin para el modelo Admin.
+    """
+    # Columnas que se muestran en el listado
+    list_display = (
+        "dni",
+        "name",
+        "surname",
+        "department",
+        "hire_date",
+        "is_active",
+        "user_email",
+    )
+    
+    # Filtros en la barra lateral
+    list_filter = (
+        "is_active",
+        "department",
+    )
+    
+    # Campos por los que se puede buscar
+    search_fields = (
+        "dni",
+        "name",
+        "surname",
+        "user__email",
+        "department",
+    )
+    
+    # Organización de campos en el formulario
+    fieldsets = (
+        ("Información Personal", {
+            "fields": (
+                "dni",
+                "name",
+                "surname",
+                "birth_date",
+                "address",
+                "phone",
+            ),
+        }),
+        ("Información Laboral", {
+            "fields": (
+                "department",
+                "hire_date",
+                "is_active",
+            ),
+        }),
+        ("Usuario Asociado", {
+            "fields": (
+                "user",
+            ),
+            "description": "Usuario del sistema asociado a este administrador.",
+        }),
+    )
+    
+    # Ordenamiento por defecto
+    ordering = ("-hire_date",)
+    
+    # Método para mostrar el email del usuario
+    def user_email(self, obj):
+        """Muestra el email del usuario asociado."""
+        return obj.user.email if obj.user else "-"
+    user_email.short_description = "Email"
+    user_email.admin_order_field = "user__email"
+    
+    # Acciones personalizadas
+    actions = ["activate_admins", "deactivate_admins"]
+    
+    def activate_admins(self, request, queryset):
+        """Activa los administradores seleccionados."""
+        updated = queryset.update(is_active=True)
+        self.message_user(
+            request,
+            f"{updated} administrador(es) activado(s) correctamente.",
+        )
+    activate_admins.short_description = "Activar administradores seleccionados"
+    
+    def deactivate_admins(self, request, queryset):
+        """Desactiva los administradores seleccionados."""
+        updated = queryset.update(is_active=False)
+        self.message_user(
+            request,
+            f"{updated} administrador(es) desactivado(s) correctamente.",
+        )
+    deactivate_admins.short_description = "Desactivar administradores seleccionados"
+
+
 # Desregistrar la clase UserAdmin por defecto (si existía) y registrar la personalizada
 try:
     admin.site.unregister(User)
@@ -66,3 +155,4 @@ except NotRegistered:
     pass
 
 admin.site.register(User, CustomUserAdmin)
+admin.site.register(Admin, AdminAdmin)
