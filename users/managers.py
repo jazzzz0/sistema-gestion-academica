@@ -17,7 +17,9 @@ class CustomUserManager(DjangoUserManager):
         **extra_fields,
     ) -> "User":
         """
-        Crea y guarda un usuario con el email, DNI, rol y contraseña proporcionados.
+        Crear y guardar un usuario con políticas específicas según el rol:
+        - STUDENT/TEACHER: la contraseña es el DNI. No existen contraseñas manuales. El campo 'is_first_login' es True.
+        - ADMIN: la contraseña es manual. El campo 'is_first_login' es False.
         """
         # Validaciones básicas de integridad
         if not email:
@@ -25,41 +27,44 @@ class CustomUserManager(DjangoUserManager):
         if not role:
             raise ValueError("El rol debe ser proporcionado")
 
+        allowed_roles = ("STUDENT", "TEACHER", "ADMIN")
+        if role not in allowed_roles:
+            raise ValueError(f"El rol debe ser uno de {', '.join(sorted(allowed_roles))}")
+
         email = self.normalize_email(email)
 
-        # Se asegura que los flags de permisos sean False por defecto
-        extra_fields.setdefault("is_staff", False)
-        extra_fields.setdefault("is_superuser", False)
+        # Configurar flags según el rol, superuser > admin > student/teacher
+        if role in ("STUDENT", "TEACHER"):
+            extra_fields.setdefault("is_staff", False)
+            extra_fields.setdefault("is_superuser", False)
+        elif role == "ADMIN":
+            extra_fields.setdefault("is_staff", True)
+            extra_fields.setdefault("is_superuser", False)
 
         user = self.model(email=email, role=role, **extra_fields)
 
-        # Lógica de contraseña y primer login
-        final_password: str = ""  # Inicializamos para evitar errores de referencia
-        is_manual_password = bool(password)
+        final_password: Optional[str] = None
 
         if role in ("STUDENT", "TEACHER"):
-            if not is_manual_password:
-                # Si no se provee contraseña, usar el DNI
-                if not dni:
-                    raise ValueError("El DNI debe ser proporcionado para roles STUDENT o TEACHER")
-                final_password = dni
-                user.is_first_login = True  # Forzar cambio de contraseña en el primer login
-            else:
-                final_password = password
-                user.is_first_login = extra_fields.get("is_first_login", False)
+            if password:
+                raise ValueError("Los estudiantes y los profesores no deben tener contraseñas manuales")
+            if not dni:
+                raise ValueError("Los estudiantes y los profesores deben tener un DNI")
+            final_password = dni
+            user.is_first_login = True
 
         elif role == "ADMIN":
-            if not is_manual_password:
-                # Rol ADMIN (no Superuser): Debe tener una contraseña manual segura.
-                # Medida de seguridad que impide crear Admins sin contraseña.
-                raise ValueError("El rol ADMIN requiere una contraseña manual establecida")
-            else:
-                final_password = password
-                user.is_first_login = extra_fields.get("is_first_login", False)
+            if not password:
+                raise ValueError("Los administradores deben tener una contraseña establecida")
+            final_password = password
+            user.is_first_login = extra_fields.get("is_first_login", False)
 
-        # Usar set_password para hashear la contraseña
+        if not final_password:
+            # Esto no debería ocurrir, pero es una medida de seguridad adicional
+            raise ValueError("No se pudo determinar la contraseña final del usuario")
+
+        # Guardar el usuario con la contraseña hasheada
         user.set_password(final_password)
-
         user.save(using=self._db)
         return user
 
@@ -70,34 +75,23 @@ class CustomUserManager(DjangoUserManager):
         **extra_fields
     ) -> "User":
         """
-        Crea un superusuario directamente, sin la lógica de DNI, y asigna 'ADMIN'.
+        Crea un superusuario (único con is_superuser=True).
+        Solo el superusuario puede acceder al Django Admin completo.
         """
         if not email:
             raise ValueError("El email debe ser proporcionado")
+        if not password:
+            raise ValueError("El superusuario debe tener una contraseña")
 
-        # 1. Asignar todos los flags de superusuario y el rol
-        extra_fields.setdefault("is_staff", True)
-        extra_fields.setdefault("is_superuser", True)
-        extra_fields.setdefault("is_active", True)  # Asegurar que esté activo
-        extra_fields.setdefault("role", "ADMIN")
-        extra_fields.setdefault("is_first_login", False)  # No forzar cambio de contraseña
+        # Asignar todos los flags de superusuario y el rol
+        extra_fields["is_staff"] = True
+        extra_fields["is_superuser"] = True
+        extra_fields["is_active"] = True
+        extra_fields["role"] = "ADMIN"
+        extra_fields["is_first_login"] = False
 
-        # 2. Verificar seguridad
-        if not extra_fields.get("is_staff"):
-            raise ValueError("El superusuario debe tener is_staff=True.")
-        if not extra_fields.get("is_superuser"):
-            raise ValueError("El superusuario debe tener is_superuser=True.")
-
-        # 3. Crear el objeto User directamente, evitando la dependencia de create_user(dni)
         email = self.normalize_email(email)
         user = self.model(email=email, **extra_fields)
-
-        # Si no se pasó contraseña, Django lo obligará en el prompt.
-        if not password:
-            raise ValueError("El superusuario debe tener una contraseña establecida.")
-
         user.set_password(password)
-
-        # 4. Guardar
         user.save(using=self._db)
         return user
