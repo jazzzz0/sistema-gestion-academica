@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Crear Alumno</title>
+</head>
+<body>
+    <h1>Crear nuevo alumno</h1>
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit">Guardar</button>
+    </form>
+</body>
+</html>
+{% extends "base.html" %}
+
+{% block title %}Crear Alumno - Sistema de Gestión Académica{% endblock %}
+
+{% block content %} 

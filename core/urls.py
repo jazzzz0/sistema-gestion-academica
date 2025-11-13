@@ -17,9 +17,11 @@ Including another URLconf
 
 from django.contrib import admin
 from django.urls import path, include
+from core.views import home  # <-- importar la vista
 
 
 urlpatterns = [
+    path('home', home, name='home'),
     path('admin/', admin.site.urls),
     path("users/", include("users.urls")),
     path('students/', include('students.urls')),
