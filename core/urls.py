@@ -22,7 +22,7 @@ from users.views import HomeView, DashboardView
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path("users/", include("users.urls" )),
+    path("users/", include("users.urls")),
     path('students/', include('students.urls')),
     path('careers/', include('careers.urls')),
     path("enrollments/", include("enrollments.urls")),
