@@ -1,7 +1,7 @@
 from django.contrib.auth.models import AbstractUser
 from django.db import models
 
-from .managers import CustomUserManager
+from users.managers import CustomUserManager
 
 
 class User(AbstractUser):
@@ -34,12 +34,6 @@ class User(AbstractUser):
         help_text="Rol del usuario en el sistema",
     )
 
-    is_active = models.BooleanField(
-        default=True,
-        verbose_name="Activo",
-        help_text="Indica si el usuario está activo",
-    )
-
     is_first_login = models.BooleanField(
         default=True,
         verbose_name="Forzar cambio de contraseña",
@@ -47,12 +41,6 @@ class User(AbstractUser):
             "Indica si el usuario debe cambiar su contraseña "
             "en el próximo inicio de sesión"
         ),
-    )
-
-    date_joined = models.DateTimeField(
-        auto_now_add=True,
-        verbose_name="Fecha de alta",
-        help_text="Fecha en que el usuario se unió al sistema",
     )
 
     # No usamos el campo "username" de AbstractUser
@@ -63,7 +51,7 @@ class User(AbstractUser):
     USERNAME_FIELD = "email"
     REQUIRED_FIELDS = ["role"]
 
-    objects: CustomUserManager = CustomUserManager()
+    objects = CustomUserManager()
 
     def __str__(self):
         return f"{self.email} ({self.role})"
