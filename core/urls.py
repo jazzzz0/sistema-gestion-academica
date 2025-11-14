@@ -17,8 +17,7 @@ Including another URLconf
 
 from django.contrib import admin
 from django.urls import path, include
-from base.views import HomeView, DashboardView 
-
+from users.views import HomeView, DashboardView
 
 
 urlpatterns = [
