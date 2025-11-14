@@ -70,13 +70,13 @@ class AdminAdmin(admin.ModelAdmin):
         "surname",
         "department",
         "hire_date",
-        "is_active",
+        "user_is_active",
         "user_email",
     )
     
     # Filtros en la barra lateral
     list_filter = (
-        "is_active",
+        "user__is_active",
         "department",
     )
     
@@ -105,7 +105,6 @@ class AdminAdmin(admin.ModelAdmin):
             "fields": (
                 "department",
                 "hire_date",
-                "is_active",
             ),
         }),
         ("Usuario Asociado", {
@@ -125,13 +124,26 @@ class AdminAdmin(admin.ModelAdmin):
         return obj.user.email if obj.user else "-"
     user_email.short_description = "Email"
     user_email.admin_order_field = "user__email"
-    
+
+    # Método para mostrar el estado de activación del usuario
+    def user_is_active(self, obj):
+        """Muestra el estado de activación del usuario asociado."""
+        return obj.user.is_active if obj.user else "-"
+    user_is_active.short_description = "Activo"
+    user_is_active.admin_order_field = "user__is_active"
+    user_is_active.boolean = True  # Muestra un ícono de checkmark/X en lugar de True/False
+
     # Acciones personalizadas
     actions = ["activate_admins", "deactivate_admins"]
     
     def activate_admins(self, request, queryset):
         """Activa los administradores seleccionados."""
-        updated = queryset.update(is_active=True)
+        updated = 0
+        for admin in queryset:
+            if admin.user:
+                admin.user.is_active = True
+                admin.user.save(update_fields=['is_active'])
+                updated += 1
         self.message_user(
             request,
             f"{updated} administrador(es) activado(s) correctamente.",
@@ -140,7 +152,12 @@ class AdminAdmin(admin.ModelAdmin):
     
     def deactivate_admins(self, request, queryset):
         """Desactiva los administradores seleccionados."""
-        updated = queryset.update(is_active=False)
+        updated = 0
+        for admin in queryset:
+            if admin.user:
+                admin.user.is_active = False
+                admin.user.save(update_fields=['is_active'])
+                updated += 1
         self.message_user(
             request,
             f"{updated} administrador(es) desactivado(s) correctamente.",

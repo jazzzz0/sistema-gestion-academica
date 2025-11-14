@@ -24,11 +24,6 @@ class Admin(Person):
         help_text="Fecha de incorporación del administrador",
     )
 
-    is_active = models.BooleanField(
-        default=True,
-        verbose_name="Activo",
-        help_text="Indica si el administrador está activo",
-    )
 
     def clean(self):
         """
@@ -79,7 +74,6 @@ class Admin(Person):
         verbose_name_plural = "Administradores"
         ordering = ["-hire_date"]
         indexes = [
-            models.Index(fields=["is_active"], name="admin_is_active_idx"),
             models.Index(fields=["department"], name="admin_department_idx"),
         ]
         
