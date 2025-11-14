@@ -1,32 +1,32 @@
-{% extends 'base.html' %}
+{% extends "base.html" %}
 
-{% block title %}Panel de Control{% endblock %}
+{% block title %}Dashboard{% endblock %}
 
 {% block content %}
-<div class="container mt-5">
-  <h1 class="fw-bold mb-4">Panel de Control</h1>
+    <div class="container mt-5">
+        <h1 class="fw-bold mb-4">Dashboard</h1>
 
-  {% if user.role == 'ADMIN' %}
-    <div class="alert alert-danger" role="alert">
-      Bienvenido, <strong>Administrador</strong>.
-    </div>
-    <p>Accesos directos:</p>
-    <ul>
-      <li><a href="{% url 'students:list' %}" class="text-decoration-none">Gestión de Alumnos</a></li>
-      <li><a href="{% url 'subjects:list' %}" class="text-decoration-none">Gestión de Materias</a></li>
-    </ul>
+        {% if user.role == 'ADMIN' %}
+            <div class="alert alert-danger" role="alert">
+                Bienvenido, <strong>Administrador</strong>.
+            </div>
+            <p>Accesos directos:</p>
+            <ul>
+                <li><a href="{% url 'students:list' %}" class="text-decoration-none">Gestión de Alumnos</a></li>
+                <li><a href="{% url 'subjects:list' %}" class="text-decoration-none">Gestión de Materias</a></li>
+            </ul>
 
-  {% elif user.role == 'STUDENT' %}
-    <div class="alert alert-primary" role="alert">
-      Bienvenido, <strong>{{ user.first_name }}</strong>.
-    </div>
-    <p>En este panel próximamente podrás consultar tus calificaciones e inscripciones.</p>
+        {% elif user.role == 'STUDENT' %}
+            <div class="alert alert-primary" role="alert">
+                Bienvenido, <strong>{{ user.first_name }}</strong>.
+            </div>
+            <p>En este panel próximamente podrás consultar tus calificaciones e inscripciones.</p>
 
-  {% else %}
-    <div class="alert alert-secondary" role="alert">
-      Bienvenido al sistema.
+        {% else %}
+            <div class="alert alert-secondary" role="alert">
+                Bienvenido al sistema.
+            </div>
+        {% endif %}
     </div>
-  {% endif %}
-</div>
 {% endblock %}
 
