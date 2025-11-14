@@ -3,9 +3,30 @@
 {% block title %}Dashboard{% endblock %}
 
 {% block content %}
-  <div class="text-center mt-5">
-    <h1>Panel principal</h1>
-    <p>Hola, {{ user.first_name }} ({{ user.email }})</p>
-    <p>Tu rol: {{ user.role|default:"Usuario" }}</p>
-  </div>
+    <div class="container mt-5">
+        <h1 class="fw-bold mb-4">Dashboard</h1>
+
+        {% if user.role == 'ADMIN' %}
+            <div class="alert alert-danger" role="alert">
+                Bienvenido, <strong>Administrador</strong>.
+            </div>
+            <p>Accesos directos:</p>
+            <ul>
+                <li><a href="{% url 'students:list' %}" class="text-decoration-none">Gestión de Alumnos</a></li>
+                <li><a href="{% url 'subjects:list' %}" class="text-decoration-none">Gestión de Materias</a></li>
+            </ul>
+
+        {% elif user.role == 'STUDENT' %}
+            <div class="alert alert-primary" role="alert">
+                Bienvenido, <strong>{{ user.first_name }}</strong>.
+            </div>
+            <p>En este panel próximamente podrás consultar tus calificaciones e inscripciones.</p>
+
+        {% else %}
+            <div class="alert alert-secondary" role="alert">
+                Bienvenido al sistema.
+            </div>
+        {% endif %}
+    </div>
 {% endblock %}
+
