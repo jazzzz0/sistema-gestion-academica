@@ -1,4 +1,14 @@
 asgiref==3.9.1
+attrs==25.4.0
+cattrs==25.3.0
 Django==5.2.5
+django-extensions==4.1
+django-schema-graph==3.1.0
+eralchemy==1.6.0
+greenlet==3.2.4
+pydot==4.0.1
+pyparsing==3.2.5
+SQLAlchemy==2.0.44
 sqlparse==0.5.3
+typing_extensions==4.15.0
 tzdata==2025.2
