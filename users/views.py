@@ -13,3 +13,9 @@ class DashboardView(LoginRequiredMixin, TemplateView):
     template_name = "dashboard.html"
     login_url = 'users:login'  # Redirige a login si no está autenticado
     redirect_field_name = 'next'
+
+
+class ProfileView(LoginRequiredMixin, TemplateView):
+    template_name = "profile.html"
+    login_url = 'users:login'  # Redirige a login si no está autenticado
+    redirect_field_name = 'next'
