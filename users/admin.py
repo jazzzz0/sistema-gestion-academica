@@ -3,8 +3,8 @@ from django.contrib.auth.admin import UserAdmin
 from django.contrib.admin.sites import NotRegistered
 from django.forms.widgets import HiddenInput
 
+from users.models import User, Admin
 from subjects.models import Subject
-from users.models import User
 from users.models.teacher import Teacher
 
 
@@ -61,6 +61,113 @@ class CustomUserAdmin(UserAdmin):
         return form
 
 
+@admin.register(Admin)
+class AdminAdmin(admin.ModelAdmin):
+    """
+    Configuración del Django Admin para el modelo Admin.
+    """
+    # Columnas que se muestran en el listado
+    list_display = (
+        "dni",
+        "name",
+        "surname",
+        "department",
+        "hire_date",
+        "user_is_active",
+        "user_email",
+    )
+
+    # Filtros en la barra lateral
+    list_filter = (
+        "user__is_active",
+        "department",
+    )
+
+    # Campos por los que se puede buscar
+    search_fields = (
+        "dni",
+        "name",
+        "surname",
+        "user__email",
+        "department",
+    )
+
+    # Organización de campos en el formulario
+    fieldsets = (
+        ("Información Personal", {
+            "fields": (
+                "dni",
+                "name",
+                "surname",
+                "birth_date",
+                "address",
+                "phone",
+            ),
+        }),
+        ("Información Laboral", {
+            "fields": (
+                "department",
+                "hire_date",
+            ),
+        }),
+        ("Usuario Asociado", {
+            "fields": (
+                "user",
+            ),
+            "description": "Usuario del sistema asociado a este administrador.",
+        }),
+    )
+
+    # Ordenamiento por defecto
+    ordering = ("-hire_date",)
+
+    # Método para mostrar el email del usuario
+    def user_email(self, obj):
+        """Muestra el email del usuario asociado."""
+        return obj.user.email if obj.user else "-"
+    user_email.short_description = "Email"
+    user_email.admin_order_field = "user__email"
+
+    # Método para mostrar el estado de activación del usuario
+    def user_is_active(self, obj):
+        """Muestra el estado de activación del usuario asociado."""
+        return obj.user.is_active if obj.user else "-"
+    user_is_active.short_description = "Activo"
+    user_is_active.admin_order_field = "user__is_active"
+    user_is_active.boolean = True  # Muestra un ícono de checkmark/X en lugar de True/False
+
+    # Acciones personalizadas
+    actions = ["activate_admins", "deactivate_admins"]
+
+    def activate_admins(self, request, queryset):
+        """Activa los administradores seleccionados."""
+        updated = 0
+        for admin in queryset:
+            if admin.user:
+                admin.user.is_active = True
+                admin.user.save(update_fields=['is_active'])
+                updated += 1
+        self.message_user(
+            request,
+            f"{updated} administrador(es) activado(s) correctamente.",
+        )
+    activate_admins.short_description = "Activar administradores seleccionados"
+
+    def deactivate_admins(self, request, queryset):
+        """Desactiva los administradores seleccionados."""
+        updated = 0
+        for admin in queryset:
+            if admin.user:
+                admin.user.is_active = False
+                admin.user.save(update_fields=['is_active'])
+                updated += 1
+        self.message_user(
+            request,
+            f"{updated} administrador(es) desactivado(s) correctamente.",
+        )
+    deactivate_admins.short_description = "Desactivar administradores seleccionados"
+
+
 class SubjectTeacherInline(admin.TabularInline):
     """
     Inline para mostrar las materias asignadas a un profesor.
@@ -100,12 +207,15 @@ class TeacherAdmin(admin.ModelAdmin):
         ("Información Laboral", {
            "fields": ("hire_date",)
         }),
+        ("Usuario Asociado", {
+            "fields": ("user",)
+        }),
     )
 
     readonly_fields = ("user",)
 
     def full_name(self, obj):
-        return f"{obj.user.first_name} {obj.user.last_name}"
+        return f"{obj.name} {obj.surname}"
     full_name.short_description = "Nombre Completo"
 
     def subject_count(self, obj):

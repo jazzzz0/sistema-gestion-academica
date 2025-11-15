@@ -140,6 +140,58 @@ button:hover {
 
 /* ========================================================================== */
 
+/* ========================================================================== */
+/* 6. Estilos del Navbar responsive y mejoras visuales                        */
+/* ========================================================================== */
+
+.navbar {
+  background-color: var(--color-primary);
+  font-family: var(--font-base);
+  padding: 0.5rem 1rem;
+  transition: background-color 0.3s ease-in-out;
+}
+
+.navbar-brand {
+  font-family: var(--font-headings);
+  font-size: 1.5rem;
+  color: #fff !important;
+  letter-spacing: 0.5px;
+}
+
+.navbar-toggler {
+  border: none;
+}
+
+.navbar-toggler:focus {
+  outline: none;
+  box-shadow: none;
+}
+
+.navbar-nav .nav-link {
+  color: #fff !important;
+  font-size: var(--font-size-base);
+  margin-left: 0.5rem;
+  margin-right: 0.5rem;
+  transition: color 0.2s ease-in-out;
+}
+
+.navbar-nav .nav-link:hover {
+  color: var(--color-accent) !important;
+}
+
+/* Ajustes responsive adicionales */
+@media (max-width: 991px) {
+  .navbar-nav {
+    background-color: var(--color-secondary);
+    border-radius: 0 0 8px 8px;
+    padding: 0.5rem;
+  }
+
+  .navbar-nav .nav-link {
+    display: block;
+    margin: 0.25rem 0;
+  }
+}
 
 
 /* Fin del archivo                                                            */

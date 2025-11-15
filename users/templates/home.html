@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+
+{% block title %}Inicio{% endblock %}
+
+{% block content %}
+  <div class="text-center mt-5">
+    <h1>Bienvenido al Sistema de Gestión Académica</h1>
+    <p>Inicia sesión para acceder a tu panel.</p>
+    <a href="{% url 'users:login' %}" class="btn btn-primary mt-3">Iniciar sesión</a>
+  </div>
+{% endblock %}
