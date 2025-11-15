@@ -4,6 +4,8 @@ from django.contrib.admin.sites import NotRegistered
 from django.forms.widgets import HiddenInput
 
 from users.models import User, Admin
+from subjects.models import Subject
+from users.models.teacher import Teacher
 
 
 class CustomUserAdmin(UserAdmin):
@@ -21,7 +23,7 @@ class CustomUserAdmin(UserAdmin):
         (None,
             {"fields": ("email", "password")}),
         ("Estado y Rol",
-            {"fields": ('role', "is_active", 'is_first_login')}),
+            {"fields": ("role", "is_active", "is_first_login")}),
         ("Permisos de Sistema y Grupos",
             {"fields": ("is_staff", "is_superuser", "groups", "user_permissions")}),
         ("Registro de Fechas",
@@ -35,7 +37,7 @@ class CustomUserAdmin(UserAdmin):
             "fields": ("email", "password1", "password2"),
         }),
         ("Estado y Rol",
-            {"fields": ('role', "is_active", 'is_first_login')}),
+            {"fields": ("role", "is_active", "is_first_login")}),
         ("Permisos de Sistema y Grupos",
             {"fields": ("is_staff", "is_superuser", "groups", "user_permissions")}),
     )
@@ -59,6 +61,7 @@ class CustomUserAdmin(UserAdmin):
         return form
 
 
+@admin.register(Admin)
 class AdminAdmin(admin.ModelAdmin):
     """
     Configuración del Django Admin para el modelo Admin.
@@ -73,13 +76,13 @@ class AdminAdmin(admin.ModelAdmin):
         "user_is_active",
         "user_email",
     )
-    
+
     # Filtros en la barra lateral
     list_filter = (
         "user__is_active",
         "department",
     )
-    
+
     # Campos por los que se puede buscar
     search_fields = (
         "dni",
@@ -88,7 +91,7 @@ class AdminAdmin(admin.ModelAdmin):
         "user__email",
         "department",
     )
-    
+
     # Organización de campos en el formulario
     fieldsets = (
         ("Información Personal", {
@@ -114,10 +117,10 @@ class AdminAdmin(admin.ModelAdmin):
             "description": "Usuario del sistema asociado a este administrador.",
         }),
     )
-    
+
     # Ordenamiento por defecto
     ordering = ("-hire_date",)
-    
+
     # Método para mostrar el email del usuario
     def user_email(self, obj):
         """Muestra el email del usuario asociado."""
@@ -135,7 +138,7 @@ class AdminAdmin(admin.ModelAdmin):
 
     # Acciones personalizadas
     actions = ["activate_admins", "deactivate_admins"]
-    
+
     def activate_admins(self, request, queryset):
         """Activa los administradores seleccionados."""
         updated = 0
@@ -149,7 +152,7 @@ class AdminAdmin(admin.ModelAdmin):
             f"{updated} administrador(es) activado(s) correctamente.",
         )
     activate_admins.short_description = "Activar administradores seleccionados"
-    
+
     def deactivate_admins(self, request, queryset):
         """Desactiva los administradores seleccionados."""
         updated = 0
@@ -165,6 +168,66 @@ class AdminAdmin(admin.ModelAdmin):
     deactivate_admins.short_description = "Desactivar administradores seleccionados"
 
 
+class SubjectTeacherInline(admin.TabularInline):
+    """
+    Inline para mostrar las materias asignadas a un profesor.
+    """
+    model = Subject
+    fk_name = "teacher"
+    fields = ("name",)
+    readonly_fields = ("name",)
+    extra = 0
+    # Impedir añadir o eliminar asignaciones
+    can_delete = False
+
+    def has_add_permission(self, request, obj=None):
+        return False
+
+    def has_change_permission(self, request, obj=None):
+        return False
+
+
+@admin.register(Teacher)
+class TeacherAdmin(admin.ModelAdmin):
+    """
+    Configuración del admin para el modelo Teacher.
+    """
+    list_display = ("full_name", "dni", "academic_degree", "subject_count", "hire_date", "is_active")
+    list_filter = ("user__is_active", "academic_degree", "hire_date")
+    search_fields = ("name", "surname", "dni", "user__email")
+    inlines = [SubjectTeacherInline]
+
+    fieldsets = (
+        ("Información Personal", {
+            "fields": ("name", "surname", "dni", "birth_date", "address", "phone")
+        }),
+        ("Información Académica", {
+            "fields": ("academic_degree",)
+        }),
+        ("Información Laboral", {
+           "fields": ("hire_date",)
+        }),
+        ("Usuario Asociado", {
+            "fields": ("user",)
+        }),
+    )
+
+    readonly_fields = ("user",)
+
+    def full_name(self, obj):
+        return f"{obj.name} {obj.surname}"
+    full_name.short_description = "Nombre Completo"
+
+    def subject_count(self, obj):
+        return obj.subjects.count() if obj.user else 0
+    subject_count.short_description = "N° de Materias"
+
+    def is_active(self, obj):
+        return obj.user.is_active if obj.user else False
+    is_active.boolean = True
+    is_active.short_description = "Estado"
+
+
 # Desregistrar la clase UserAdmin por defecto (si existía) y registrar la personalizada
 try:
     admin.site.unregister(User)
@@ -172,4 +235,3 @@ except NotRegistered:
     pass
 
 admin.site.register(User, CustomUserAdmin)
-admin.site.register(Admin, AdminAdmin)
