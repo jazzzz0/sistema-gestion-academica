@@ -12,14 +12,39 @@
             integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXhQfvsIibYQ0J8zr65"
             crossorigin="anonymous">
 
+    <!--CSS local-->
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+
     {% block head %}{% endblock %}
 </head>
+
+
 <body>
-<!-- Barra de navegación -->
-<nav class="navbar navbar-expand-lg navbar-light bg-light px-3 shadow-sm">
+    <!-- Barra de navegación -->
+    <nav class="navbar navbar-expand-lg navbar-dark fixed-top shadow-sm
+    {% if user.is_superuser %}
+          navbar-admin
+        {% elif user.groups.all.0.name == 'Docente' %}
+          navbar-teacher
+        {% else %}
+          navbar-student
+        {% endif %}
+    ">
     <div class="container-fluid">
         <!-- Nombre del proyecto -->
-        <a class="navbar-brand" href="#">Sistema de Gestión Académica - CRUI</a>
+        <a class="navbar-brand fw-bold d-flex align-items-center" href="{% url 'home' %}">
+            SGA
+            {% if user.is_authenticated %}
+                {% if user.is_superuser %}
+                    <span class="role-badge ms-2" style="background-color:#d32f2f;">ADMIN</span>
+                {% elif user.groups.all.0.name == 'Docente' %}
+                    <span class="role-badge ms-2" style="background-color:#1976d2;">DOCENTE</span>
+                {% else %}
+                    <span class="role-badge ms-2" style="background-color:#388e3c;">ESTUDIANTE</span>
+                {% endif %}
+            {% endif %}
+        </a>
 
         <!-- Botón colapsable (móvil) -->
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
@@ -31,7 +56,7 @@
         <div class="collapse navbar-collapse" id="navbarNav">
             <ul class="navbar-nav ms-auto">
                 <li class="nav-item">
-                    <a class="nav-link active" href="#">Inicio</a>
+                    <a class="nav-link active" href="{% url 'home' %}">Inicio</a>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link" href="#">Alumnos</a>
@@ -48,10 +73,13 @@
 
     <div class="ms-auto">
         {% if user.is_authenticated %}
-            <span class="me-3 text-muted">Hola, {{ user.email }}</span>
-            <a href="{% url 'logout' %}" class="btn btn-outline-danger btn-sm">Cerrar sesión</a>
+            <span class="me-3 text-muted">
+                Hola,&nbsp;<strong>{{ user.first_name|default:user.username }}</strong>
+            </span>
+            <a href="{% url 'users:profile' %}" class="btn btn-outline-light btn-sm me-2">Mi Perfil</a>
+            <a href="{% url 'users:logout' %}" class="btn btn-outline-danger btn-sm">Cerrar sesión</a>
         {% else %}
-            <a href="{% url 'login' %}" class="btn btn-outline-primary btn-sm">Iniciar sesión</a>
+            <a href="{% url 'users:login' %}" class="btn btn-outline-primary btn-sm">Iniciar sesión</a>
         {% endif %}
     </div>
 </nav>

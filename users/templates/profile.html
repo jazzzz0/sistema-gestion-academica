@@ -1,0 +1,303 @@
+{% extends "base.html" %}
+
+{% block title %}Mi Perfil{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row">
+        <!-- Columna principal del perfil -->
+        <div class="col-lg-8 mx-auto">
+            <!-- Encabezado del perfil -->
+            <div class="card shadow mb-4">
+                <div class="card-header
+                    {% if user.is_superuser or user.role == 'ADMIN' %}
+                        bg-danger
+                    {% elif user.role == 'TEACHER' %}
+                        bg-primary
+                    {% else %}
+                        bg-success
+                    {% endif %}
+                    text-white">
+                    <h3 class="mb-0">
+                        <i class="bi bi-person-circle"></i> Mi Perfil
+                    </h3>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <!-- Avatar placeholder -->
+                        <div class="col-md-4 text-center mb-3 mb-md-0">
+                            <div class="bg-light rounded-circle d-inline-flex align-items-center justify-content-center"
+                                 style="width: 150px; height: 150px; font-size: 4rem;">
+                                {% if user.is_superuser or user.role == 'ADMIN' %}
+                                    <span style="color: #d32f2f;">👤</span>
+                                {% elif user.role == 'TEACHER' %}
+                                    <span style="color: #1976d2;">👨‍🏫</span>
+                                {% else %}
+                                    <span style="color: #388e3c;">👨‍🎓</span>
+                                {% endif %}
+                            </div>
+                            <div class="mt-3">
+                                <span class="badge
+                                    {% if user.is_superuser or user.role == 'ADMIN' %}
+                                        bg-danger
+                                    {% elif user.role == 'TEACHER' %}
+                                        bg-primary
+                                    {% else %}
+                                        bg-success
+                                    {% endif %}
+                                    fs-6">
+                                    {% if user.is_superuser %}
+                                        ADMINISTRADOR
+                                    {% elif user.role == 'TEACHER' %}
+                                        DOCENTE
+                                    {% elif user.role == 'STUDENT' %}
+                                        ESTUDIANTE
+                                    {% else %}
+                                        {{ user.get_role_display|upper }}
+                                    {% endif %}
+                                </span>
+                            </div>
+                        </div>
+
+                        <!-- Información básica -->
+                        <div class="col-md-8">
+                            <h4 class="mb-3">Información de Usuario</h4>
+
+                            <div class="mb-2">
+                                <strong>Correo electrónico:</strong>
+                                <p class="text-muted mb-1">{{ user.email }}</p>
+                            </div>
+
+                            {% if user.role == 'STUDENT' and user.student_profile %}
+                                <div class="mb-2">
+                                    <strong>Nombre completo:</strong>
+                                    <p class="text-muted mb-1">{{ user.student_profile.name }} {{ user.student_profile.surname }}</p>
+                                </div>
+                                <div class="mb-2">
+                                    <strong>DNI:</strong>
+                                    <p class="text-muted mb-1">{{ user.student_profile.dni }}</p>
+                                </div>
+                            {% elif user.role == 'TEACHER' and user.teacher_profile %}
+                                <div class="mb-2">
+                                    <strong>Nombre completo:</strong>
+                                    <p class="text-muted mb-1">{{ user.teacher_profile.name }} {{ user.teacher_profile.surname }}</p>
+                                </div>
+                                <div class="mb-2">
+                                    <strong>DNI:</strong>
+                                    <p class="text-muted mb-1">{{ user.teacher_profile.dni }}</p>
+                                </div>
+                            {% elif user.role == 'ADMIN' and user.admin_profile %}
+                                <div class="mb-2">
+                                    <strong>Nombre completo:</strong>
+                                    <p class="text-muted mb-1">{{ user.admin_profile.name }} {{ user.admin_profile.surname }}</p>
+                                </div>
+                                <div class="mb-2">
+                                    <strong>DNI:</strong>
+                                    <p class="text-muted mb-1">{{ user.admin_profile.dni }}</p>
+                                </div>
+                            {% endif %}
+
+                            <div class="mb-2">
+                                <strong>Miembro desde:</strong>
+                                <p class="text-muted mb-1">{{ user.date_joined|date:"d/m/Y" }}</p>
+                            </div>
+
+                            <div class="mb-2">
+                                <strong>Último acceso:</strong>
+                                <p class="text-muted mb-1">
+                                    {% if user.last_login %}
+                                        {{ user.last_login|date:"d/m/Y H:i" }}
+                                    {% else %}
+                                        Nunca
+                                    {% endif %}
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Información adicional según el rol -->
+            {% if user.role == 'STUDENT' and user.student_profile %}
+                <div class="card shadow mb-4">
+                    <div class="card-header bg-success text-white">
+                        <h5 class="mb-0">
+                            <i class="bi bi-mortarboard"></i> Información Académica
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <strong>Carrera:</strong>
+                                <p class="text-muted">{{ user.student_profile.career.name }}</p>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <strong>Código de carrera:</strong>
+                                <p class="text-muted">{{ user.student_profile.career.code }}</p>
+                            </div>
+                            {% if user.student_profile.address %}
+                            <div class="col-md-12 mb-3">
+                                <strong>Domicilio:</strong>
+                                <p class="text-muted">{{ user.student_profile.address }}</p>
+                            </div>
+                            {% endif %}
+                            {% if user.student_profile.birth_date %}
+                            <div class="col-md-6 mb-3">
+                                <strong>Fecha de nacimiento:</strong>
+                                <p class="text-muted">{{ user.student_profile.birth_date|date:"d/m/Y" }}</p>
+                            </div>
+                            {% endif %}
+                            {% if user.student_profile.phone %}
+                            <div class="col-md-6 mb-3">
+                                <strong>Teléfono:</strong>
+                                <p class="text-muted">{{ user.student_profile.phone }}</p>
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+
+            {% elif user.role == 'TEACHER' and user.teacher_profile %}
+                <div class="card shadow mb-4">
+                    <div class="card-header bg-primary text-white">
+                        <h5 class="mb-0">
+                            <i class="bi bi-book"></i> Información Docente
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            {% if user.teacher_profile.address %}
+                            <div class="col-md-12 mb-3">
+                                <strong>Domicilio:</strong>
+                                <p class="text-muted">{{ user.teacher_profile.address }}</p>
+                            </div>
+                            {% endif %}
+                            {% if user.teacher_profile.birth_date %}
+                            <div class="col-md-6 mb-3">
+                                <strong>Fecha de nacimiento:</strong>
+                                <p class="text-muted">{{ user.teacher_profile.birth_date|date:"d/m/Y" }}</p>
+                            </div>
+                            {% endif %}
+                            {% if user.teacher_profile.phone %}
+                            <div class="col-md-6 mb-3">
+                                <strong>Teléfono:</strong>
+                                <p class="text-muted">{{ user.teacher_profile.phone }}</p>
+                            </div>
+                            {% endif %}
+                        </div>
+
+                        <!-- Materias que dicta -->
+                        <div class="mt-4">
+                            <h6 class="mb-3"><strong>Materias a Cargo:</strong></h6>
+                            {% if user.teacher_profile.subjects.all %}
+                                <div class="table-responsive">
+                                    <table class="table table-striped table-hover">
+                                        <thead class="table-primary">
+                                            <tr>
+                                                <th>Materia</th>
+                                                <th>Código</th>
+                                                <th>Carrera</th>
+                                                <th>Año</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {% for subject in user.teacher_profile.subjects.all %}
+                                            <tr>
+                                                <td>{{ subject.name }}</td>
+                                                <td>{{ subject.code }}</td>
+                                                <td>{{ subject.career.name }}</td>
+                                                <td>{{ subject.year }}°</td>
+                                            </tr>
+                                            {% endfor %}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            {% else %}
+                                <div class="alert alert-info">
+                                    No tienes materias asignadas actualmente.
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+
+            {% elif user.is_superuser or user.role == 'ADMIN' %}
+                <div class="card shadow mb-4">
+                    <div class="card-header bg-danger text-white">
+                        <h5 class="mb-0">
+                            <i class="bi bi-shield-check"></i> Panel de Administración
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        {% if user.admin_profile %}
+                            <div class="row">
+                                {% if user.admin_profile.address %}
+                                <div class="col-md-12 mb-3">
+                                    <strong>Domicilio:</strong>
+                                    <p class="text-muted">{{ user.admin_profile.address }}</p>
+                                </div>
+                                {% endif %}
+                                {% if user.admin_profile.birth_date %}
+                                <div class="col-md-6 mb-3">
+                                    <strong>Fecha de nacimiento:</strong>
+                                    <p class="text-muted">{{ user.admin_profile.birth_date|date:"d/m/Y" }}</p>
+                                </div>
+                                {% endif %}
+                                {% if user.admin_profile.phone %}
+                                <div class="col-md-6 mb-3">
+                                    <strong>Teléfono:</strong>
+                                    <p class="text-muted">{{ user.admin_profile.phone }}</p>
+                                </div>
+                                {% endif %}
+                            </div>
+                        {% endif %}
+
+                        <div class="mt-4">
+                            <h6 class="mb-3"><strong>Accesos Rápidos:</strong></h6>
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <a href="{% url 'students:list' %}" class="btn btn-outline-danger w-100">
+                                        <i class="bi bi-people"></i> Gestión de Estudiantes
+                                    </a>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <a href="{% url 'subjects:list' %}" class="btn btn-outline-danger w-100">
+                                        <i class="bi bi-journal-text"></i> Gestión de Materias
+                                    </a>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <a href="/admin/" class="btn btn-outline-danger w-100" target="_blank">
+                                        <i class="bi bi-gear"></i> Panel de Administración
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {% endif %}
+
+            <!-- Acciones del perfil -->
+            <div class="card shadow mb-4">
+                <div class="card-header bg-secondary text-white">
+                    <h5 class="mb-0">
+                        <i class="bi bi-gear-fill"></i> Acciones
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="d-grid gap-2">
+                        <a href="#" class="btn btn-outline-primary">
+                            <i class="bi bi-key"></i> Cambiar Contraseña
+                        </a>
+                        <a href="#" class="btn btn-outline-secondary">
+                            <i class="bi bi-pencil"></i> Editar Perfil
+                        </a>
+                        <a href="{% url 'users:dashboard' %}" class="btn btn-outline-info">
+                            <i class="bi bi-house-door"></i> Volver al Dashboard
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

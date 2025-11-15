@@ -17,15 +17,16 @@ Including another URLconf
 
 from django.contrib import admin
 from django.urls import path, include
-from core.views import home  # <-- importar la vista
+from users.views import HomeView, DashboardView
 
 
 urlpatterns = [
-    path('home', home, name='home'),
     path('admin/', admin.site.urls),
     path("users/", include("users.urls")),
     path('students/', include('students.urls')),
     path('careers/', include('careers.urls')),
     path("enrollments/", include("enrollments.urls")),
     path('subjects/', include('subjects.urls')),
+    path("", HomeView.as_view(), name="home"),
+    path("dashboard/", DashboardView.as_view(), name="dashboard"),
 ]
