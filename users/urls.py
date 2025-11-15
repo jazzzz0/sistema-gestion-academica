@@ -1,5 +1,6 @@
 from django.urls import path
 from django.contrib.auth.views import LoginView, LogoutView
+from .views import DashboardView, ProfileView, HomeView
 
 app_name = "users"  # IMPORTANTE para el namespace
 
@@ -16,5 +17,15 @@ urlpatterns = [
         "logout/",
         LogoutView.as_view(),
         name="logout"
+    ),
+    path(
+        "dashboard/",
+        DashboardView.as_view(),
+        name="dashboard"
+    ),
+    path(
+        "profile/",
+        ProfileView.as_view(),
+        name="profile"
     ),
 ]
