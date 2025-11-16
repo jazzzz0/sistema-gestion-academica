@@ -38,8 +38,8 @@ class AdminService:
             Admin: Objeto Admin creado.
         """
         # Validar campos obligatorios
-        required_fields = ['name', 'surname', 'dni', 'email', 'hire_date']
-        missing_fields = [field for field in required_fields if field not in data]
+        required_fields = ['name', 'surname', 'dni', 'email', 'hire_date', 'password']
+        missing_fields = [field for field in required_fields if field not in data or not data[field]]
         if missing_fields:
             raise ValidationError(f"Faltan campos obligatorios: {', '.join(missing_fields)}")
 
