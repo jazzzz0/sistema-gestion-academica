@@ -3,6 +3,7 @@ from django.core.exceptions import ValidationError
 from django.db import models
 from django.utils import timezone
 
+
 class Admin(Person):
     user = models.OneToOneField(
         User,
@@ -23,7 +24,6 @@ class Admin(Person):
         verbose_name="Fecha de incorporación",
         help_text="Fecha de incorporación del administrador",
     )
-
 
     def clean(self):
         """
