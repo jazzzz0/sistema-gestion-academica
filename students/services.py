@@ -32,12 +32,8 @@ class StudentService:
         user = User.objects.create_user(
             email=data["email"],
             role="STUDENT",
-            password=data["dni"],
+            dni=data["dni"],
         )
-
-        # Forzar cambio de contraseña en el primer login
-        user.is_first_login = True
-        user.save(update_fields=["is_first_login"])
 
         # Crear Student (con campos de Person)
         student = Student.objects.create(
