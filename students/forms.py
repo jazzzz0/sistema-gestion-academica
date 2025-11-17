@@ -82,14 +82,17 @@ class StudentCreateForm(forms.Form):
     def save(self):
         """
         Llama al servicio para crear el User y el Student asociado.
-        Maneja los errores del servicio y los convierte en
-        errores de validación de formulario.
+        Si el servicio falla, añade el error al formulario y retorna None.
         """
+        if not self.is_valid():
+            return None
+
         data = self.cleaned_data
         try:
             student = StudentService.create_user_and_student(data)
             return student
-        except ValueError as e:
-            raise forms.ValidationError(str(e))
+
         except Exception as e:
-            raise forms.ValidationError(f'Error al crear Estudiante: {str(e)}')
+            self.add_error(None, f"Error al crear el estudiante: {str(e)}")
+            return None
+        
