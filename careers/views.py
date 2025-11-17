@@ -1,4 +1,7 @@
-from django.shortcuts import render
+from django.contrib.auth.mixins import LoginRequiredMixin
+from django.views.generic import CreateView
 
-def index(request):
-    return render(request, 'careers/template.html')
+
+# TODO: Necesitamos un AdminRequiredMixin para que esta vista solo pueda ser utilizada por los admins
+class CareerCreateView(LoginRequiredMixin, CreateView):
+    pass
