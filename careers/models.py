@@ -15,7 +15,7 @@ class Career(models.Model):
         blank=True,
         null=True,
         verbose_name="Descripción",
-        help_text="Opcional: agrege una breve descripcion de la carrera",
+        help_text="Opcional: agregue una breve descripción de la carrera",
     )
 
     created_at = models.DateTimeField(
