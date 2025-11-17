@@ -1,10 +1,18 @@
 from django.db import models
 from django.db.models.functions import Lower
 
-# Create your models here.
+from users.models.teacher import Teacher
 
 
 class Subject(models.Model):
+    teacher = models.ForeignKey(
+        Teacher,
+        on_delete=models.PROTECT,
+        related_name="subjects",
+        verbose_name="Docente",
+        help_text="Docente encargado de la materia",
+    )
+
     name = models.CharField(
         max_length=100,
         unique=True,
@@ -16,15 +24,7 @@ class Subject(models.Model):
         blank=True,
         null=True,
         verbose_name="Descripción",
-        help_text="Opcional: agrege una breve descripcion de la materia",
-    )
-
-    # Este campo será reemplazado por una relación con el modelo Teacher en el futuro
-    teacher = models.CharField(
-        blank=True,
-        null=True,
-        verbose_name="Profesor",
-        help_text="Opcional: ingrese el nombre del profesor de la materia",
+        help_text="Opcional: agregue una breve descripción de la materia",
     )
 
     quota = models.PositiveIntegerField(
