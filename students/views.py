@@ -10,7 +10,7 @@ from users.mixins import AdminRequiredMixin
 class StudentCreateView(AdminRequiredMixin, FormView):
     form_class = StudentCreateForm
     template_name = 'students/student_form.html'
-    success_url = reverse_lazy('students:student_list')
+    success_url = reverse_lazy('students:student-list')
 
     def form_valid(self, form: StudentCreateForm) -> HttpResponse:
         # El formulario se encarga de validar y guardar el estudiante
