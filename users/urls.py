@@ -1,6 +1,4 @@
 from django.urls import path
-from django.contrib.auth.views import LoginView, LogoutView
-from users.views.teacher import TeacherCreateView
 from users import views
 
 app_name = "users"
@@ -13,7 +11,7 @@ urlpatterns = [
 
     # Vistas de profesores
     # path("teacher/", TeacherListView.as_view(), name="teacher-list"),
-    path("teacher/create/", TeacherCreateView.as_view(), name="teacher-create"),
+    # path("teacher/create/", TeacherCreateView.as_view(), name="teacher-create"),
 
 ]
 
