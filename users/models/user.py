@@ -43,7 +43,9 @@ class User(AbstractUser):
         ),
     )
 
-    # No usamos el campo "username" de AbstractUser
+    # No usamos el campo "username" de AbstractUser.
+    # Los campos first_name y last_name se gestionarán
+    # a través del modelo Persona asociado (name y surname).
     username = None
     first_name = None
     last_name = None
