@@ -1,31 +1,19 @@
 from django.urls import path
 from django.contrib.auth.views import LoginView, LogoutView
-from .views import DashboardView, ProfileView, HomeView
+from users.views.teacher import TeacherCreateView
+from users import views
 
-app_name = "users"  # IMPORTANTE para el namespace
+app_name = "users"
 
 urlpatterns = [
-    path(
-        "login/",
-        LoginView.as_view(
-            template_name="registration/login.html",
-            redirect_authenticated_user=True
-        ),
-        name="login"
-    ),
-    path(
-        "logout/",
-        LogoutView.as_view(),
-        name="logout"
-    ),
-    path(
-        "dashboard/",
-        DashboardView.as_view(),
-        name="dashboard"
-    ),
-    path(
-        "profile/",
-        ProfileView.as_view(),
-        name="profile"
-    ),
+    # Vistas generales a todos los usuarios
+    path("", views.HomeView.as_view(), name="home"),
+    path("dashboard/", views.DashboardView.as_view(), name="dashboard"),
+    path("profile/", views.ProfileView.as_view(), name="profile"),
+
+    # Vistas de profesores
+    # path("teacher/", TeacherListView.as_view(), name="teacher-list"),
+    path("teacher/create/", TeacherCreateView.as_view(), name="teacher-create"),
+
 ]
+
