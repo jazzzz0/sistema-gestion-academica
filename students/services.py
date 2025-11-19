@@ -22,12 +22,6 @@ class StudentService:
         Returns:
             Student: El objeto Student creado.
         """
-        # Validar campos obligatorios
-        required_fields = ["email", "dni", "name", "surname", "career"]
-        missing_fields = [field for field in required_fields if field not in data]
-        if missing_fields:
-            raise ValueError(f"Faltan campos obligatorios: {', '.join(missing_fields)}")
-
         # Crear User con rol STUDENT
         user = User.objects.create_user(
             email=data["email"],
