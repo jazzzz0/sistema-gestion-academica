@@ -29,5 +29,5 @@ urlpatterns = [
     path('subjects/', include('subjects.urls')),
     path("", HomeView.as_view(), name="home"),
     path("dashboard/", DashboardView.as_view(), name="dashboard"),
-    path("", include("django.contrib.auth.urls")), 
+    path("", include("django.contrib.auth.urls")), # <- aquí: registra password_reset y las demás rutas auth
 ]
