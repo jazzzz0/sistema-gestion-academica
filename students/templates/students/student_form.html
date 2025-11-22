@@ -7,6 +7,13 @@
     <div class="col-md-8 col-lg-6">
 
         <h1 class="h4 mb-4 fw-bold">{{ title }}</h1>
+        <p class="text-muted small mb-4">
+            {% if action == "Crear" %}
+             Completa los datos para registrar un nuevo estudiante.
+            {% else %}
+             Modifica los datos del estudiante y guarda los cambios.
+            {% endif %}
+        </p>
 
         {% if form.non_field_errors %}
             <div class="alert alert-danger py-2 mb-4">
