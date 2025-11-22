@@ -8,5 +8,5 @@ urlpatterns = [
     # path('', views.index, name='career-list')
 
     # Creación
-    path('crear/', views.CareerCreateView.as_view(), name='career-create'),
+    path('create/', views.CareerCreateView.as_view(), name='career-create'),
 ]
