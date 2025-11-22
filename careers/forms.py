@@ -11,7 +11,7 @@ class CareerForm(forms.ModelForm):
             "name": forms.TextInput(
                 attrs={
                     "class": "form-control",
-                    "placeholder": "Ej: Tecnicatura en Programación"
+                    "placeholder": "Ej: Ingeniería en Sistemas"
                 }
             ),
             "description": forms.Textarea(

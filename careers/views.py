@@ -15,7 +15,7 @@ class CareerCreateView(AdminRequiredMixin, CreateView):
     model = Career
     form_class = CareerForm
     template_name = "careers/career_form.html"
-    success_url = reverse_lazy("careers:career-list")
+    success_url = reverse_lazy("careers:career_list")
 
     def get_context_data(self, **kwargs):
         """Añade contexto extra para el template."""
@@ -26,8 +26,17 @@ class CareerCreateView(AdminRequiredMixin, CreateView):
 
     def form_valid(self, form):
         response = super().form_valid(form)
+
+        # Forzar is_active = False.
+        # 1. La Carrera se crea sin Materias, por lo tanto, debe estar inactiva.
+        # 2. Se cargan las materias en un formulario independiente. (SGA-101)
+        # 3. La carrera se activa.
+        self.object.is_active = False
+        self.object.save()
+
         messages.success(
             self.request,
-            f"La carrera '{self.object.name}' se ha creado exitosamente."
+            f"Carrera '{self.object.name}' creada en modo Borrador. "
+            f"Recuerde agregar materias y activarla para que sea visible."
         )
         return response
