@@ -69,6 +69,17 @@ class CustomUserManager(DjangoUserManager):
         if not final_password:
             raise ValueError("No se pudo determinar la contraseña final")
 
+        user = self.model(
+            email=email,
+            dni=dni,
+            role=role,
+            **extra_fields
+        )
+
+        user.set_password(final_password)
+        user.save(using=self._db)
+        return user
+
     def create_superuser(
         self,
         username_ignored: str = None,
