@@ -5,8 +5,8 @@ app_name = 'careers'
 
 urlpatterns = [
     # Listado (necesario para el botón Cancelar)
-    # path('', views.index, name='career-list')
+    # path('', views.index, name='career_list'),
 
     # Creación
-    path('create/', views.CareerCreateView.as_view(), name='career-create'),
+    path('create/', views.CareerCreateView.as_view(), name='career_create'),
 ]

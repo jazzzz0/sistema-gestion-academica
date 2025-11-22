@@ -15,7 +15,7 @@ class CareerCreateView(AdminRequiredMixin, CreateView):
     model = Career
     form_class = CareerForm
     template_name = "careers/career_form.html"
-    success_url = reverse_lazy("careers:career-list")
+    success_url = reverse_lazy("careers:career_list")
 
     def get_context_data(self, **kwargs):
         """Añade contexto extra para el template."""

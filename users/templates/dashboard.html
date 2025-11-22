@@ -12,8 +12,8 @@
             </div>
             <p>Accesos directos:</p>
             <ul>
-                <li><a href="{% url 'students:list' %}" class="text-decoration-none">Gestión de Alumnos</a></li>
-                <li><a href="{% url 'subjects:list' %}" class="text-decoration-none">Gestión de Materias</a></li>
+                <li><a href="{% url 'students:student_list' %}" class="text-decoration-none">Gestión de Alumnos</a></li>
+                <li><a href="{% url 'subjects:subject_list' %}" class="text-decoration-none">Gestión de Materias</a></li>
             </ul>
 
         {% elif user.role == 'STUDENT' %}

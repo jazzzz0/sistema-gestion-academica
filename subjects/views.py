@@ -15,7 +15,7 @@ class SubjectCreateView(AdminRequiredMixin, CreateView):
     model = Subject
     form_class = SubjectForm
     template_name = "subjects/subject_form.html"
-    success_url = reverse_lazy("subjects:subject-list")
+    success_url = reverse_lazy("subjects:subject_list")
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
