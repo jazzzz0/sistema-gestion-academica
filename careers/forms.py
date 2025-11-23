@@ -24,9 +24,12 @@ class CareerForm(forms.ModelForm):
         }
 
     def clean_name(self):
-        """Valida que el nombre sea único (case-insensitive idealmente, pero aquí exacto)."""
+        """Valida que el nombre sea único (case-insensitive)."""
         name = self.cleaned_data.get("name")
+
         # Excluimos la propia instancia si estamos editando (para el futuro UpdateView)
-        if name and Career.objects.filter(name=name).exclude(pk=self.instance.pk).exists():
-            raise forms.ValidationError("Ya existe una carrera con ese nombre.")
+        if name:
+            if Career.objects.filter(name__iexact=name).exclude(pk=self.instance.pk).exists():
+                raise forms.ValidationError("Ya existe una carrera con ese nombre.")
+
         return name
