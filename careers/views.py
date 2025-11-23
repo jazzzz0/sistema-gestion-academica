@@ -1,4 +1,5 @@
 from django.contrib import messages
+from django.shortcuts import redirect
 from django.urls import reverse_lazy
 from django.views.generic import CreateView
 
@@ -25,9 +26,18 @@ class CareerCreateView(AdminRequiredMixin, CreateView):
         return context
 
     def form_valid(self, form):
-        response = super().form_valid(form)
+        self.object = form.save(commit=False)
+
+        # Forzar is_active = False.
+        # 1. La Carrera se crea sin Materias, por lo tanto, debe estar inactiva.
+        # 2. Se cargan las materias en un formulario independiente. (SGA-101)
+        # 3. La carrera se activa.
+        self.object.is_active = False
+        self.object.save()
+
         messages.success(
             self.request,
-            f"La carrera '{self.object.name}' se ha creado exitosamente."
+            f"Carrera '{self.object.name}' creada en modo Borrador. "
+            f"Recuerde agregar materias y activarla para que sea visible."
         )
-        return response
+        return redirect(self.get_success_url())
