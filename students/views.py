@@ -9,10 +9,11 @@ from .models import Student
 from users.mixins import AdminRequiredMixin
 
 
+
 class StudentCreateView(AdminRequiredMixin, FormView):
     form_class = StudentForm
     template_name = 'students/student_form.html'
-    success_url = reverse_lazy('students:student-list')
+    success_url = reverse_lazy('students:student_list')
 
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
