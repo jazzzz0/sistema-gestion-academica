@@ -1,6 +1,7 @@
 from django.db import transaction
 from django.contrib.auth import get_user_model
-
+from django.core.exceptions import ValidationError
+from users.models import User
 from .models import Student
 
 User = get_user_model()
@@ -40,5 +41,39 @@ class StudentService:
             birth_date=data.get("birth_date"),
             phone=data.get("phone"),
         )
+    @staticmethod
+    @transaction.atomic
+    def update_student_and_user(student: Student, *, email, dni, name, surname, career, address=None, birth_date=None, phone=None):
+        """
+        Actualiza de manera atómica los datos del Student y su User asociado.
+        """
+
+        user = student.user
+
+        # --- Validaciones de unicidad ---
+        # Email
+        if User.objects.exclude(id=user.id).filter(email=email).exists():
+            raise ValidationError({"email": "Ya existe un usuario con este email."})
+
+        # DNI
+        if Student.objects.exclude(id=student.id).filter(dni=dni).exists():
+            raise ValidationError({"dni": "Ya existe otro estudiante con este DNI."})
+
+        # --- Actualizar datos del STUDENT ---
+        student.dni = dni
+        student.name = name
+        student.surname = surname
+        student.career = career
+        student.address = address
+        student.birth_date = birth_date
+        student.phone = phone
+        student.full_clean()
+        student.save()
+
+        # --- Actualizar datos del USER ---
+        user.email = email
+        user.full_clean()
+        user.save()
+
 
         return student

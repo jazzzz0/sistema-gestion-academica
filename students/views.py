@@ -1,36 +1,60 @@
 from django.contrib import messages
 from django.http import HttpResponseRedirect, HttpResponse
 from django.urls import reverse_lazy
+from django.shortcuts import render, get_object_or_404, redirect
 from django.views.generic import FormView, ListView
 
-from students.forms import StudentCreateForm
+from .forms import StudentForm
+from .models import Student
 from users.mixins import AdminRequiredMixin
 
-from students.models import Student
 
 
 class StudentCreateView(AdminRequiredMixin, FormView):
-    form_class = StudentCreateForm
+    form_class = StudentForm
     template_name = 'students/student_form.html'
     success_url = reverse_lazy('students:student_list')
 
-    def form_valid(self, form: StudentCreateForm) -> HttpResponse:
-        # El formulario se encarga de validar y guardar el estudiante
-        student = form.save()
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs["student"] = None
+        return kwargs
 
-        if student:
-            messages.success(self.request, f'Estudiante {student.full_name} creado correctamente.')
-            return HttpResponseRedirect(self.get_success_url())
-        else:
-            # El guardado falló
-            # El formulario ya tiene el error
-            # Simplemente volvemos a mostrar el formulario
-            return self.form_invalid(form)
+    def form_valid(self, form):
+        student = form.save()
+        messages.success(self.request, f"Estudiante {student.full_name} creado correctamente.")
+        return HttpResponseRedirect(self.get_success_url())
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['title'] = 'Crear Estudiante'
-        context['action'] = 'Crear'
+        context["title"] = "Crear Estudiante"
+        context["action"] = "Crear"
+        return context
+
+
+class StudentUpdateView(AdminRequiredMixin, FormView):
+    form_class = StudentForm
+    template_name = "students/student_form.html"
+    success_url = reverse_lazy("students:student-list")
+
+    def dispatch(self, request, *args, **kwargs):
+        self.student = get_object_or_404(Student, pk=kwargs["pk"])
+        return super().dispatch(request, *args, **kwargs)
+
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs["student"] = self.student
+        return kwargs
+
+    def form_valid(self, form):
+        student = form.save()
+        messages.success(self.request, f"Estudiante {student.full_name} actualizado correctamente.")
+        return redirect(self.get_success_url())
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["title"] = "Editar Estudiante"
+        context["action"] = "Guardar Cambios"
         return context
 
 
@@ -49,3 +73,4 @@ class StudentListView(AdminRequiredMixin, ListView):
         context = super().get_context_data(**kwargs)
         context['title'] = 'Listado de Alumnos'
         return context
+
