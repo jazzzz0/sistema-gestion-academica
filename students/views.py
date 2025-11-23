@@ -1,13 +1,14 @@
 from django.contrib import messages
+from django.core.exceptions import ValidationError
 from django.http import HttpResponseRedirect, HttpResponse
 from django.urls import reverse_lazy
 from django.shortcuts import render, get_object_or_404, redirect
-from django.views.generic import FormView, ListView
+from django.views.generic import FormView, ListView, UpdateView
 
-from .forms import StudentForm
+from .forms import StudentForm, StudentCareerForm
 from .models import Student
 from users.mixins import AdminRequiredMixin
-
+from .services import StudentService
 
 
 class StudentCreateView(AdminRequiredMixin, FormView):
@@ -35,7 +36,7 @@ class StudentCreateView(AdminRequiredMixin, FormView):
 class StudentUpdateView(AdminRequiredMixin, FormView):
     form_class = StudentForm
     template_name = "students/student_form.html"
-    success_url = reverse_lazy("students:student-list")
+    success_url = reverse_lazy("students:student_list")
 
     def dispatch(self, request, *args, **kwargs):
         self.student = get_object_or_404(Student, pk=kwargs["pk"])
@@ -43,19 +44,67 @@ class StudentUpdateView(AdminRequiredMixin, FormView):
 
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
-        kwargs["student"] = self.student
+        kwargs["instance"] = self.student
         return kwargs
 
     def form_valid(self, form):
-        student = form.save()
-        messages.success(self.request, f"Estudiante {student.full_name} actualizado correctamente.")
-        return redirect(self.get_success_url())
+        # OJO: No llamamos a form.save() aquí.
+        # Extraemos los datos limpios del formulario (cleaned_data)
+        data = form.cleaned_data
+
+        try:
+            # Delegamos la lógica "pesada" al servicio
+            StudentService.update_student_and_user(
+                student=self.student,
+                email=data.get('email'),
+                dni=data.get('dni'),
+                name=data.get('name'),
+                surname=data.get('surname'),
+                career=data.get('career'),
+                address=data.get('address'),
+                birth_date=data.get('birth_date'),
+                phone=data.get('phone')
+            )
+            messages.success(self.request, f"Estudiante {self.student.get_full_name()} actualizado correctamente.")
+            return redirect(self.get_success_url())
+
+        except ValidationError as e:
+            # Si el servicio lanza un error de validación (ej. email duplicado)
+            # lo agregamos al formulario y volvemos a renderizar
+            form.add_error(None, e)
+            return self.form_invalid(form)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["title"] = "Editar Estudiante"
         context["action"] = "Guardar Cambios"
         return context
+
+
+class StudentCareerUpdateView(AdminRequiredMixin, UpdateView):
+    model = Student
+    form_class = StudentCareerForm
+    template_name = "students/student_career_form.html"
+
+    def get_success_url(self):
+        return reverse_lazy("students:student_detail", kwargs={"pk": self.object.pk})
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+
+        # Verificar si el estudiante tiene inscripciones activas
+        context["has_enrollments"] = self.object.enrollments.exists()
+        context["title"] = f"Actualizar Carrera del Estudiante {self.object.full_name}"
+
+        return context
+
+    def form_valid(self, form):
+        response = super().form_valid(form)
+        messages.success(
+            self.request,
+            f"Carrera actualizada correctamente para {self.object.full_name}."
+        )
+        return response
 
 
 class StudentListView(AdminRequiredMixin, ListView):

@@ -1,0 +1,129 @@
+{% extends "base.html" %}
+
+{% block title %}Gestionar Carrera - {{ object.surname }}, {{ object.name }}{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center mt-4">
+    <div class="col-md-8 col-lg-6">
+
+        <h1 class="h4 mb-4 fw-bold">Gestionar Carrera - {{ object.surname }}, {{ object.name }}</h1>
+
+        <!-- Advertencia si tiene inscripciones -->
+        {% if has_enrollments %}
+            <div class="alert alert-warning alert-dismissible fade show" role="alert">
+                <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                <strong>Advertencia:</strong> Este estudiante tiene inscripciones registradas.
+                Cambiar la carrera podría dejar inconsistente su historial académico
+                (materias aprobadas que no pertenecen a la nueva carrera).
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        {% endif %}
+
+        <!-- Card Informativa - Carrera Actual -->
+        <div class="card mb-4 shadow-sm border-info">
+            <div class="card-header bg-info bg-opacity-10">
+                <h2 class="h6 fw-bold mb-0 text-info">
+                    <i class="bi bi-mortarboard me-2"></i>Carrera Actual
+                </h2>
+            </div>
+            <div class="card-body">
+                {% if object.career %}
+                    <p class="mb-0">
+                        <strong class="text-primary">{{ object.career.name }}</strong>
+                        {% if object.career.description %}
+                            <br><small class="text-muted">{{ object.career.description }}</small>
+                        {% endif %}
+                    </p>
+                {% else %}
+                    <p class="mb-0 text-muted fst-italic">
+                        <i class="bi bi-dash-circle me-2"></i>Sin Asignar
+                    </p>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Formulario de Cambio de Carrera -->
+        <form method="post" novalidate id="careerForm">
+            {% csrf_token %}
+
+            <div class="card mb-4 shadow-sm">
+                <div class="card-header bg-light">
+                    <h2 class="h6 fw-bold mb-0 text-primary">
+                        <i class="bi bi-pencil-square me-2"></i>Cambiar Carrera
+                    </h2>
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <label for="{{ form.career.id_for_label }}" class="form-label fw-semibold">
+                            {{ form.career.label }}
+                        </label>
+                        {{ form.career }}
+                        {% if form.career.help_text %}
+                            <div class="form-text">{{ form.career.help_text }}</div>
+                        {% endif %}
+                        {% for error in form.career.errors %}
+                            <div class="invalid-feedback d-block">{{ error }}</div>
+                        {% endfor %}
+
+                        <!-- Mensajes de ayuda dinámicos -->
+                        <div id="helpTextChange" class="alert alert-warning mt-3 d-none">
+                            <i class="bi bi-exclamation-triangle me-2"></i>
+                            <strong>⚠️ Atención:</strong> Al cambiar la carrera, verifique las inscripciones vigentes del alumno.
+                        </div>
+
+                        <div id="helpTextUnassign" class="alert alert-info mt-3 d-none">
+                            <i class="bi bi-info-circle me-2"></i>
+                            El alumno quedará registrado sin carrera activa.
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Botones de Acción -->
+            <div class="d-flex justify-content-between align-items-center">
+                <a href="{% url 'students:student_detail' object.pk %}" class="btn btn-secondary">
+                    <i class="bi bi-x-circle me-2"></i>Cancelar
+                </a>
+                <button type="submit" class="btn btn-primary">
+                    <i class="bi bi-check-circle me-2"></i>Guardar Cambios
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const careerSelect = document.getElementById('{{ form.career.id_for_label }}');
+        const helpTextChange = document.getElementById('helpTextChange');
+        const helpTextUnassign = document.getElementById('helpTextUnassign');
+        const currentCareer = "{{ object.career.id|default:'' }}";
+
+        function updateHelpText() {
+            const selectedValue = careerSelect.value;
+
+            // Ocultar ambos mensajes primero
+            helpTextChange.classList.add('d-none');
+            helpTextUnassign.classList.add('d-none');
+
+            if (selectedValue === '') {
+                // Caso: Desasignación (A → Null)
+                if (currentCareer !== '') {
+                    helpTextUnassign.classList.remove('d-none');
+                }
+            } else if (currentCareer !== '' && selectedValue !== currentCareer) {
+                // Caso: Cambio (A → B)
+                helpTextChange.classList.remove('d-none');
+            }
+        }
+
+        // Ejecutar al cargar y al cambiar
+        updateHelpText();
+        careerSelect.addEventListener('change', updateHelpText);
+    });
+</script>
+{% endblock %}
+

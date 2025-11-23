@@ -36,11 +36,6 @@ class StudentForm(forms.Form):
         max_length=100,
         widget=forms.TextInput(attrs={'class': 'form-control'})
     )
-    career = forms.ModelChoiceField(
-        queryset=Career.objects.all(),
-        label="Carrera",
-        widget=forms.Select(attrs={'class': 'form-select'})
-    )
     address = forms.CharField(
         label="Domicilio",
         max_length=200,
@@ -74,7 +69,6 @@ class StudentForm(forms.Form):
             self.initial["dni"] = student.dni
             self.initial["name"] = student.name
             self.initial["surname"] = student.surname
-            self.initial["career"] = student.career
             self.initial["address"] = student.address
             self.initial["birth_date"] = student.birth_date
             self.initial["phone"] = student.phone
@@ -120,7 +114,7 @@ class StudentForm(forms.Form):
                 dni=data["dni"],
                 name=data["name"],
                 surname=data["surname"],
-                career=data["career"],
+                career=self.student.career,  # Mantenemos la carrera, hay un formulario separado
                 address=data.get("address"),
                 birth_date=data.get("birth_date"),
                 phone=data.get("phone"),
@@ -128,3 +122,17 @@ class StudentForm(forms.Form):
         else:
             # --- Modo creación ---
             return StudentService.create_user_and_student(data)
+
+
+class StudentCareerForm(forms.ModelForm):
+    career = forms.ModelChoiceField(
+        queryset=Career.objects.all(),
+        label="Carrera",
+        required=False,
+        empty_label="----------",
+        widget=forms.Select(attrs={'class': 'form-select'})
+    )
+
+    class Meta:
+        model = Student
+        fields = ['career']
