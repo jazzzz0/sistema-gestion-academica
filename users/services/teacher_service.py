@@ -11,13 +11,20 @@ class TeacherService:
 
     @staticmethod
     @transaction.atomic
-    def create_teacher_user(data: dict) -> Teacher:
+    def create_teacher(data: dict) -> Teacher:
         """
         Crea un User (con rol Teacher) y un Teacher (Person)
         en una transacción atómica.
 
         La contraseña inicial será el DNI.
         """
+        # VALIDACIÓN PREVIA (DEBE AGREGARSE)
+        if not TeacherService.validate_email_unique(data["email"]):
+            raise ValueError("El email ya está registrado en el sistema.")
+
+        if not TeacherService.validate_dni_unique(data["dni"]):
+            raise ValueError("El DNI ya está registrado en el sistema.")
+
         # Crear User
         user = User.objects.create_user(
             email=data["email"],

@@ -1,5 +1,6 @@
 from django import forms
 from django.contrib.auth import get_user_model
+from django.utils import timezone
 
 from users.models.teacher import Teacher
 from users.services.teacher_service import TeacherService
@@ -81,23 +82,40 @@ class TeacherCreateForm(forms.Form):
         help_text="Número de teléfono del profesor."
     )
 
-    def clean_dni(self):
-        """
-        Valida que el DNI sea numérico y tenga entre 7 y 8 dígitos.
-        """
-        dni = self.cleaned_data["dni"]
-        if not dni.isdigit() or not (7 <= len(dni) <= 8):
-            raise forms.ValidationError("DNI inválido. Debe tener 7 u 8 dígitos numéricos.")
-        return dni
-
     def clean_email(self):
         """
         Valida que el email no esté ya registrado.
         """
         email = self.cleaned_data["email"]
+
         if User.objects.filter(email=email).exists():
             raise forms.ValidationError("El correo electrónico ya está registrado.")
+
         return email
+
+    def clean_dni(self):
+        """
+        Valida que el DNI sea numérico y tenga entre 7 y 8 dígitos.
+        Valida que el DNI no esté ya registrado.
+        """
+        dni = self.cleaned_data["dni"]
+
+        if not dni.isdigit() or not (7 <= len(dni) <= 8):
+            raise forms.ValidationError("DNI inválido. Debe tener 7 u 8 dígitos numéricos.")
+
+        if User.objects.filter(dni=dni).exists():
+            raise forms.ValidationError("El DNI ya está registrado.")
+
+        return dni
+
+    def clean_hire_date(self):
+        """
+        Valida que la fecha de contratación no sea futura.
+        """
+        hire_date = self.cleaned_data["hire_date"]
+        if hire_date > timezone.now().date():
+            raise forms.ValidationError("La fecha de contratación no puede ser futura.")
+        return hire_date
 
     def save(self):
         if not self.is_valid():
@@ -105,7 +123,7 @@ class TeacherCreateForm(forms.Form):
 
         data = self.cleaned_data
         try:
-            teacher = TeacherService.create_teacher_user(data)
+            teacher = TeacherService.create_teacher(data)
             return teacher
 
         except Exception as e:
