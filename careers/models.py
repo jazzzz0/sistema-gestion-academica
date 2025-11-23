@@ -2,7 +2,6 @@ from django.core.exceptions import ValidationError
 from django.db import models
 
 
-# Create your models here.
 class Career(models.Model):
     name = models.CharField(
         max_length=100,
@@ -15,7 +14,7 @@ class Career(models.Model):
         blank=True,
         null=True,
         verbose_name="Descripción",
-        help_text="Opcional: agrege una breve descripcion de la carrera",
+        help_text="Opcional: agregue una breve descripción de la carrera",
     )
 
     created_at = models.DateTimeField(
