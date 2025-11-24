@@ -75,6 +75,7 @@ class CustomUserManager(DjangoUserManager):
             role=role,
             **extra_fields
         )
+
         user.set_password(final_password)
         user.save(using=self._db)
         return user
@@ -84,7 +85,6 @@ class CustomUserManager(DjangoUserManager):
         username_ignored: str = None,
         email: str = None,
         password: Optional[str] = None,
-        role: str = None,
         **extra_fields
     ) -> "User":
         """
