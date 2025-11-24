@@ -76,10 +76,10 @@
             <span class="me-3 text-muted">
                 Hola,&nbsp;<strong>{{ user.first_name|default:user.username }}</strong>
             </span>
-            <a href="{% url 'users:profile' %}" class="btn btn-outline-light btn-sm me-2">Mi Perfil</a>
-            <a href="{% url 'users:logout' %}" class="btn btn-outline-danger btn-sm">Cerrar sesión</a>
+            <a href="{% url 'profile' %}" class="btn btn-outline-light btn-sm me-2">Mi Perfil</a>
+            <a href="{% url 'logout' %}" class="btn btn-outline-danger btn-sm">Cerrar sesión</a>
         {% else %}
-            <a href="{% url 'users:login' %}" class="btn btn-outline-primary btn-sm">Iniciar sesión</a>
+            <a href="{% url 'login' %}" class="btn btn-outline-primary btn-sm">Iniciar sesión</a>
         {% endif %}
     </div>
 </nav>
