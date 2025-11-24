@@ -21,6 +21,7 @@ class Enrollment(models.Model):
         ("aprobada", "Aprobada"),
         ("reprobada", "Reprobada"),
         ("ausente", "Ausente"),
+        ("baja", "Baja")
     ]
 
     student = models.ForeignKey(

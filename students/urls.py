@@ -1,6 +1,7 @@
 from django.urls import path
 from . import views
-from .views import StudentCreateView, StudentUpdateView
+from .views import StudentCreateView, StudentUpdateView, StudentListView
+
 app_name = 'students'
 
 urlpatterns = [
