@@ -3,7 +3,7 @@ from django.http import HttpResponseRedirect, HttpResponse
 from django.urls import reverse_lazy
 from django.views.generic import FormView
 from django.shortcuts import render, get_object_or_404, redirect
-from students.forms import StudentCreateForm
+
 from users.mixins import AdminRequiredMixin
 from .models import Student
 from .forms import StudentForm
@@ -47,7 +47,10 @@ class StudentUpdateView(AdminRequiredMixin, FormView):
     def form_valid(self, form):
         student = form.save()
         messages.success(self.request, f"Estudiante {student.full_name} actualizado correctamente.")
-        return redirect(self.get_success_url())
+        # cuando este la vista de detalle habilitada, cambiar la redireccion
+        # return redirect("students:student-detail", pk=student.pk)
+        # por ahora redirigir a la lista
+        return redirect(self.success_url)
 
     def get_context_data(self, **kwargs):
         ctx = super().get_context_data(**kwargs)
