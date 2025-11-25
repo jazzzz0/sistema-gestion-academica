@@ -135,4 +135,9 @@ class ActiveToggleForm(forms.Form):
     Formulario mínimo para activar/desactivar la cuenta del estudiante.
     No tiene campos, solo valida que el POST sea legítimo.
     """
-    confirm = forms.BooleanField(required=True, label="Confirmar acción")
+    is_active = forms.BooleanField(
+        required=True,
+        initial=True,
+        widget=forms.HiddenInput()
+    )
+    
