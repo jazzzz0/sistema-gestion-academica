@@ -1,5 +1,4 @@
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.http import HttpResponse
 from django.views.generic import TemplateView
 
 
@@ -11,11 +10,11 @@ class HomeView(TemplateView):
 # Vista Dashboard (para usuarios autenticados)
 class DashboardView(LoginRequiredMixin, TemplateView):
     template_name = "dashboard.html"
-    login_url = 'users:login'  # Redirige a login si no está autenticado
+    login_url = '/login/'  # Redirige a login si no está autenticado
     redirect_field_name = 'next'
 
 
 class ProfileView(LoginRequiredMixin, TemplateView):
     template_name = "profile.html"
-    login_url = 'users:login'  # Redirige a login si no está autenticado
+    login_url = '/login/'  # Redirige a login si no está autenticado
     redirect_field_name = 'next'
