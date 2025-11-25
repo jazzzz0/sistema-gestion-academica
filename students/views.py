@@ -1,17 +1,19 @@
 from django.contrib import messages
-from django.http import HttpResponseRedirect, HttpResponse
+from django.http import HttpResponseRedirect
 from django.urls import reverse_lazy
-from django.views.generic import FormView
-from django.shortcuts import render, get_object_or_404, redirect
+from django.shortcuts import get_object_or_404, redirect
+from django.views.generic import FormView, ListView
+from django.db.models import Q
 
 from users.mixins import AdminRequiredMixin
 from .models import Student
 from .forms import StudentForm
 
+
 class StudentCreateView(AdminRequiredMixin, FormView):
     form_class = StudentForm
     template_name = 'students/student_form.html'
-    success_url = reverse_lazy('students:student-list')
+    success_url = reverse_lazy('students:student_list')
 
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
@@ -24,16 +26,16 @@ class StudentCreateView(AdminRequiredMixin, FormView):
         return HttpResponseRedirect(self.get_success_url())
 
     def get_context_data(self, **kwargs):
-        ctx = super().get_context_data(**kwargs)
-        ctx["title"] = "Crear Estudiante"
-        ctx["action"] = "Crear"
-        return ctx
+        context = super().get_context_data(**kwargs)
+        context["title"] = "Crear Estudiante"
+        context["action"] = "Crear"
+        return context
 
 
 class StudentUpdateView(AdminRequiredMixin, FormView):
     form_class = StudentForm
     template_name = "students/student_form.html"
-    success_url = reverse_lazy("students:student-list")
+    success_url = reverse_lazy("students:student_list")
 
     def dispatch(self, request, *args, **kwargs):
         self.student = get_object_or_404(Student, pk=kwargs["pk"])
@@ -50,10 +52,41 @@ class StudentUpdateView(AdminRequiredMixin, FormView):
         # cuando este la vista de detalle habilitada, cambiar la redireccion
         # return redirect("students:student-detail", pk=student.pk)
         # por ahora redirigir a la lista
-        return redirect(self.success_url)
+        return redirect(self.get_success_url)
 
     def get_context_data(self, **kwargs):
-        ctx = super().get_context_data(**kwargs)
-        ctx["title"] = "Editar Estudiante"
-        ctx["action"] = "Guardar Cambios"
-        return ctx
+        context = super().get_context_data(**kwargs)
+        context["title"] = "Editar Estudiante"
+        context["action"] = "Guardar Cambios"
+        return context
+
+
+class StudentListView(AdminRequiredMixin, ListView):
+    model = Student
+    template_name = 'students/student_list.html'
+    context_object_name = 'students'
+    paginate_by = 20  # Requisito de paginación por defecto
+
+    def get_queryset(self):
+        # Optimizamos la consulta trayendo los datos del usuario relacionado
+        # y ordenamos por apellido/nombre para una visualización consistente
+        queryset = Student.objects.select_related('user').all().order_by('surname', 'name')
+
+        # Capturar el parámetro de búsqueda desde GET
+        search_query = self.request.GET.get('search', '').strip()
+
+        if search_query:
+            # Filtrar por nombre, apellido o email (case-insensitive)
+            queryset = queryset.filter(
+                Q(name__icontains=search_query) |
+                Q(surname__icontains=search_query) |
+                Q(user__email__icontains=search_query)
+            )
+
+        return queryset
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['title'] = 'Listado de Alumnos'
+        context['search_query'] = self.request.GET.get('search', '')
+        return context
