@@ -21,6 +21,7 @@ class Enrollment(models.Model):
         ("aprobada", "Aprobada"),
         ("reprobada", "Reprobada"),
         ("ausente", "Ausente"),
+        ("baja", "Baja"),
     ]
 
     student = models.ForeignKey(
@@ -83,7 +84,7 @@ class Enrollment(models.Model):
 
     def clean(self):
         # Validación extra de seguridad (la vista ya filtra materias válidas)
-        if self.subject not in self.student.career.subjects.all():
+        if not self.student.career.subjects.filter(pk=self.subject_id).exists():
             raise ValidationError(
                 "La materia no pertenece a la carrera del estudiante."
             )
