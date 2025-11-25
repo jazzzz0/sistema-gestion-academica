@@ -1,10 +1,10 @@
 from django.contrib import messages
 from django.shortcuts import redirect
-from django.urls import reverse_lazy
-from django.views.generic import CreateView
+from django.urls import reverse_lazy, reverse
+from django.views.generic import CreateView, UpdateView
 
 from users.mixins import AdminRequiredMixin
-from .forms import CareerForm
+from .forms import CareerForm, CareerSubjectsForm
 from .models import Career
 
 
@@ -41,3 +41,18 @@ class CareerCreateView(AdminRequiredMixin, CreateView):
             f"Recuerde agregar materias y activarla para que sea visible."
         )
         return redirect(self.get_success_url())
+
+class CareerSubjectsUpdateView(AdminRequiredMixin, UpdateView):
+    """
+    Vista para asignar materias a una carrera. 
+    Solo accesible por administradores.
+    """
+    
+    model = Career
+    form_class = CareerSubjectsForm
+    template_name = "careers/career_subjects_form.html"
+    context_object_name = "career"
+    # No modificar name/description/is_active porque el form incluye solo 'subjects'
+
+    def get_success_url(self):
+        return reverse("career_detail", kwargs={"pk": self.object.pk})

@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}Gestionar Materias - {{ career.name }}{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+  <h1 class="mb-3">Gestionar Materias - {{ career.name }}</h1>
+
+  <form method="post" novalidate>
+    {% csrf_token %}
+    {{ form.non_field_errors }}
+    <div class="mb-2 text-muted">{{ form.subjects.help_text }}</div>
+
+    <div class="card">
+      <div class="card-body" style="max-height: 400px; overflow-y: auto;">
+        <div class="row">
+          {% for checkbox in form.subjects %}
+            <div class="col-12 col-md-6 col-lg-4 mb-2">
+              <div class="form-check">
+                {{ checkbox.tag }}
+                <label class="form-check-label" for="{{ checkbox.id_for_label }}">
+                  {{ checkbox.choice_label }}
+                </label>
+              </div>
+            </div>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+
+    <div class="mt-3 d-flex gap-2">
+      <button type="submit" class="btn btn-primary">Guardar Plan de Estudios</button>
+      <a href="{% url 'career_detail' career.pk %}" class="btn btn-secondary">Cancelar</a>
+    </div>
+  </form>
+</div>
+{% endblock %}
