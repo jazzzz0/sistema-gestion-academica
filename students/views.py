@@ -93,8 +93,9 @@ class StudentListView(AdminRequiredMixin, ListView):
 class StudentDetailView(AdminRequiredMixin, DetailView):
         model = Student
         template_name = "students/student_detail.html"
+        context_object_name = 'student'
 
-    def get_queryset(self):
+        def get_queryset(self):
         # Optimización para evitar N+1
-        return Student.objects.select_related("user", "career")
+            return Student.objects.select_related("user", "career")
 
