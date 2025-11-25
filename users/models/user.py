@@ -51,7 +51,7 @@ class User(AbstractUser):
     last_name = None
 
     USERNAME_FIELD = "email"
-    REQUIRED_FIELDS = ["role"]
+    REQUIRED_FIELDS = []  # No requerimos role al crear superusuario, siempre será ADMIN
 
     objects = CustomUserManager()
 
