@@ -17,11 +17,26 @@ Including another URLconf
 
 from django.contrib import admin
 from django.urls import path, include
+from users.views import HomeView, DashboardView, ProfileView
+
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+
+    # Páginas principales
+    path("", HomeView.as_view(), name="home"),  # Página de inicio en /
+    path("dashboard/", DashboardView.as_view(), name="dashboard"),  # Dashboard post-login
+    path("profile/", ProfileView.as_view(), name="profile"),  # Perfil de usuario
+
+    # Autenticación de Django (login, logout, password_reset, etc.)
+    path("", include("django.contrib.auth.urls")),
+
+    # URLs de gestión de profesores
     path("users/", include("users.urls")),
+
+    # URLs de otras apps
     path('students/', include('students.urls')),
     path('careers/', include('careers.urls')),
     path("enrollments/", include("enrollments.urls")),
+    path('subjects/', include('subjects.urls')),
 ]
