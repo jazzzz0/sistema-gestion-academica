@@ -1,0 +1,100 @@
+{% extends 'base.html' %}
+
+{% load static %}
+
+{% block title %}{{ title }}{% endblock %} 
+
+{% block content %}
+<div class="container my-5">
+  <div class="row justify-content-center">
+    <div class="col-12 col-md-8">
+
+      <!-- Card principal -->
+      <div class="card shadow-sm">
+        <div class="card-header bg-white">
+          <h2 class="h5 mb-0"> {{ title }} </h2>
+        </div>
+
+        <div class="card-body">
+          <!-- Mensajes Django (flash messages) -->
+          {% if messages %}
+            {% for message in messages %}
+              <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+              </div>
+            {% endfor %}
+          {% endif %}
+
+          <!-- Nota informativa -->
+          <div class="alert alert-info" role="alert">
+            La carrera se creará en estado inactivo. Podrá agregar materias y activarla desde el detalle de la carrera.
+          </div>
+
+          <!-- Errores no asociados a campo -->
+          {% if form.non_field_errors %}
+            <div class="alert alert-danger">
+              <ul class="mb-0">
+                {% for err in form.non_field_errors %}
+                  <li>{{ err }}</li>
+                {% endfor %}
+              </ul>
+            </div>
+          {% endif %}
+
+          <!-- Formulario -->
+          <form method="post" novalidate>
+            {% csrf_token %}
+            {{ form.hidden_fields }}
+
+            <!-- Nombre -->
+            <div class="mb-3">
+              <label for="{{ form.name.id_for_label }}" class="form-label">Nombre</label>
+              <input
+                type="text"
+                name="{{ form.name.html_name }}"
+                id="{{ form.name.id_for_label }}"
+                value="{{ form.name.value|default_if_none:'' }}"
+                class="form-control{% if form.name.errors %} is-invalid{% endif %}"
+                placeholder="Ingrese el nombre de la carrera"
+                required
+              >
+              {% if form.name.help_text %}
+                <div class="form-text">{{ form.name.help_text }}</div>
+              {% endif %}
+              {% for error in form.name.errors %}
+                <div class="invalid-feedback">{{ error }}</div>
+              {% endfor %}
+            </div>
+
+            <!-- Descripción -->
+            <div class="mb-3">
+              <label for="{{ form.description.id_for_label }}" class="form-label">Descripción</label>
+              <textarea
+                name="{{ form.description.html_name }}"
+                id="{{ form.description.id_for_label }}"
+                class="form-control{% if form.description.errors %} is-invalid{% endif %}"
+                rows="6"
+                placeholder="Descripción amplia de la carrera (objetivos, perfil de egreso, etc.)"
+              >{{ form.description.value|default_if_none:'' }}</textarea>
+              {% if form.description.help_text %}
+                <div class="form-text">{{ form.description.help_text }}</div>
+              {% endif %}
+              {% for error in form.description.errors %}
+                <div class="invalid-feedback">{{ error }}</div>
+              {% endfor %}
+            </div>
+
+            <!-- Botones acción -->
+            <div class="d-flex gap-2 justify-content-end">
+              <a href="{% url 'careers:career_list' %}" class="btn btn-outline-secondary">Cancelar</a>
+              <button type="submit" class="btn btn-primary">Guardar Carrera</button>
+            </div>
+          </form>
+        </div> <!-- card-body -->
+      </div> <!-- card -->
+    </div> <!-- col -->
+  </div> <!-- row -->
+</div> <!-- container -->
+
+{% endblock %}
