@@ -1,9 +1,12 @@
-from django.shortcuts import render
-from django.http import HttpResponse
+from django.views.generic import DetailView
+from core.mixins import AdminRequiredMixin    
+from students.models import Student
 
-def index(request):
-    """
-    Función de vista para la página principal de la app students.
-    Retorna una respuesta HTTP simple.
-    """
-    return HttpResponse("¡Hola desde la app Students!")
+class StudentDetailView(AdminRequiredMixin, DetailView):
+    model = Student
+    template_name = "students/student_detail.html"
+
+    def get_queryset(self):
+        # Optimización para evitar N+1
+        return Student.objects.select_related("user", "career")
+
