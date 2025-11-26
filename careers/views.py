@@ -1,7 +1,8 @@
 from django.contrib import messages
+from django.db.models.deletion import ProtectedError
 from django.shortcuts import redirect
 from django.urls import reverse_lazy, reverse
-from django.views.generic import CreateView, UpdateView, ListView
+from django.views.generic import CreateView, UpdateView, ListView, DeleteView
 
 from users.mixins import AdminRequiredMixin
 from .forms import CareerForm, CareerSubjectsForm
@@ -107,3 +108,43 @@ class CareerSubjectsUpdateView(AdminRequiredMixin, UpdateView):
 
     def get_success_url(self):
         return reverse("career_detail", kwargs={"pk": self.object.pk})
+
+
+class CareerDeleteView(AdminRequiredMixin, DeleteView):
+    """
+    Vista para eliminar una Carrera. 
+    Solo accesible por administradores.
+    """
+    model = Career
+    template_name = "careers/career_confirm_delete.html"
+    context_object_name = "career"
+    success_url = reverse_lazy("careers:career_list")
+
+    def delete(self, request, *args, **kwargs):
+        """
+        Intentamos eliminar la carrera; si existen objetos protegidos
+        (ej. estudiantes vinculados) capturamos ProtectedError y
+        redirigimos mostrando un mensaje amigable sin borrar el registro.
+        """
+        self.object = self.get_object()
+        try:
+            # Intentar borrado físico
+            self.object.delete()
+        except ProtectedError:
+            messages.error(
+                request,
+                "No se puede eliminar la carrera porque tiene alumnos asociados. Considere desactivarla."
+            )
+            # Redirigir al detalle de la carrera para que el admin vea el registro
+            return redirect(reverse("careers:career_detail", kwargs={"pk": self.object.pk}))
+
+        # Si se eliminó correctamente, añadir mensaje y redirigir al listado
+        messages.success(request, "Carrera eliminada correctamente.")
+        return redirect(self.get_success_url())
+
+    def get_context_data(self, **kwargs):
+        """Contexto adicional para el template"""
+        context = super().get_context_data(**kwargs)
+        context["title"] = "¿Eliminar Carrera?"
+        context["action"] = "Confirmar Eliminación"
+        return context

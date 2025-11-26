@@ -9,9 +9,13 @@ urlpatterns = [
 
     # Creación
     path('create/', views.CareerCreateView.as_view(), name='career_create'),
+
+    # Actualización
     path("<int:pk>/update/", views.CareerUpdateView.as_view(), name="career_update"),
 
     # Asignación de materias
     path('<int:pk>/subjects/', views.CareerSubjectsUpdateView.as_view(), name='career_subjects_update'),
 
+    # Eliminación
+    path('<int:pk>/delete/', views.CareerDeleteView.as_view(), name='career_delete'),
 ]
