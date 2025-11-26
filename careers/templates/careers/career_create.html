@@ -16,16 +16,6 @@
         </div>
 
         <div class="card-body">
-          <!-- Mensajes Django (flash messages) -->
-          {% if messages %}
-            {% for message in messages %}
-              <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
-                {{ message }}
-                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-              </div>
-            {% endfor %}
-          {% endif %}
-
           <!-- Nota informativa -->
           <div class="alert alert-info" role="alert">
             La carrera se creará en estado inactivo. Podrá agregar materias y activarla desde el detalle de la carrera.
