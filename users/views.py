@@ -1,7 +1,11 @@
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.views.generic import TemplateView, ListView
+from django.views.generic.edit import CreateView
+from django.urls import reverse_lazy
+from django.contrib import messages
 
 from users.models import Admin
+from users.forms import AdminCreateForm
 
 
 # Vista Home (para usuarios no autenticados)
@@ -30,3 +34,21 @@ class AdminListView(LoginRequiredMixin, UserPassesTestMixin, ListView):
 
     def test_func(self):
         return self.request.user.is_superuser  # Solo superusuarios pueden acceder
+    
+class AdminCreateView(LoginRequiredMixin, UserPassesTestMixin, CreateView):
+    model = Admin
+    form_class = AdminCreateForm
+    template_name = "users/admin_create.html"
+    success_url = reverse_lazy("users:admin_list")
+
+    def test_func(self):
+        return self.request.user.is_superuser  # Solo superusuarios pueden acceder
+
+    def handle_no_permission(self):
+        messages.error(self.request, "No tienes permiso para realizar esta acción.")
+        return super().handle_no_permission()
+
+    def form_valid(self, form):
+        response = super().form_valid(form)
+        messages.success(self.request, "Administrador creado correctamente.")
+        return response

@@ -1,0 +1,86 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="card">
+        <div class="card-header">
+            <h3>Nuevo Personal Administrativo</h3>
+        </div>
+        <div class="card-body">
+            <form method="post">
+                {% csrf_token %}
+                
+                <div class="row">
+                    <!-- Datos de Cuenta -->
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="id_email">Email</label>
+                            {{ form.email|add_class:"form-control" }}
+                        </div>
+                        <div class="form-group">
+                            <label for="id_dni">DNI</label>
+                            {{ form.dni|add_class:"form-control" }}
+                            <small class="form-text text-muted">El DNI será la contraseña inicial</small>
+                        </div>
+                    </div>
+
+                    <!-- Información Personal -->
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="id_name">Nombre</label>
+                            {{ form.name|add_class:"form-control" }}
+                        </div>
+                        <div class="form-group">
+                            <label for="id_surname">Apellido</label>
+                            {{ form.surname|add_class:"form-control" }}
+                        </div>
+                        <div class="form-group">
+                            <label for="id_phone">Teléfono</label>
+                            {{ form.phone|add_class:"form-control" }}
+                        </div>
+                        <div class="form-group">
+                            <label for="id_address">Dirección</label>
+                            {{ form.address|add_class:"form-control" }}
+                        </div>
+                        <div class="form-group">
+                            <label for="id_birth_date">Fecha de Nacimiento</label>
+                            {{ form.birth_date|add_class:"form-control"|attr:"type:date" }}
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <!-- Información Institucional -->
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="id_department">Departamento</label>
+                            {{ form.department|add_class:"form-control" }}
+                        </div>
+                        <div class="form-group">
+                            <label for="id_position">Puesto</label>
+                            {{ form.position|add_class:"form-control" }}
+                        </div>
+                        <div class="form-group">
+                            <label for="id_hire_date">Fecha de Contratación</label>
+                            {{ form.hire_date|add_class:"form-control"|attr:"type:date" }}
+                        </div>
+                    </div>
+
+                    <!-- Opciones -->
+                    <div class="col-md-6">
+                        <div class="form-check">
+                            {{ form.send_welcome_email|add_class:"form-check-input" }}
+                            <label class="form-check-label" for="id_send_welcome_email">Enviar correo de bienvenida</label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mt-4">
+                    <button type="submit" class="btn btn-primary">Guardar Admin</button>
+                    <a href="{% url 'users:admin_list' %}" class="btn btn-secondary">Cancelar</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
