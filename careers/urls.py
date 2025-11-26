@@ -9,7 +9,9 @@ urlpatterns = [
 
     # Creación
     path('create/', views.CareerCreateView.as_view(), name='career_create'),
+    path("<int:pk>/update/", views.CareerUpdateView.as_view(), name="career_update"),
 
     # Asignación de materias
     path('<int:pk>/subjects/', views.CareerSubjectsUpdateView.as_view(), name='career_subjects_update'),
+
 ]

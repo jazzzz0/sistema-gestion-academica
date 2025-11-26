@@ -42,12 +42,45 @@ class CareerCreateView(AdminRequiredMixin, CreateView):
         )
         return redirect(self.get_success_url())
 
-class CareerSubjectsUpdateView(AdminRequiredMixin, UpdateView):
+
+class CareerUpdateView(AdminRequiredMixin, UpdateView):
     """
-    Vista para asignar materias a una carrera. 
+    Vista para editar una Carrera existente.
     Solo accesible por administradores.
     """
-    
+    model = Career
+    form_class = CareerForm
+    template_name = "careers/career_form.html"
+    context_object_name = "career"
+
+    def get_context_data(self, **kwargs):
+        """Contexto adicional para el template"""
+        context = super().get_context_data(**kwargs)
+        context["title"] = "Editar Carrera"
+        context["action"] = "Guardar Cambios"
+        return context
+
+    def form_valid(self, form):
+        """
+        Actualiza únicamente name y description.
+        NO modifica is_active ni las materias.
+        """
+        messages.success(
+            self.request,
+            f"La carrera '{form.instance.name}' fue actualizada correctamente."
+        )
+        return super().form_valid(form)
+
+    def get_success_url(self):
+        """Redirige al detalle de la carrera luego de actualizar."""
+        return reverse("careers:career_detail", kwargs={"pk": self.object.pk})
+
+
+class CareerSubjectsUpdateView(AdminRequiredMixin, UpdateView):
+    """
+    Vista para asignar materias a una carrera.
+    Solo accesible por administradores.
+    """
     model = Career
     form_class = CareerSubjectsForm
     template_name = "careers/career_subjects_form.html"
