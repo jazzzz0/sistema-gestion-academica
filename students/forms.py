@@ -139,7 +139,7 @@ class ActiveToggleForm(forms.Form):
 
 class StudentCareerForm(forms.ModelForm):
     career = forms.ModelChoiceField(
-        queryset=Career.objects.all(),
+        queryset=Career.objects.filter(is_active=True),
         label="Carrera",
         required=False,
         empty_label="----------",
