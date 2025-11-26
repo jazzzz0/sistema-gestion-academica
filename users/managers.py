@@ -40,7 +40,7 @@ class CustomUserManager(DjangoUserManager):
         final_password: Optional[str] = None
 
         # Lógica de configuración agrupada por rol
-        extra_fields.setdefault("is_superuser", False) # Por defecto, ningún usuario es superusuario
+        extra_fields.setdefault("is_superuser", False)  # Por defecto, ningún usuario es superusuario
 
         if role in ("STUDENT", "TEACHER"):
             # Configuración de permisos
@@ -69,6 +69,17 @@ class CustomUserManager(DjangoUserManager):
         if not final_password:
             raise ValueError("No se pudo determinar la contraseña final")
 
+        # Crear el usuario
+        user = self.model(
+            email=email,
+            role=role,
+            **extra_fields
+        )
+
+        user.set_password(final_password)
+        user.save(using=self._db)
+        return user
+
     def create_superuser(
         self,
         username_ignored: str = None,
@@ -90,6 +101,7 @@ class CustomUserManager(DjangoUserManager):
         if extra_fields.get("is_superuser") is not True:
             raise ValueError("El superusuario debe ser superusuario")
 
+        # Forzar rol ADMIN para superusuarios
         return self.create_user(
             email=email,
             role="ADMIN",

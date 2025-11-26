@@ -124,6 +124,19 @@ class StudentForm(forms.Form):
             return StudentService.create_user_and_student(data)
 
 
+# === Formulario para activar/desactivar cuenta ===
+class ActiveToggleForm(forms.Form):
+    """
+    Formulario mínimo para activar/desactivar la cuenta del estudiante.
+    No tiene campos, solo valida que el POST sea legítimo.
+    """
+    is_active = forms.BooleanField(
+        required=True,
+        initial=True,
+        widget=forms.HiddenInput()
+    )
+
+
 class StudentCareerForm(forms.ModelForm):
     career = forms.ModelChoiceField(
         queryset=Career.objects.all(),

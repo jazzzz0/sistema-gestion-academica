@@ -1,31 +1,17 @@
 from django.urls import path
-from django.contrib.auth.views import LoginView, LogoutView
-from .views import DashboardView, ProfileView, HomeView
+from . import views
 
-app_name = "users"  # IMPORTANTE para el namespace
+app_name = "users"
 
 urlpatterns = [
-    path(
-        "login/",
-        LoginView.as_view(
-            template_name="registration/login.html",
-            redirect_authenticated_user=True
-        ),
-        name="login"
-    ),
-    path(
-        "logout/",
-        LogoutView.as_view(),
-        name="logout"
-    ),
-    path(
-        "dashboard/",
-        DashboardView.as_view(),
-        name="dashboard"
-    ),
-    path(
-        "profile/",
-        ProfileView.as_view(),
-        name="profile"
-    ),
+    # Vistas de gestión de profesores (descomentarlas cuando estén implementadas)
+    # path("teachers/", views.TeacherListView.as_view(), name="teacher_list"),
+    # path("teachers/create/", views.TeacherCreateView.as_view(), name="teacher_create"),
+    # path("teachers/<int:pk>/edit/", views.TeacherUpdateView.as_view(), name="teacher_update"),
+    # path("teachers/<int:pk>/delete/", views.TeacherDeleteView.as_view(), name="teacher_delete"),
+
+    # Vistas de gestión de administradores
+    path("admins/", views.AdminListView.as_view(), name="admin_list"),
+    # path("admins/create/", views.AdminCreateView.as_view(), name="admin_create"),
+    # path("admins/<int:pk>/delete/", views.AdminDeleteView.as_view(), name="admin_delete"),
 ]

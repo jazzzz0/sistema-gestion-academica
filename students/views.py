@@ -1,14 +1,13 @@
 from django.contrib import messages
-from django.core.exceptions import ValidationError
-from django.http import HttpResponseRedirect, HttpResponse
+from django.http import HttpResponseRedirect
 from django.urls import reverse_lazy
-from django.shortcuts import render, get_object_or_404, redirect
-from django.views.generic import FormView, ListView, UpdateView
+from django.shortcuts import get_object_or_404, redirect
+from django.views.generic import FormView, ListView, DetailView
+from django.db.models import Q
 
-from .forms import StudentForm, StudentCareerForm
-from .models import Student
 from users.mixins import AdminRequiredMixin
-from .services import StudentService
+from .models import Student
+from .forms import StudentForm
 
 
 class StudentCreateView(AdminRequiredMixin, FormView):
@@ -66,7 +65,7 @@ class StudentUpdateView(AdminRequiredMixin, FormView):
                 phone=data.get('phone')
             )
             messages.success(self.request, f"Estudiante {self.student.get_full_name()} actualizado correctamente.")
-            return redirect(self.get_success_url())
+            return redirect("students:student_detail", pk=self.student.pk)
 
         except ValidationError as e:
             # Si el servicio lanza un error de validación (ej. email duplicado)
@@ -116,10 +115,34 @@ class StudentListView(AdminRequiredMixin, ListView):
     def get_queryset(self):
         # Optimizamos la consulta trayendo los datos del usuario relacionado
         # y ordenamos por apellido/nombre para una visualización consistente
-        return Student.objects.select_related('user').all().order_by('surname', 'name')
+        queryset = Student.objects.select_related('user').all().order_by('surname', 'name')
+
+        # Capturar el parámetro de búsqueda desde GET
+        search_query = self.request.GET.get('search', '').strip()
+
+        if search_query:
+            # Filtrar por nombre, apellido o email (case-insensitive)
+            queryset = queryset.filter(
+                Q(name__icontains=search_query) |
+                Q(surname__icontains=search_query) |
+                Q(user__email__icontains=search_query)
+            )
+
+        return queryset
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['title'] = 'Listado de Alumnos'
+        context['search_query'] = self.request.GET.get('search', '')
         return context
+
+
+class StudentDetailView(AdminRequiredMixin, DetailView):
+        model = Student
+        template_name = "students/student_detail.html"
+        context_object_name = 'student'
+
+        def get_queryset(self):
+        # Optimización para evitar N+1
+            return Student.objects.select_related("user", "career")
 

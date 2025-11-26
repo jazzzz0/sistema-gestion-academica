@@ -44,6 +44,24 @@ class StudentService:
 
     @staticmethod
     @transaction.atomic
+    def toggle_active_status(student_id: int, is_active: bool):
+        """
+        Activa o desactiva la cuenta del Student a través de su User.
+
+        Args:
+            student_id (int): ID del estudiante.
+            is_active (bool): Nuevo estado para el usuario.
+        """
+        student = Student.objects.select_related("user").get(pk=student_id)
+
+        user = student.user
+        user.is_active = is_active
+        user.save(update_fields=["is_active"])
+
+        return user
+
+    @staticmethod
+    @transaction.atomic
     def update_student_and_user(student: Student, *, email, dni, name, surname, career, address=None, birth_date=None, phone=None):
         """
         Actualiza de manera atómica los datos del Student y su User asociado.
@@ -80,3 +98,4 @@ class StudentService:
         user.save()
 
         return student
+    
