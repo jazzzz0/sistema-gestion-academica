@@ -41,6 +41,8 @@ class StudentService:
             birth_date=data.get("birth_date"),
             phone=data.get("phone"),
         )
+        return student
+    
     @staticmethod
     @transaction.atomic
     def update_student_and_user(student: Student, *, email, dni, name, surname, career, address=None, birth_date=None, phone=None):

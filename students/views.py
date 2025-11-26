@@ -22,7 +22,7 @@ class StudentCreateView(AdminRequiredMixin, FormView):
 
     def form_valid(self, form):
         student = form.save()
-        messages.success(self.request, f"Estudiante {student.full_name} creado correctamente.")
+        messages.success(self.request, f"Estudiante {student.get_full_name()} creado correctamente.")
         return HttpResponseRedirect(self.get_success_url())
 
     def get_context_data(self, **kwargs):
@@ -48,7 +48,7 @@ class StudentUpdateView(AdminRequiredMixin, FormView):
 
     def form_valid(self, form):
         student = form.save()
-        messages.success(self.request, f"Estudiante {student.full_name} actualizado correctamente.")
+        messages.success(self.request, f"Estudiante {student.get_full_name()} actualizado correctamente.")
         # cuando este la vista de detalle habilitada, cambiar la redireccion
         # return redirect("students:student-detail", pk=student.pk)
         # por ahora redirigir a la lista
