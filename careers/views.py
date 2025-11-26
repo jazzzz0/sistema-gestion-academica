@@ -1,7 +1,7 @@
 from django.contrib import messages
 from django.shortcuts import redirect
 from django.urls import reverse_lazy, reverse
-from django.views.generic import CreateView, UpdateView
+from django.views.generic import CreateView, UpdateView, ListView
 
 from users.mixins import AdminRequiredMixin
 from .forms import CareerForm, CareerSubjectsForm
@@ -41,6 +41,24 @@ class CareerCreateView(AdminRequiredMixin, CreateView):
             f"Recuerde agregar materias y activarla para que sea visible."
         )
         return redirect(self.get_success_url())
+
+
+class CareerListView(AdminRequiredMixin, ListView):
+    """
+    Vista para listar las Carreras.
+    Solo accesible por administradores.
+    """
+    model = Career
+    template_name = "careers/career_list.html"
+    context_object_name = "careers"
+    queryset = Career.objects.all().order_by('name').prefetch_related('subjects') # Ordenamiento alfabético por nombre
+    paginate_by = 20  # Requisito de paginación por defecto consistente en el sistema
+
+    def get_context_data(self, **kwargs):
+        """Añade contexto extra para el template."""
+        context = super().get_context_data(**kwargs)
+        context["title"] = "Listado de Carreras"
+        return context
 
 
 class CareerUpdateView(AdminRequiredMixin, UpdateView):
