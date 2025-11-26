@@ -1,13 +1,15 @@
 from django.contrib import messages
+from django.core.exceptions import ValidationError
 from django.http import HttpResponseRedirect
 from django.urls import reverse_lazy
 from django.shortcuts import get_object_or_404, redirect
-from django.views.generic import FormView, ListView, DetailView
+from django.views.generic import FormView, ListView, DetailView, UpdateView
 from django.db.models import Q
 
 from users.mixins import AdminRequiredMixin
 from .models import Student
-from .forms import StudentForm
+from .forms import StudentForm, StudentCareerForm
+from .services import StudentService
 
 
 class StudentCreateView(AdminRequiredMixin, FormView):
@@ -138,11 +140,11 @@ class StudentListView(AdminRequiredMixin, ListView):
 
 
 class StudentDetailView(AdminRequiredMixin, DetailView):
-        model = Student
-        template_name = "students/student_detail.html"
-        context_object_name = 'student'
+    model = Student
+    template_name = "students/student_detail.html"
+    context_object_name = 'student'
 
-        def get_queryset(self):
+    def get_queryset(self):
         # Optimización para evitar N+1
-            return Student.objects.select_related("user", "career")
+        return Student.objects.select_related("user", "career")
 
