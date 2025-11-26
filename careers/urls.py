@@ -4,8 +4,8 @@ from .views import CareerDetailView, CareerUpdateView, CareerToggleActiveView
 app_name = 'careers'
 
 urlpatterns = [
-    # Listado (necesario para el botón Cancelar)
-    # path('', views.index, name='career_list'),
+    # Listado de carreras
+    path('', views.CareerListView.as_view(), name='career_list'),
 
     # Creación
     path('create/', views.CareerCreateView.as_view(), name='career_create'),
