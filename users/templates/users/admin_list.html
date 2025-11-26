@@ -7,7 +7,7 @@
 <div class="container mt-4">
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h2 class="h3 text-gray-800">Administradores</h2>
-        <a href="#" class="btn btn-primary shadow-sm">
+        <a href="{% url 'users:admin_create' %}" class="btn btn-primary shadow-sm">
             <i class="bi bi-person-plus-fill"></i> Nuevo Admin
         </a>
     </div>
@@ -47,7 +47,7 @@
                             </td>
 
                             <td class="text-end pe-4">
-                                <a href="{% url 'users:admin_delete' admin.pk %}"
+                                <a href="#"
                                    class="btn btn-sm btn-outline-danger"
                                    title="Desactivar o Borrar Administrador"
                                    onclick="return confirm('¿Está seguro de que desea eliminar a este administrador?');">
