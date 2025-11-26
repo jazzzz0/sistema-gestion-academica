@@ -1,0 +1,106 @@
+{% extends "base.html" %}
+
+{% block title %}{{ career.name }}{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h1 class="h3">{{ career.name }}</h1>
+
+        {% if career.is_active %}
+            <span class="badge bg-success">PÚBLICA</span>
+        {% else %}
+            <span class="badge bg-warning text-dark">BORRADOR</span>
+        {% endif %}
+    </div>
+
+    <!-- Descripción -->
+    <div class="card mb-4">
+        <div class="card-header bg-light">
+            <h5 class="mb-0">Información General</h5>
+        </div>
+        <div class="card-body">
+            <p>{{ career.description|linebreaks }}</p>
+
+            {% if career.created_at %}
+                <p class="text-muted small mb-0">
+                    Creada el {{ career.created_at|date:"d/m/Y" }}
+                </p>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Materias -->
+    <div class="card mb-4">
+        <div class="card-header bg-light">
+            <h5 class="mb-0">Plan de Estudios (Materias)</h5>
+        </div>
+        <div class="card-body">
+
+            {% if career.subjects.all %}
+                {% if career.subjects.all|length > 0 %}
+                    <ul class="list-group">
+                        {% for subject in career.subjects.all %}
+                            <li class="list-group-item">
+                                {{ subject.name }}
+                            </li>
+                        {% endfor %}
+                    </ul>
+                {% else %}
+                    <p class="text-muted">
+                        No hay materias asignadas a esta carrera.
+                    </p>
+                {% endif %}
+            {% endif %}
+
+        </div>
+    </div>
+
+    <!-- Botonera -->
+    <div class="card mb-5">
+        <div class="card-header bg-light">
+            <h5 class="mb-0">Acciones</h5>
+        </div>
+        <div class="card-body">
+
+            <!-- Grupo: Contenido -->
+            <div class="mb-3">
+                <a class="btn btn-primary" href="{% url 'careers:career_update' career.pk %}">
+                    Editar Datos
+                </a>
+
+                <a class="btn btn-outline-primary" href="#">
+                    Gestionar Materias
+                </a>
+            </div>
+
+            <!-- Grupo: Ciclo de Vida -->
+            <div class="mb-3">
+                <form method="post" action="{% url 'careers:career_toggle_status' career.pk %}">
+                    {% csrf_token %}
+
+                    {% if career.is_active %}
+                        <button class="btn btn-warning" type="submit">
+                            Desactivar / Ocultar
+                        </button>
+                    {% else %}
+                        <button class="btn btn-success" type="submit">
+                            Publicar Carrera
+                        </button>
+                    {% endif %}
+                </form>
+            </div>
+
+            <!-- Grupo: Peligro -->
+            <div>
+                <a class="btn btn-danger" href="#">
+                    Eliminar Carrera
+                </a>
+            </div>
+
+        </div>
+    </div>
+
+</div>
+{% endblock %}
