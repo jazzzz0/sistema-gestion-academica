@@ -109,7 +109,7 @@ class CareerSubjectsUpdateView(AdminRequiredMixin, UpdateView):
     # No modificar name/description/is_active porque el form incluye solo 'subjects'
 
     def get_success_url(self):
-        return reverse("career_detail", kwargs={"pk": self.object.pk})
+        return reverse("careers:career_detail", kwargs={"pk": self.object.pk})
 
 
 class CareerDetailView(AdminRequiredMixin, DetailView):
