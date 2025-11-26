@@ -1,10 +1,105 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Detalle del Alumno</title>
-</head>
-<body>
-    <h1>Detalle del Alumno</h1>
-    <p>{{ object }}</p>
-</body>
-</html>
+{% extends "base.html" %}
+
+{% block title %}Detalle del Alumno - {{ object.last_name }}{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="h3 text-gray-800">
+            <i class="bi bi-person-badge me-2"></i>Legajo: {{ object.pk }}
+        </h1>
+        <div>
+            <a href="{% url 'students:student_list' %}" class="btn btn-outline-secondary btn-sm">
+                <i class="bi bi-arrow-left"></i> Volver al Listado
+            </a>
+            <a href="{% url 'students:student_update' object.pk %}" class="btn btn-primary btn-sm">
+                <i class="bi bi-pencil"></i> Editar Datos Personales
+            </a>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-5">
+            <div class="card shadow mb-4">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">Información Personal</h6>
+                </div>
+                <div class="card-body">
+                    <div class="text-center mb-4">
+                        <i class="bi bi-person-circle text-gray-300" style="font-size: 5rem;"></i>
+                        <h4 class="mt-2">{{ object.last_name }}, {{ object.first_name }}</h4>
+                        <p class="text-muted">DNI: {{ object.dni }}</p>
+                    </div>
+                    <hr>
+                    <div class="row">
+                        <div class="col-sm-4 fw-bold">Email:</div>
+                        <div class="col-sm-8">{{ object.email|default:"No informado" }}</div>
+                    </div>
+                    </div>
+            </div>
+        </div>
+
+        <div class="col-md-7">
+            <div class="card shadow mb-4 border-left-info">
+                <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                    <h6 class="m-0 font-weight-bold text-info">Situación Académica</h6>
+                </div>
+                <div class="card-body">
+                    <div class="row align-items-center">
+                        <div class="col-md-8">
+                            <small class="text-uppercase text-muted fw-bold">Carrera Actual</small>
+                            <h3 class="h5 mt-1">
+                                {% if object.career %}
+                                    {{ object.career.name }}
+                                {% else %}
+                                    <span class="text-danger fst-italic">Sin carrera asignada</span>
+                                {% endif %}
+                            </h3>
+                        </div>
+                        <div class="col-md-4 text-end">
+                            <a href="{% url 'students:student_update_career' object.pk %}" 
+                               class="btn {% if object.career %}btn-outline-secondary{% else %}btn-primary pulse-animation{% endif %} btn-sm">
+                                
+                                {% if object.career %}
+                                    <i class="bi bi-arrow-repeat"></i> Cambiar Carrera
+                                {% else %}
+                                    <i class="bi bi-plus-circle"></i> Asignar Carrera
+                                {% endif %}
+                            </a>
+                        </div>
+                    </div>
+                    
+                    {% if object.career %}
+                    <hr>
+                    <div class="mt-2">
+                        <small class="text-muted">Inscripto desde: {{ object.date_joined|date:"d/m/Y" }}</small>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <div class="card shadow mb-4">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-secondary">Inscripciones Recientes</h6>
+                </div>
+                <div class="card-body">
+                    <p class="text-muted text-center">
+                        Aquí se listarán las materias (WIP).
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .pulse-animation {
+        animation: pulse 2s infinite;
+    }
+    @keyframes pulse {
+        0% { box-shadow: 0 0 0 0 rgba(13, 110, 253, 0.7); }
+        70% { box-shadow: 0 0 0 10px rgba(13, 110, 253, 0); }
+        100% { box-shadow: 0 0 0 0 rgba(13, 110, 253, 0); }
+    }
+</style>
+{% endblock %}
