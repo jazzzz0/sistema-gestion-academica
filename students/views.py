@@ -2,7 +2,7 @@ from django.contrib import messages
 from django.http import HttpResponseRedirect
 from django.urls import reverse_lazy
 from django.shortcuts import get_object_or_404, redirect
-from django.views.generic import FormView, ListView
+from django.views.generic import FormView, ListView, DetailView
 from django.db.models import Q
 
 from users.mixins import AdminRequiredMixin
@@ -49,10 +49,7 @@ class StudentUpdateView(AdminRequiredMixin, FormView):
     def form_valid(self, form):
         student = form.save()
         messages.success(self.request, f"Estudiante {student.get_full_name()} actualizado correctamente.")
-        # cuando este la vista de detalle habilitada, cambiar la redireccion
-        # return redirect("students:student-detail", pk=student.pk)
-        # por ahora redirigir a la lista
-        return redirect(self.get_success_url)
+        return redirect("students:student_detail", pk=student.pk)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -90,3 +87,14 @@ class StudentListView(AdminRequiredMixin, ListView):
         context['title'] = 'Listado de Alumnos'
         context['search_query'] = self.request.GET.get('search', '')
         return context
+
+
+class StudentDetailView(AdminRequiredMixin, DetailView):
+        model = Student
+        template_name = "students/student_detail.html"
+        context_object_name = 'student'
+
+        def get_queryset(self):
+        # Optimización para evitar N+1
+            return Student.objects.select_related("user", "career")
+
