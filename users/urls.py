@@ -12,6 +12,6 @@ urlpatterns = [
 
     # Vistas de gestión de administradores
     path("admins/", views.AdminListView.as_view(), name="admin_list"),
-    # path("admins/create/", views.AdminCreateView.as_view(), name="admin_create"),
+    path("admins/create/", views.AdminCreateView.as_view(), name="admin_create"),
     # path("admins/<int:pk>/delete/", views.AdminDeleteView.as_view(), name="admin_delete"),
 ]

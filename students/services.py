@@ -41,6 +41,7 @@ class StudentService:
             birth_date=data.get("birth_date"),
             phone=data.get("phone"),
         )
+        return student
 
     @staticmethod
     @transaction.atomic
