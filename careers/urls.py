@@ -1,6 +1,5 @@
 from django.urls import path
 from . import views
-from .views import CareerUpdateView
 
 app_name = 'careers'
 
@@ -10,5 +9,9 @@ urlpatterns = [
 
     # Creación
     path('create/', views.CareerCreateView.as_view(), name='career_create'),
-    path("<int:pk>/update/", CareerUpdateView.as_view(), name="career_update"),
+    path("<int:pk>/update/", views.CareerUpdateView.as_view(), name="career_update"),
+
+    # Asignación de materias
+    path('<int:pk>/subjects/', views.CareerSubjectsUpdateView.as_view(), name='career_subjects_update'),
+
 ]

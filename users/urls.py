@@ -1,17 +1,17 @@
 from django.urls import path
-from users import views
+from . import views
 
 app_name = "users"
 
 urlpatterns = [
-    # Vistas generales a todos los usuarios
-    path("", views.HomeView.as_view(), name="home"),
-    path("dashboard/", views.DashboardView.as_view(), name="dashboard"),
-    path("profile/", views.ProfileView.as_view(), name="profile"),
+    # Vistas de gestión de profesores (descomentarlas cuando estén implementadas)
+    # path("teachers/", views.TeacherListView.as_view(), name="teacher_list"),
+    # path("teachers/create/", views.TeacherCreateView.as_view(), name="teacher_create"),
+    # path("teachers/<int:pk>/edit/", views.TeacherUpdateView.as_view(), name="teacher_update"),
+    # path("teachers/<int:pk>/delete/", views.TeacherDeleteView.as_view(), name="teacher_delete"),
 
-    # Vistas de profesores
-    # path("teacher/", TeacherListView.as_view(), name="teacher-list"),
-    # path("teacher/create/", TeacherCreateView.as_view(), name="teacher-create"),
-
+    # Vistas de gestión de administradores
+    path("admins/", views.AdminListView.as_view(), name="admin_list"),
+    path("admins/create/", views.AdminCreateView.as_view(), name="admin_create"),
+    # path("admins/<int:pk>/delete/", views.AdminDeleteView.as_view(), name="admin_delete"),
 ]
-
