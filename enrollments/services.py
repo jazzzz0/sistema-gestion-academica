@@ -64,7 +64,7 @@ class EnrollmentService:
         if enrollment.student != student:
             raise ValidationError("No puedes darte de baja de una materia que no estás cursando.")
 
-        # Estados válidos para darse de baja (según tu modelo)
+        # Estados válidos para darse de baja 
         if enrollment.status not in ["activa", "regular"]:
             raise ValidationError("Esta inscripción no puede darse de baja.")
 
