@@ -4,59 +4,7 @@
     <title>Detalle del Alumno</title>
 </head>
 <body>
-    {% extends "base.html" %}
-
-    {% block content %}
-    <div class="container mt-5">
-        <!-- Encabezado con el nombre y estado del alumno -->
-        <div class="d-flex justify-content-between align-items-center mb-4">
-            <h2 class="fw-bold">
-                {{ student.surname }}, {{ student.name }}
-                {% if student.user.is_active %}
-                    <span class="badge bg-success">ACTIVO</span>
-                {% else %}
-                    <span class="badge bg-danger">INACTIVO</span>
-                {% endif %}
-            </h2>
-        </div>
-
-        <!-- Información Personal -->
-        <div class="card mb-4">
-            <div class="card-header">Información Personal</div>
-            <div class="card-body">
-                <p><strong>DNI:</strong> {{ student.dni }}</p>
-                <p><strong>Email:</strong> {{ student.user.email }}</p>
-                <p><strong>Teléfono:</strong> {{ student.phone|default:"No especificado" }}</p>
-                <p><strong>Dirección:</strong> {{ student.address|default:"No especificada" }}</p>
-                <p><strong>Fecha de Nacimiento:</strong> {{ student.birth_date|date:"d/m/Y"|default:"No especificada" }}</p>
-            </div>
-        </div>
-
-        <!-- Información Académica -->
-        <div class="card mb-4">
-            <div class="card-header">Información Académica</div>
-            <div class="card-body">
-                <p><strong>Carrera:</strong>
-                    {% if student.career %}
-                        {{ student.career }}
-                    {% else %}
-                        <span class="text-muted fst-italic">Sin carrera asignada</span>
-                    {% endif %}
-                </p>
-            </div>
-        </div>
-
-        <!-- Panel de Acciones -->
-        <div class="d-flex justify-content-start gap-3">
-            <a href="{% url 'students:edit_student' student.id %}" class="btn btn-primary">Editar Datos Personales</a>
-            <a href="{% url 'students:manage_career' student.id %}" class="btn btn-info">Gestionar Carrera</a>
-            {% if student.user.is_active %}
-                <a href="{% url 'students:deactivate_student' student.id %}" class="btn btn-outline-danger">Dar de Baja</a>
-            {% else %}
-                <a href="{% url 'students:activate_student' student.id %}" class="btn btn-outline-success">Reactivar</a>
-            {% endif %}
-        </div>
-    </div>
-    {% endblock %}
+    <h1>Detalle del Alumno</h1>
+    <p>{{ object }}</p>
 </body>
 </html>
