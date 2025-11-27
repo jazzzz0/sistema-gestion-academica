@@ -1,0 +1,124 @@
+{% extends "base.html" %}
+
+{% block title %}{{ career.name }} | Detalle{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h1 class="h3 text-primary">
+            <i class="bi bi-journal-bookmark-fill me-2"></i>{{ career.name }}
+        </h1>
+
+        {% if career.is_active %}
+            <span class="badge bg-success shadow-sm">
+                <i class="bi bi-check-circle me-1"></i>PÚBLICA
+            </span>
+        {% else %}
+            <span class="badge bg-warning text-dark shadow-sm">
+                <i class="bi bi-cone-striped me-1"></i>BORRADOR
+            </span>
+        {% endif %}
+    </div>
+
+    <div class="card mb-4 shadow-sm">
+        <div class="card-header bg-light fw-bold">
+            <i class="bi bi-info-circle me-2"></i>Información General
+        </div>
+        <div class="card-body">
+            <p class="lead" style="font-size: 1rem;">
+                {{ career.description|linebreaks }}
+            </p>
+
+            {% if career.created_at %}
+                <hr>
+                <p class="text-muted small mb-0">
+                    <i class="bi bi-calendar3 me-1"></i>
+                    Fecha de creación: {{ career.created_at|date:"d/m/Y H:i" }}
+                </p>
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="card mb-4 shadow-sm">
+        <div class="card-header bg-light fw-bold d-flex justify-content-between align-items-center">
+            <span><i class="bi bi-book me-2"></i>Plan de Estudios (Materias)</span>
+            <span class="badge bg-secondary rounded-pill">{{ career.subjects.count }}</span>
+        </div>
+
+        <ul class="list-group list-group-flush">
+            {% for subject in career.subjects.all %}
+                <li class="list-group-item d-flex justify-content-between align-items-center">
+                    {{ subject.name }}
+                </li>
+            {% empty %}
+                <li class="list-group-item text-center py-4 text-muted">
+                    <i class="bi bi-folder-x" style="font-size: 2rem;"></i>
+                    <p class="mb-2 mt-2">No hay materias asignadas a esta carrera.</p>
+                    <a href="{% url 'careers:career_subjects_update' career.pk %}" class="btn btn-sm btn-outline-primary">
+                        <i class="bi bi-plus-lg me-1"></i>Agregar Materias
+                    </a>
+                </li>
+            {% endfor %}
+        </ul>
+    </div>
+
+    <div class="card mb-5 border-0 bg-transparent">
+        <div class="card-header bg-transparent border-bottom-0 ps-0">
+            <h5 class="mb-0 text-secondary">Acciones de Gestión</h5>
+        </div>
+        <div class="card-body p-0">
+            <div class="row g-3">
+
+                <div class="col-md-4">
+                    <div class="d-grid gap-2">
+                        <a class="btn btn-primary" href="{% url 'careers:career_update' career.pk %}">
+                            <i class="bi bi-pencil-square me-2"></i>Editar Datos
+                        </a>
+                        <a class="btn btn-outline-primary" href="{% url 'careers:career_subjects_update' career.pk %}">
+                            <i class="bi bi-list-check me-2"></i>Gestionar Materias
+                        </a>
+                    </div>
+                </div>
+
+                <div class="col-md-4">
+                    <div class="d-grid">
+                        <form method="post" action="{% url 'careers:career_toggle_status' career.pk %}">
+                            {% csrf_token %}
+
+                            {% if career.is_active %}
+                                <button class="btn btn-warning w-100" type="submit"
+                                        onclick="return confirm('¿Seguro que deseas ocultar esta carrera? Los alumnos no podrán verla.');">
+                                    <i class="bi bi-eye-slash me-2"></i>Desactivar / Ocultar
+                                </button>
+                            {% else %}
+                                <button class="btn btn-success w-100" type="submit">
+                                    <i class="bi bi-rocket-takeoff me-2"></i>Publicar Carrera
+                                </button>
+                            {% endif %}
+                        </form>
+                    </div>
+                    <div class="text-center mt-2">
+                        <small class="text-muted">
+                            {% if career.is_active %}
+                                Visible para alumnos
+                            {% else %}
+                                Solo visible para administradores
+                            {% endif %}
+                        </small>
+                    </div>
+                </div>
+
+                <div class="col-md-4">
+                    <div class="d-grid">
+                        <a class="btn btn-outline-danger disabled" href="#" aria-disabled="true">
+                            <i class="bi bi-trash me-2"></i>Eliminar Carrera (Próximamente)
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+{% endblock %}

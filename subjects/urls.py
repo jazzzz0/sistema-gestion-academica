@@ -1,14 +1,16 @@
 from django.urls import path
 from . import views
-from .views import SubjectListView
 
 app_name = 'subjects'
 
 urlpatterns = [
-   
+    # Listado de materias
+    path("", views.SubjectListView.as_view(), name="subject_list"),
+
     # Creación
     path("create/", views.SubjectCreateView.as_view(), name="subject_create"),  # <-- comma added
+    path("create/", views.SubjectCreateView.as_view(), name="subject_create"),
 
-    # Listado de materias
-    path("", SubjectListView.as_view(), name="subject_list"),
+    # Edición
+    path("update/<int:pk>/", views.SubjectUpdateView.as_view(), name="subject_update"),
 ]
