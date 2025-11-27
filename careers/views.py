@@ -2,11 +2,14 @@ from django.contrib import messages
 from django.db.models.deletion import ProtectedError
 from django.shortcuts import redirect
 from django.urls import reverse_lazy, reverse
-from django.views.generic import CreateView, UpdateView, ListView, DeleteView
+from django.views.generic import CreateView, UpdateView, ListView, DeleteView, DetailView
 
 from users.mixins import AdminRequiredMixin
 from .forms import CareerForm, CareerSubjectsForm
 from .models import Career
+from django.shortcuts import get_object_or_404, redirect
+from django.views import View
+from django.http import HttpResponseNotAllowed
 
 
 class CareerCreateView(AdminRequiredMixin, CreateView):
@@ -148,3 +151,29 @@ class CareerDeleteView(AdminRequiredMixin, DeleteView):
         context["title"] = "¿Eliminar Carrera?"
         context["action"] = "Confirmar Eliminación"
         return context
+    
+
+class CareerDetailView(AdminRequiredMixin, DetailView):
+    model = Career
+    template_name = "careers/career_detail.html"
+    context_object_name = "career"
+
+    def get_queryset(self):
+        return Career.objects.prefetch_related("subjects")
+
+
+class CareerToggleActiveView(AdminRequiredMixin, View):
+
+    def post(self, request, pk):
+        career = get_object_or_404(Career, pk=pk)
+
+        career.is_active = not career.is_active
+        career.save()
+
+        estado = "activada" if career.is_active else "desactivada"
+        messages.success(request, f"La carrera ha sido {estado} correctamente.")
+
+        return redirect("careers:career_detail", pk=career.pk)
+
+    def get(self, *args, **kwargs):
+        return HttpResponseNotAllowed(["POST"])
