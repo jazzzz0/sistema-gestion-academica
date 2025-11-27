@@ -75,7 +75,7 @@
                         <a class="btn btn-primary" href="{% url 'careers:career_update' career.pk %}">
                             <i class="bi bi-pencil-square me-2"></i>Editar Datos
                         </a>
-                        <a class="btn btn-outline-primary" href="{% url 'careers:career_subjects_update' career.pk %}">
+                        <a class="btn btn-primary w-100" href="{% url 'careers:career_subjects_update' career.pk %}">
                             <i class="bi bi-list-check me-2"></i>Gestionar Materias
                         </a>
                     </div>
@@ -111,9 +111,9 @@
 
                 <div class="col-md-4">
                     <div class="d-grid">
-                        <a class="btn btn-outline-danger disabled" href="#" aria-disabled="true">
-                            <i class="bi bi-trash me-2"></i>Eliminar Carrera (Próximamente)
-                        </a>
+                            <a href="{% url 'careers:career_delete' career.pk %}" class="btn btn-danger w-100" title="Eliminar">
+                                <i class="bi bi-trash me-2"></i>Eliminar Carrera
+                            </a>
                     </div>
                 </div>
             </div>
