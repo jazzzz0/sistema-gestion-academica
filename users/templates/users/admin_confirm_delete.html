@@ -1,0 +1,41 @@
+{% extends 'base.html' %}
+
+{% block title %}Confirmar Desactivación{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card border-danger shadow">
+                <div class="card-header bg-danger text-white">
+                    <h5 class="mb-0">
+                        <i class="bi bi-exclamation-triangle-fill"></i> ¿Desactivar Administrador?
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <p class="card-text lead">
+                        Está a punto de quitar el acceso al sistema a <strong>{{ admin }}</strong>.
+                    </p>
+                    <div class="alert alert-warning">
+                        <small>Esta acción es inmediata, pero puede revertirse desde el panel de administración si es necesario.</small>
+                    </div>
+
+                    <form method="post">
+                        {% csrf_token %}
+
+                        <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                            <a href="{% url 'users:admin_list' %}" class="btn btn-secondary me-md-2">
+                                Cancelar
+                            </a>
+
+                            <button type="submit" class="btn btn-danger">
+                                Confirmar Desactivación
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
