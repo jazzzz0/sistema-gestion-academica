@@ -30,3 +30,36 @@ class SubjectCreateView(AdminRequiredMixin, CreateView):
             f'Materia {form.cleaned_data["name"]} creada correctamente.'
         )
         return response
+class SubjectDetailView(AdminRequiredMixin, DetailView):
+    """
+    Ficha técnica de la Materia (SGA-89).
+    Solo accesible por Administradores.
+    """
+    model = Subject
+    template_name = "subjects/subject_detail.html"
+    context_object_name = "subject"
+
+    def get_queryset(self):
+        """
+        Optimización requerida:
+        - prefetch enrollments (enrollment_set o related_name)
+        - prefetch careers
+        """
+        return (
+            Subject.objects.all()
+            .select_related("teacher")
+            .prefetch_related("enrollment_set")        # o el related_name que usen
+            .prefetch_related("careers")               # idem
+        )
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+
+        subject = context["subject"]
+
+        # Contar alumnos activos
+        # Si usás algún filtro tipo active=True lo ajustamos después
+        enrollments = subject.enrollment_set.all()
+        context["enrollment_count"] = enrollments.count()
+
+        return context
