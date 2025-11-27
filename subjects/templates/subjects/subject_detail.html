@@ -20,7 +20,7 @@
 <!-- Profesor Titular -->
 {% if subject.teacher %}
     <span class="badge bg-primary">
-        Profesor Titular: {{ subject.teacher.last_name }}, {{ subject.teacher.first_name }}
+        Profesor Titular: {{ subject.teacher.surname }}, {{ subject.teacher.name }}
     </span>
 {% else %}
     <span class="badge bg-secondary">Sin profesor asignado</span>
