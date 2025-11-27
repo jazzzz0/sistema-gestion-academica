@@ -34,6 +34,47 @@ class StudentCreateView(AdminRequiredMixin, FormView):
         return context
 
 
+class StudentListView(AdminRequiredMixin, ListView):
+    model = Student
+    template_name = 'students/student_list.html'
+    context_object_name = 'students'
+    paginate_by = 20  # Requisito de paginación por defecto
+
+    def get_queryset(self):
+        # Optimizamos la consulta trayendo los datos del usuario relacionado
+        # y ordenamos por apellido/nombre para una visualización consistente
+        queryset = Student.objects.select_related('user').all().order_by('surname', 'name')
+
+        # Capturar el parámetro de búsqueda desde GET
+        search_query = self.request.GET.get('search', '').strip()
+
+        if search_query:
+            # Filtrar por nombre, apellido o email (case-insensitive)
+            queryset = queryset.filter(
+                Q(name__icontains=search_query) |
+                Q(surname__icontains=search_query) |
+                Q(user__email__icontains=search_query)
+            )
+
+        return queryset
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['title'] = 'Listado de Alumnos'
+        context['search_query'] = self.request.GET.get('search', '')
+        return context
+
+
+class StudentDetailView(AdminRequiredMixin, DetailView):
+    model = Student
+    template_name = "students/student_detail.html"
+    context_object_name = 'student'
+
+    def get_queryset(self):
+        # Optimización para evitar N+1
+        return Student.objects.select_related("user", "career")
+
+
 class StudentUpdateView(AdminRequiredMixin, FormView):
     form_class = StudentForm
     template_name = "students/student_form.html"
@@ -107,44 +148,4 @@ class StudentCareerUpdateView(AdminRequiredMixin, UpdateView):
         )
         return response
 
-
-class StudentListView(AdminRequiredMixin, ListView):
-    model = Student
-    template_name = 'students/student_list.html'
-    context_object_name = 'students'
-    paginate_by = 20  # Requisito de paginación por defecto
-
-    def get_queryset(self):
-        # Optimizamos la consulta trayendo los datos del usuario relacionado
-        # y ordenamos por apellido/nombre para una visualización consistente
-        queryset = Student.objects.select_related('user').all().order_by('surname', 'name')
-
-        # Capturar el parámetro de búsqueda desde GET
-        search_query = self.request.GET.get('search', '').strip()
-
-        if search_query:
-            # Filtrar por nombre, apellido o email (case-insensitive)
-            queryset = queryset.filter(
-                Q(name__icontains=search_query) |
-                Q(surname__icontains=search_query) |
-                Q(user__email__icontains=search_query)
-            )
-
-        return queryset
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['title'] = 'Listado de Alumnos'
-        context['search_query'] = self.request.GET.get('search', '')
-        return context
-
-
-class StudentDetailView(AdminRequiredMixin, DetailView):
-    model = Student
-    template_name = "students/student_detail.html"
-    context_object_name = 'student'
-
-    def get_queryset(self):
-        # Optimización para evitar N+1
-        return Student.objects.select_related("user", "career")
 
