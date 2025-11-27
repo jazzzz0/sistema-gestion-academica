@@ -1,20 +1,15 @@
 from django.contrib import messages
 from django.urls import reverse_lazy
-from django.views.generic import CreateView
+from django.views.generic import CreateView, ListView
 
+from users.mixins import AdminRequiredMixin
 from subjects.forms import SubjectForm
 from subjects.models import Subject
-from users.mixins import AdminRequiredMixin
-from django.views.generic import ListView
-from users.mixins import AdminRequiredMixin
-from subjects.models import Subject
+
 
 
 class SubjectCreateView(AdminRequiredMixin, CreateView):
-    """
-    Vista para crear una nueva Materia.
-    Solo accesible por Administradores.
-    """
+  
     model = Subject
     form_class = SubjectForm
     template_name = "subjects/subject_form.html"
@@ -35,10 +30,7 @@ class SubjectCreateView(AdminRequiredMixin, CreateView):
         return response
 
 class SubjectListView(AdminRequiredMixin, ListView):
-    """
-    Vista para listar todas las Materias (SGA-88).
-    Solo accesible por Administradores.
-    """
+ 
     model = Subject
     template_name = "subjects/subject_list.html"
     context_object_name = "subjects"

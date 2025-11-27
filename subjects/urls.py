@@ -5,9 +5,7 @@ from .views import SubjectListView
 app_name = 'subjects'
 
 urlpatterns = [
-    # Listado
-    # path('', views.index, name="subject_list"),
-
+   
     # Creación
     path("create/", views.SubjectCreateView.as_view(), name="subject_create"),  # <-- comma added
 

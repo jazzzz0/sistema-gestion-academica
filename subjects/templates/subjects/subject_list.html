@@ -35,7 +35,7 @@
                 <!-- Profesor Titular -->
                 <td>
                     {% if subject.teacher %}
-                        {{ subject.teacher.last_name }}, {{ subject.teacher.first_name }}
+                        {{ subject.teacher.surname }}, {{ subject.teacher.name }}
                     {% else %}
                         <span class="text-muted">Sin asignar</span>
                     {% endif %}
