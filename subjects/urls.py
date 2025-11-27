@@ -8,7 +8,6 @@ urlpatterns = [
     path("", views.SubjectListView.as_view(), name="subject_list"),
 
     # Creación
-    path("create/", views.SubjectCreateView.as_view(), name="subject_create"),  # <-- comma added
     path("create/", views.SubjectCreateView.as_view(), name="subject_create"),
 
     # Edición
