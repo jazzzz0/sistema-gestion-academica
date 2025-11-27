@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+
+{% block title %}Editar Carrera{% endblock %}
+
+{% block content %}
+    <h1 class="h4 mb-3">Editar Carrera</h1>
+
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+
+        <button class="btn btn-primary">Guardar Cambios</button>
+        <a class="btn btn-secondary" href="{% url 'careers:career_detail' career.pk %}">Cancelar</a>
+    </form>
+{% endblock %}

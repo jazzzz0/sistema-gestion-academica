@@ -41,6 +41,8 @@ class StudentService:
             birth_date=data.get("birth_date"),
             phone=data.get("phone"),
         )
+        return student
+    
     @staticmethod
     @transaction.atomic
     def toggle_active_status(student_id: int, is_active: bool):

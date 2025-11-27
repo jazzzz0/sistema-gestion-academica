@@ -1,5 +1,6 @@
 from django import forms
 from .models import Career
+from subjects.models import Subject
 
 
 class CareerForm(forms.ModelForm):
@@ -33,3 +34,26 @@ class CareerForm(forms.ModelForm):
                 raise forms.ValidationError("Ya existe una carrera con ese nombre.")
 
         return name
+
+class CareerSubjectsForm(forms.ModelForm):
+    class Meta:
+        model = Career
+        fields = ["subjects"]
+
+        widgets = {
+            "subjects": forms.CheckboxSelectMultiple(
+                attrs={
+                    "class": "form-check",
+                },
+            )
+        }
+
+        help_texts = {
+            "subjects": "Seleccione las materias que forman parte del plan de estudios de esta carrera.",
+        }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        # Mostrar todas las materias ordenadas por nombre
+        self.fields["subjects"].queryset = Subject.objects.all().order_by("name")
