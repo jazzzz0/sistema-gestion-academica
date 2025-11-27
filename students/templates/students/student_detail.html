@@ -51,9 +51,15 @@
             <a href="{% url 'students:edit_student' student.id %}" class="btn btn-primary">Editar Datos Personales</a>
             <a href="{% url 'students:manage_career' student.id %}" class="btn btn-info">Gestionar Carrera</a>
             {% if student.user.is_active %}
-                <a href="{% url 'students:deactivate_student' student.id %}" class="btn btn-outline-danger">Dar de Baja</a>
+                <form method="post" action="{% url 'students:toggle_student_active' student.id %}">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-outline-danger">Dar de Baja</button>
+                </form>
             {% else %}
-                <a href="{% url 'students:activate_student' student.id %}" class="btn btn-outline-success">Reactivar</a>
+                <form method="post" action="{% url 'students:toggle_student_active' student.id %}">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-outline-success">Reactivar</button>
+                </form>
             {% endif %}
         </div>
     </div>
