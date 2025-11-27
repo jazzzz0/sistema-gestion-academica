@@ -6,6 +6,7 @@ from django.views.generic.edit import FormView, DeleteView
 from django.urls import reverse_lazy
 from django.contrib import messages
 
+from .mixins import SuperuserRequiredMixin
 from .models import Admin
 from .forms import AdminCreateForm
 
@@ -28,27 +29,17 @@ class ProfileView(LoginRequiredMixin, TemplateView):
     redirect_field_name = 'next'
 
 
-class AdminListView(LoginRequiredMixin, UserPassesTestMixin, ListView):
+class AdminListView(SuperuserRequiredMixin, ListView):
     model = Admin
     template_name = "users/admin_list.html"
     context_object_name = "admins"
     queryset = Admin.objects.select_related('user').all().order_by('-hire_date')
 
-    def test_func(self):
-        return self.request.user.is_superuser  # Solo superusuarios pueden acceder
 
-
-class AdminCreateView(LoginRequiredMixin, UserPassesTestMixin, FormView):
+class AdminCreateView(SuperuserRequiredMixin, FormView):
     form_class = AdminCreateForm
     template_name = "users/admin_create.html"
     success_url = reverse_lazy("users:admin_list")
-
-    def test_func(self):
-        return self.request.user.is_superuser  # Solo superusuarios pueden acceder
-
-    def handle_no_permission(self):
-        messages.error(self.request, "No tienes permiso para realizar esta acción.")
-        return super().handle_no_permission()
 
     def form_valid(self, form):
         form.save()  # Calls AdminService.create_admin_user()
@@ -56,18 +47,11 @@ class AdminCreateView(LoginRequiredMixin, UserPassesTestMixin, FormView):
         return super().form_valid(form)
 
 
-class AdminDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
+class AdminDeleteView(SuperuserRequiredMixin, DeleteView):
     model = Admin
     template_name = "users/admin_confirm_delete.html"
     success_url = reverse_lazy("users:admin_list")
     context_object_name = "admin"
-
-    def test_func(self):
-        return self.request.user.is_superuser  # Solo superusuarios pueden acceder
-
-    def handle_no_permission(self):
-        messages.error(self.request, "No tienes permiso para realizar esta acción.")
-        return super().handle_no_permission()
 
     # Lógica de "Borrado" suave (Override delete o form_valid)
     def delete(self, request, *args, **kwargs):
