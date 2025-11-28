@@ -17,6 +17,8 @@ class Student(Person):
     career = models.ForeignKey(
         Career,
         on_delete=models.PROTECT,  # Evita borrar una carrera si tiene estudiantes asociados
+        null=True,
+        blank=True,
         related_name="students",
         verbose_name="Carrera",
         help_text="Carrera del estudiante",

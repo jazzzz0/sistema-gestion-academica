@@ -1,7 +1,8 @@
 from django.contrib import messages
+from django.db.models.deletion import ProtectedError
 from django.shortcuts import redirect
 from django.urls import reverse_lazy, reverse
-from django.views.generic import CreateView, UpdateView, ListView, DetailView
+from django.views.generic import CreateView, UpdateView, ListView, DeleteView, DetailView
 
 from users.mixins import AdminRequiredMixin
 from .forms import CareerForm, CareerSubjectsForm
@@ -18,15 +19,8 @@ class CareerCreateView(AdminRequiredMixin, CreateView):
     """
     model = Career
     form_class = CareerForm
-    template_name = "careers/career_create.html"
+    template_name = "careers/career_form.html"
     success_url = reverse_lazy("careers:career_list")
-
-    def get_context_data(self, **kwargs):
-        """Añade contexto extra para el template."""
-        context = super().get_context_data(**kwargs)
-        context["title"] = "Crear Nueva Carrera"
-        context["action"] = "Guardar"
-        return context
 
     def form_valid(self, form):
         self.object = form.save(commit=False)
@@ -74,13 +68,6 @@ class CareerUpdateView(AdminRequiredMixin, UpdateView):
     template_name = "careers/career_form.html"
     context_object_name = "career"
 
-    def get_context_data(self, **kwargs):
-        """Contexto adicional para el template"""
-        context = super().get_context_data(**kwargs)
-        context["title"] = "Editar Carrera"
-        context["action"] = "Guardar Cambios"
-        return context
-
     def form_valid(self, form):
         """
         Actualiza únicamente name y description.
@@ -111,6 +98,46 @@ class CareerSubjectsUpdateView(AdminRequiredMixin, UpdateView):
     def get_success_url(self):
         return reverse("careers:career_detail", kwargs={"pk": self.object.pk})
 
+
+class CareerDeleteView(AdminRequiredMixin, DeleteView):
+    """
+    Vista para eliminar una Carrera. 
+    Solo accesible por administradores.
+    """
+    model = Career
+    template_name = "careers/career_confirm_delete.html"
+    context_object_name = "career"
+    success_url = reverse_lazy("careers:career_list")
+
+    def delete(self, request, *args, **kwargs):
+        """
+        Intentamos eliminar la carrera; si existen objetos protegidos
+        (ej. estudiantes vinculados) capturamos ProtectedError y
+        redirigimos mostrando un mensaje amigable sin borrar el registro.
+        """
+        self.object = self.get_object()
+        try:
+            # Intentar borrado físico
+            self.object.delete()
+        except ProtectedError:
+            messages.error(
+                request,
+                "No se puede eliminar la carrera porque tiene alumnos asociados. Considere desactivarla."
+            )
+            # Redirigir al detalle de la carrera para que el admin vea el registro
+            return redirect(reverse("careers:career_detail", kwargs={"pk": self.object.pk}))
+
+        # Si se eliminó correctamente, añadir mensaje y redirigir al listado
+        messages.success(request, "Carrera eliminada correctamente.")
+        return redirect(self.get_success_url())
+
+    def get_context_data(self, **kwargs):
+        """Contexto adicional para el template"""
+        context = super().get_context_data(**kwargs)
+        context["title"] = "¿Eliminar Carrera?"
+        context["action"] = "Confirmar Eliminación"
+        return context
+    
 
 class CareerDetailView(AdminRequiredMixin, DetailView):
     model = Career
