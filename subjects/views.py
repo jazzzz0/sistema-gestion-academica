@@ -18,12 +18,6 @@ class SubjectCreateView(AdminRequiredMixin, CreateView):
     template_name = "subjects/subject_form.html"
     success_url = reverse_lazy("subjects:subject_list")
 
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['title'] = 'Crear Materia'
-        context['action'] = 'Crear'
-        return context
-
     def form_valid(self, form):
         response = super().form_valid(form)
         messages.success(
@@ -68,12 +62,6 @@ class SubjectUpdateView(AdminRequiredMixin, UpdateView):
     form_class = SubjectForm
     template_name = "subjects/subject_form.html"
     success_url = reverse_lazy("subjects:subject_list")
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['title'] = 'Editar Materia'
-        context['action'] = 'Actualizar'
-        return context
 
     def form_valid(self, form):
         response = super().form_valid(form)
