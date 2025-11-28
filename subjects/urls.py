@@ -12,4 +12,7 @@ urlpatterns = [
 
     # Edición
     path("update/<int:pk>/", views.SubjectUpdateView.as_view(), name="subject_update"),
+
+    # Eliminación
+    path("delete/<int:pk>/", views.SubjectDeleteView.as_view(), name="subject_delete"),
 ]
