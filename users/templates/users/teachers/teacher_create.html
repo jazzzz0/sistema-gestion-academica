@@ -1,0 +1,83 @@
+{% extends "base.html" %}
+{% block content %}
+
+<div class="container mt-5 d-flex justify-content-center">
+    <div class="card shadow-lg w-75">
+        <div class="card-body">
+
+            <h2 class="text-center mb-4">Nuevo Profesor</h2>
+
+            {% if form.non_field_errors %}
+            <div class="alert alert-danger">
+                {% for error in form.non_field_errors %}
+                    <p>{{ error }}</p>
+                {% endfor %}
+            </div>
+            {% endif %}
+
+            <form method="post" novalidate>
+                {% csrf_token %}
+
+                <!-- DATOS DE CUENTA -->
+                <h4 class="mt-4">Datos de Cuenta</h4>
+                <div class="mb-3">
+                    <label>Email (Será el usuario de acceso)</label>
+                    {{ form.email }}
+                </div>
+
+                <div class="mb-3">
+                    <label>DNI (Será la contraseña inicial)</label>
+                    {{ form.dni }}
+                </div>
+
+                <!-- INFORMACIÓN PERSONAL -->
+                <h4 class="mt-4">Información Personal</h4>
+
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label>Nombre</label>
+                        {{ form.first_name }}
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label>Apellido</label>
+                        {{ form.last_name }}
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label>Fecha de Nacimiento</label>
+                        {{ form.birth_date }}
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label>Teléfono</label>
+                        {{ form.phone }}
+                    </div>
+                </div>
+
+                <!-- PERFIL ACADÉMICO -->
+                <h4 class="mt-4">Perfil Académico</h4>
+
+                <div class="mb-3">
+                    <label>Título</label>
+                    {{ form.academic_degree }}
+                </div>
+
+                <div class="mb-3">
+                    <label>Fecha de Contratación</label>
+                    {{ form.hire_date }}
+                </div>
+
+                <!-- BOTONES -->
+                <div class="d-flex justify-content-between mt-4">
+                    <button type="submit" class="btn btn-primary">Guardar Profesor</button>
+                    <a href="{% url 'dashboard' %}" class="btn btn-secondary">Cancelar</a>
+                </div>
+
+            </form>
+
+        </div>
+    </div>
+</div>
+
+{% endblock %}
