@@ -9,5 +9,5 @@ urlpatterns = [
     path('<int:pk>/', views.StudentDetailView.as_view(), name='student_detail'),
     path("<int:pk>/update/", views.StudentUpdateView.as_view(), name="student_update"),
     path("<int:pk>/career/", views.StudentCareerUpdateView.as_view(), name="student_update_career"),
-    path('<int:student_id>/toggle-active/', views.DeactivateStudentView.as_view(), name='toggle_student_active'),
+    path('<int:pk>/toggle-active/', views.StudentToggleActiveView.as_view(), name='toggle_student_active'),
 ]

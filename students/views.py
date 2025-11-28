@@ -151,28 +151,24 @@ class StudentCareerUpdateView(AdminRequiredMixin, UpdateView):
         return response
 
 
-class DeactivateStudentView(UserPassesTestMixin, View):
-    def post(self, request, student_id, *args, **kwargs):
-        # Check if the user has the required permissions
-        if not self.test_func():
-            return self.handle_no_permission()
+class StudentToggleActiveView(AdminRequiredMixin, View):
+    """
+        Vista para alternar el estado (Activo/Inactivo) de un alumno.
+        Solo accesible por Admin/Superuser.
+    """
+    def post(self, request, pk):
+        # Obtener el estudiante o 404
+        student = get_object_or_404(Student, pk=pk)
 
-        # Call the service to toggle the student's active status
-        success = StudentService.toggle_active(student_id)
+        # Calcular el nuevo estado
+        new_status = not student.user.is_active
 
-        if success:
-            messages.success(request, "El estado del alumno ha sido actualizado correctamente.")
-        else:
-            messages.error(request, "Hubo un error al intentar actualizar el estado del alumno.")
+        # Llamar al servicio para actualizar el estado
+        StudentService.toggle_active_status(student.pk, new_status)
 
-        # Redirect back to the student detail view
-        return HttpResponseRedirect(reverse('students:student_detail', args=[student_id]))
+        # Feedback al usuario
+        status_msg = "reactivado" if new_status else "dado de baja"
+        messages.success(request, f"El alumno {student.surname} ha sido {status_msg} correctamente.")
 
-    def test_func(self):
-        # Allow only superusers or users with the ADMIN role
-        return self.request.user.is_superuser or self.request.user.role == 'ADMIN'
-
-    def handle_no_permission(self):
-        messages.error(self.request, "No tienes permiso para realizar esta acción.")
-        return HttpResponseRedirect(reverse('students:student_list'))
-
+        # Redirigir al detalle del alumno
+        return redirect("students:student_detail", pk=pk)
