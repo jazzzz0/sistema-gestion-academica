@@ -1,6 +1,8 @@
+from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.core.exceptions import PermissionDenied
 from django.http import HttpRequest
+from django.shortcuts import redirect
 from django.urls import reverse
 
 
@@ -32,3 +34,34 @@ class AdminRequiredMixin(LoginRequiredMixin, UserPassesTestMixin):
         else:
             # Usuario no logueado, redirige al login
             return super().handle_no_permission()
+
+
+class SuperuserRequiredMixin(LoginRequiredMixin, UserPassesTestMixin):
+    """
+    Mixin para verificar que el usuario sea un Superusuario.
+
+    Si el usuario no está logueado:
+    Lo redirige al login.
+
+    Si el usuario no es superusuario:
+    Lo redirige al dashboard.
+    """
+    request: HttpRequest
+
+    def test_func(self):
+        """
+        Comprueba si el usuario es superusuario
+        """
+        return self.request.user.is_superuser
+
+    def handle_no_permission(self):
+        """
+        Qué hacer si test_func() devuelve False.
+        """
+        # Si está logueado pero no es superusuario
+        if self.request.user.is_authenticated:
+            messages.error(self.request, "No tienes permiso para realizar esta acción.")
+            return redirect('dashboard')
+
+        # Si no está logueado, comportamiento estándar (login)
+        return super().handle_no_permission()

@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+
+{% block content %}
+	<div class="container mt-4">
+		<h1>{{ title }}</h1>
+
+		<p class="lead text-muted">
+			Está a punto de eliminar la carrera {{ career.name }}. Esta acción no se puede deshacer.
+		</p>
+
+		{% with total_students=career.student_set.count %}
+			{% if total_students > 0 %}
+				<div class="alert alert-danger" role="alert">
+					<strong>Atención:</strong> Esta carrera tiene {{ total_students }} alumno{% if total_students != 1 %}s{% endif %}. La eliminación fallará por integridad referencial. Considere desactivarla.
+				</div>
+			{% endif %}
+		{% endwith %}
+
+		<form method="post" action="">
+			{% csrf_token %}
+			<button type="submit" class="btn btn-danger" {% if career.student_set.count > 0 %}disabled{% endif %}>
+				{{ action }}
+			</button>
+			<a href="{% url 'careers:career_detail' career.pk %}" class="btn btn-secondary ms-2">Cancelar</a>
+		</form>
+	</div>
+{% endblock %}

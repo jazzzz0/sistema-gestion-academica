@@ -1,68 +1,179 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Detalle del Alumno</title>
-</head>
-<body>
-    {% extends "base.html" %}
+{% extends "base.html" %}
 
-    {% block content %}
-    <div class="container mt-5">
-        <!-- Encabezado con el nombre y estado del alumno -->
-        <div class="d-flex justify-content-between align-items-center mb-4">
-            <h2 class="fw-bold">
-                {{ student.surname }}, {{ student.name }}
-                {% if student.user.is_active %}
-                    <span class="badge bg-success">ACTIVO</span>
-                {% else %}
-                    <span class="badge bg-danger">INACTIVO</span>
-                {% endif %}
-            </h2>
-        </div>
+{% block title %}Detalle del Alumno - {{ student.surname }} {{ student.name }}{% endblock %}
 
-        <!-- Información Personal -->
-        <div class="card mb-4">
-            <div class="card-header">Información Personal</div>
-            <div class="card-body">
-                <p><strong>DNI:</strong> {{ student.dni }}</p>
-                <p><strong>Email:</strong> {{ student.user.email }}</p>
-                <p><strong>Teléfono:</strong> {{ student.phone|default:"No especificado" }}</p>
-                <p><strong>Dirección:</strong> {{ student.address|default:"No especificada" }}</p>
-                <p><strong>Fecha de Nacimiento:</strong> {{ student.birth_date|date:"d/m/Y"|default:"No especificada" }}</p>
-            </div>
-        </div>
+{% block content %}
+<div class="container mt-4">
 
-        <!-- Información Académica -->
-        <div class="card mb-4">
-            <div class="card-header">Información Académica</div>
-            <div class="card-body">
-                <p><strong>Carrera:</strong>
-                    {% if student.career %}
-                        {{ student.career }}
-                    {% else %}
-                        <span class="text-muted fst-italic">Sin carrera asignada</span>
-                    {% endif %}
-                </p>
-            </div>
-        </div>
-
-        <!-- Panel de Acciones -->
-        <div class="d-flex justify-content-start gap-3">
-            <a href="{% url 'students:edit_student' student.id %}" class="btn btn-primary">Editar Datos Personales</a>
-            <a href="{% url 'students:manage_career' student.id %}" class="btn btn-info">Gestionar Carrera</a>
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h1 class="h3 text-gray-800 d-inline-block">
+                <i class="bi bi-person-badge me-2"></i>Legajo: {{ student.id }} </h1>
             {% if student.user.is_active %}
-                <form method="post" action="{% url 'students:toggle_student_active' student.id %}">
-                    {% csrf_token %}
-                    <button type="submit" class="btn btn-outline-danger">Dar de Baja</button>
-                </form>
+                <span class="badge bg-success ms-2">ACTIVO</span>
             {% else %}
-                <form method="post" action="{% url 'students:toggle_student_active' student.id %}">
-                    {% csrf_token %}
-                    <button type="submit" class="btn btn-outline-success">Reactivar</button>
-                </form>
+                <span class="badge bg-danger ms-2">INACTIVO</span>
             {% endif %}
         </div>
+
+        <div>
+            <a href="{% url 'students:student_list' %}" class="btn btn-outline-secondary btn-sm">
+                <i class="bi bi-arrow-left"></i> Volver al Listado
+            </a>
+            <a href="{% url 'students:student_update' student.id %}" class="btn btn-primary btn-sm">
+                <i class="bi bi-pencil"></i> Editar Datos
+            </a>
+        </div>
     </div>
-    {% endblock %}
-</body>
-</html>
+
+    <div class="row">
+        <div class="col-md-5">
+            <div class="card shadow mb-4">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">Información Personal</h6>
+                </div>
+                <div class="card-body">
+                    <div class="text-center mb-4">
+                        <i class="bi bi-person-circle text-gray-300" style="font-size: 5rem;"></i>
+                        <h4 class="mt-2">{{ student.surname }}, {{ student.name }}</h4>
+                        <p class="text-muted fw-bold">DNI: {{ student.dni }}</p>
+                    </div>
+
+                    <hr>
+
+                    <div class="vstack gap-2">
+                        <div class="d-flex justify-content-between">
+                            <span class="fw-bold"><i class="bi bi-envelope me-2"></i>Email:</span>
+                            <span>{{ student.user.email|default:"No informado" }}</span>
+                        </div>
+                        <div class="d-flex justify-content-between">
+                            <span class="fw-bold"><i class="bi bi-telephone me-2"></i>Teléfono:</span>
+                            <span>{{ student.phone|default:"No especificado" }}</span>
+                        </div>
+                        <div class="d-flex justify-content-between">
+                            <span class="fw-bold"><i class="bi bi-geo-alt me-2"></i>Dirección:</span>
+                            <span class="text-end">{{ student.address|default:"No especificada" }}</span>
+                        </div>
+                        <div class="d-flex justify-content-between">
+                            <span class="fw-bold"><i class="bi bi-calendar me-2"></i>Nacimiento:</span>
+                            <span>{{ student.birth_date|date:"d/m/Y"|default:"--" }}</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card shadow mb-4 border-left-warning">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-warning">Gestión de Cuenta</h6>
+                </div>
+                <div class="card-body d-flex gap-2 justify-content-center">
+                    {% if student.user.is_active %}
+                        <a href="{% url 'students:deactivate_student' student.id %}" class="btn btn-outline-danger btn-sm w-100">
+                            <i class="bi bi-slash-circle"></i> Dar de Baja
+                        </a>
+                    {% else %}
+                        <a href="{% url 'students:activate_student' student.id %}" class="btn btn-outline-success btn-sm w-100">
+                            <i class="bi bi-check-circle"></i> Reactivar
+                        </a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-7">
+
+            <div class="card shadow mb-4 border-left-info">
+                <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                    <h6 class="m-0 font-weight-bold text-info">Situación Académica</h6>
+                </div>
+                <div class="card-body">
+                    <div class="row align-items-center">
+                        <div class="col-md-8">
+                            <small class="text-uppercase text-muted fw-bold">Carrera Inscripta</small>
+                            <h3 class="h5 mt-2">
+                                {% if student.career %}
+                                    {{ student.career.name }}
+                                {% else %}
+                                    <span class="text-danger fst-italic">Sin carrera asignada</span>
+                                {% endif %}
+                            </h3>
+                        </div>
+                        <div class="col-md-4 text-end">
+                            <a href="{% url 'students:manage_career' student.id %}"
+                               class="btn {% if student.career %}btn-outline-secondary{% else %}btn-primary pulse-animation{% endif %} btn-sm">
+
+                                {% if student.career %}
+                                    <i class="bi bi-arrow-repeat"></i> Cambiar
+                                {% else %}
+                                    <i class="bi bi-plus-circle"></i> Asignar
+                                {% endif %}
+                            </a>
+                        </div>
+                    </div>
+
+                    {% if student.career %}
+                        <hr>
+                        <div class="mt-2 text-muted small">
+                            <i class="bi bi-clock-history"></i> Fecha de ingreso: {{ student.user.date_joined|date:"d/m/Y" }}
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <div class="card shadow mb-4">
+                <div class="card-header py-3 d-flex justify-content-between align-items-center">
+                    <h6 class="m-0 font-weight-bold text-secondary">Inscripciones / Materias</h6>
+                    {% if student.career %}
+                    <button class="btn btn-sm btn-outline-primary" disabled title="Próximamente">
+                        <i class="bi bi-journal-plus"></i> Nueva Inscripción
+                    </button>
+                    {% endif %}
+                </div>
+                <div class="card-body">
+                    {% if student.enrollment_set.all %}
+                        <div class="table-responsive">
+                            <table class="table table-sm table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>Materia</th>
+                                        <th>Estado</th>
+                                        <th>Fecha</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for enrollment in student.enrollment_set.all %}
+                                    <tr>
+                                        <td>{{ enrollment.subject.name }}</td>
+                                        <td>{{ enrollment.status }}</td> <td>{{ enrollment.date|date:"d/m/Y" }}</td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% else %}
+                        <div class="text-center py-4 text-muted">
+                            <i class="bi bi-journal-x" style="font-size: 2rem;"></i>
+                            <p class="mt-2 mb-0">El alumno no tiene inscripciones activas.</p>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    /* Animación para llamar la atención si falta asignar carrera */
+    .pulse-animation {
+        animation: pulse 2s infinite;
+    }
+    @keyframes pulse {
+        0% { box-shadow: 0 0 0 0 rgba(13, 110, 253, 0.7); }
+        70% { box-shadow: 0 0 0 10px rgba(13, 110, 253, 0); }
+        100% { box-shadow: 0 0 0 0 rgba(13, 110, 253, 0); }
+    }
+    /* Clase auxiliar para bordes de color a la izquierda (estilo Dashboard) */
+    .border-left-info { border-left: .25rem solid #36b9cc !important; }
+    .border-left-warning { border-left: .25rem solid #f6c23e !important; }
+</style>
+{% endblock %}

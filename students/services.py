@@ -1,7 +1,6 @@
 from django.db import transaction
 from django.contrib.auth import get_user_model
 from django.core.exceptions import ValidationError
-from users.models import User
 from .models import Student
 
 User = get_user_model()
@@ -18,6 +17,7 @@ class StudentService:
     def create_user_and_student(data):
         """
         Crea un nuevo usuario (User) con rol STUDENT y el Student asociado.
+        La carrera inicia en None por defecto, ya que tenemos una vista única para esto.
         Args:
             data (dict): Diccionario con los datos necesarios para crear el usuario y el estudiante.
         Returns:
@@ -36,13 +36,13 @@ class StudentService:
             dni=data["dni"],
             name=data["name"],
             surname=data["surname"],
-            career=data["career"],
+            career=data.get("career"),
             address=data.get("address"),
             birth_date=data.get("birth_date"),
             phone=data.get("phone"),
         )
         return student
-    
+
     @staticmethod
     @transaction.atomic
     def toggle_active_status(student_id: int, is_active: bool):
@@ -67,7 +67,6 @@ class StudentService:
         """
         Actualiza de manera atómica los datos del Student y su User asociado.
         """
-
         user = student.user
 
         # --- Validaciones de unicidad ---
@@ -92,9 +91,12 @@ class StudentService:
 
         # --- Actualizar datos del USER ---
         user.email = email
+
+        if hasattr(user, "dni"):
+            user.dni = dni
+
         user.full_clean()
         user.save()
-
 
         return student
     
