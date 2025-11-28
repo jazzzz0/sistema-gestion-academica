@@ -6,7 +6,7 @@
 <div class="d-flex justify-content-between align-items-center mb-4">
     <h1 class="h3">Gestión de Materias</h1>
 
-    <a href="{% url 'subject_create' %}" class="btn btn-primary">
+    <a href="{% url 'subjects:subject_create' %}" class="btn btn-primary">
         Nueva Materia
     </a>
 </div>
@@ -27,7 +27,7 @@
             <tr>
                 <!-- Materia (link al detalle SGA-89) -->
                 <td>
-                    <a href="{% url 'subject_detail' subject.pk %}">
+                    <a href="{% url 'subjects:subject_detail' subject.pk %}">
                         {{ subject.name }}
                     </a>
                 </td>
@@ -46,10 +46,10 @@
 
                 <!-- Acciones -->
                 <td class="text-end">
-                    <a href="{% url 'subject_update' subject.pk %}" class="btn btn-sm btn-warning">
+                    <a href="{% url 'subjects:subject_update' subject.pk %}" class="btn btn-sm btn-warning">
                         Editar
                     </a>
-                    <a href="{% url 'subject_delete' subject.pk %}" class="btn btn-sm btn-danger">
+                    <a href="{% url 'subjects:subject_delete' subject.pk %}" class="btn btn-sm btn-danger">
                         Eliminar
                     </a>
                 </td>
@@ -92,7 +92,7 @@
 <!-- Estado vacío -->
 <div class="text-center py-5">
     <p class="text-muted fs-5 mb-3">No hay materias registradas</p>
-    <a href="{% url 'subject_create' %}" class="btn btn-primary btn-lg">
+    <a href="{% url 'subjects:subject_create' %}" class="btn btn-primary btn-lg">
         Crear Materia
     </a>
 </div>
