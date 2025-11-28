@@ -49,6 +49,12 @@ class Person(models.Model):
         null=True,
         verbose_name="Teléfono",
         help_text="Número de teléfono (opcional)",
+        validators=[
+            RegexValidator(
+                regex=r'^[\d\+\s()-]{8,20}$',
+                message="El teléfono debe contener entre 8 y 20 caracteres: números, espacios, guiones o paréntesis."
+            )
+        ]
     )
 
     class Meta:
