@@ -5,7 +5,12 @@
 {% block content %}
 
 <div class="d-flex justify-content-between align-items-center mb-3">
-    <h1 class="h3">{{ subject.name }}</h1>
+    <div>
+        <a href="{% url 'subjects:subject_list' %}" class="btn btn-outline-secondary btn-sm mb-2">
+            <i class="bi bi-arrow-left"></i> Volver al listado
+        </a>
+        <h1 class="h3">{{ subject.name }}</h1>
+    </div>
 
     <div>
         <a href="{% url 'subjects:subject_update' subject.pk %}" class="btn btn-warning me-2">
@@ -17,7 +22,6 @@
     </div>
 </div>
 
-<!-- Profesor Titular -->
 {% if subject.teacher %}
     <span class="badge bg-primary">
         Profesor Titular: {{ subject.teacher.surname }}, {{ subject.teacher.name }}
@@ -28,7 +32,6 @@
 
 <hr class="my-4">
 
-<!-- Información General -->
 <h2 class="h5 mb-3">Información General</h2>
 
 <div class="mb-4">
@@ -41,39 +44,39 @@
         {% endif %}
     </p>
 
-    <!-- Cupo -->
     <h6 class="fw-bold">Cupo</h6>
-    <p>
-        {{ enrollment_count }} / {{ subject.quota }} ocupados
+    <p class="fs-5">
+        <strong>{{ subject.enrollment_count }}</strong> / {{ subject.quota }} ocupados
     </p>
+
+    <div class="progress" style="height: 10px; width: 200px;">
+        {% widthratio subject.enrollment_count subject.quota 100 as percentage %}
+        <div class="progress-bar {% if percentage|add:0 >= 100 %}bg-danger{% else %}bg-success{% endif %}"
+             role="progressbar"
+             style="width: {{ percentage }}%;"
+             aria-valuenow="{{ subject.enrollment_count }}"
+             aria-valuemin="0"
+             aria-valuemax="{{ subject.quota }}">
+        </div>
+    </div>
 </div>
 
 <hr class="my-4">
 
-<!-- Carreras (Planes de Estudio) -->
 <h2 class="h5 mb-3">Planes de Estudio</h2>
 
-{% if subject.careers.all %}
-    {% if subject.careers.all.count %}
-        <ul class="list-group mb-4">
-            {% for career in subject.careers.all %}
-                <li class="list-group-item">
-                    {{ career.name }}
-                </li>
-            {% endfor %}
-        </ul>
-    {% else %}
+<ul class="list-group mb-4">
+    {% for career in subject.careers.all %}
+        <li class="list-group-item">
+            {{ career.name }}
+        </li>
+    {% empty %}
         <p class="text-muted fst-italic">
             Esta materia no pertenece a ninguna carrera.
         </p>
-    {% endif %}
-{% else %}
-    <p class="text-muted fst-italic">
-        Esta materia no pertenece a ninguna carrera.
-    </p>
-{% endif %}
+    {% endfor %}
+</ul>
 
-<!-- Futuro botón (placeholder) -->
 <div class="mt-4">
     <button class="btn btn-outline-secondary" disabled>
         Ver Alumnos Inscritos (Próximamente)

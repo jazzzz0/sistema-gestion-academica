@@ -1,4 +1,5 @@
 from django.contrib import messages
+from django.db.models import Count
 from django.shortcuts import redirect
 from django.urls import reverse_lazy
 from django.views.generic import CreateView, ListView, UpdateView, DeleteView, DetailView
@@ -64,28 +65,17 @@ class SubjectDetailView(AdminRequiredMixin, DetailView):
 
     def get_queryset(self):
         """
-        Optimización requerida:
-        - prefetch enrollments (enrollment_set o related_name)
-        - prefetch careers
+        Optimización aplicada:
+        1. select_related: Trae el profesor en la misma query.
+        2. prefetch_related: Trae las carreras.
+        3. annotate: Cuenta los enrollments directamente en la DB.
         """
         return (
             Subject.objects.all()
             .select_related("teacher")
-            .prefetch_related("enrollment_set")        # o el related_name que usen
-            .prefetch_related("careers")               # idem
+            .prefetch_related("careers")
+            .annotate(enrollment_count=Count('enrollments'))
         )
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-
-        subject = context["subject"]
-
-        # Contar alumnos activos
-        # Si usás algún filtro tipo active=True lo ajustamos después
-        enrollments = subject.enrollment_set.all()
-        context["enrollment_count"] = enrollments.count()
-
-        return context
 
 
 class SubjectUpdateView(AdminRequiredMixin, UpdateView):
