@@ -1,10 +1,11 @@
-from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib import messages
 from django.forms import ValidationError
 from django.shortcuts import redirect
 from django.views.generic import ListView, View
 from django.db.models import Count, Q
 from django.http import HttpResponseNotAllowed
+
+from users.mixins import StudentRequiredMixin, AdminRequiredMixin
 
 from .forms import EnrollmentCreateForm
 from .models import Enrollment
@@ -14,7 +15,7 @@ from students.models import Student
 from subjects.models import Subject
 
 
-class StudentEnrollmentListView(LoginRequiredMixin, ListView):
+class StudentEnrollmentListView(StudentRequiredMixin, ListView):
     """
     Vista para listar las materias disponibles para inscripción de un estudiante.
     Muestra las materias que pertenecen a la carrera del estudiante y en las que
@@ -48,7 +49,7 @@ class StudentEnrollmentListView(LoginRequiredMixin, ListView):
         return context
 
 
-class EnrollmentActionView(LoginRequiredMixin, View):
+class EnrollmentActionView(StudentRequiredMixin, View):
     """
     Vista para manejar la acción de inscripción de un estudiante en una materia.
     """
@@ -72,18 +73,12 @@ class EnrollmentActionView(LoginRequiredMixin, View):
         return redirect("enrollments:enrollment_list")
 
 
-class MyEnrollmentListView(LoginRequiredMixin, ListView):
+class MyEnrollmentListView(StudentRequiredMixin, ListView):
     """
     Vista para listar las inscripciones de un estudiante.
     """
     template_name = "enrollments/my_enrollments.html"
     context_object_name = "enrollments"
-
-    def dispatch(self, request, *args, **kwargs):
-        if not request.user.role == "STUDENT":
-            messages.error(request, "No tienes permiso para ver tus inscripciones.")
-            return redirect("home")
-        return super().dispatch(request, *args, **kwargs)
 
     def get_queryset(self):
         student = self.request.user.student_profile
@@ -98,7 +93,7 @@ class MyEnrollmentListView(LoginRequiredMixin, ListView):
         )
 
 
-class EnrollmentDropView(LoginRequiredMixin, View):
+class EnrollmentDropView(StudentRequiredMixin, View):
     """
     Vista para manejar la acción de baja de una inscripción por parte del estudiante.
     """
@@ -117,7 +112,7 @@ class EnrollmentDropView(LoginRequiredMixin, View):
         return HttpResponseNotAllowed(["POST"])
 
 
-class EnrollmentAdminListView(LoginRequiredMixin, ListView):
+class EnrollmentAdminListView(AdminRequiredMixin, ListView):
     """
     Vista para listar todas las inscripciones con filtros para el administrador.
     """
