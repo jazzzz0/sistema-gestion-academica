@@ -25,12 +25,12 @@ class MyEnrollmentListView(LoginRequiredMixin, ListView):
         return super().dispatch(request, *args, **kwargs)
 
     def get_queryset(self):
-        student = self.request.user.student
+        student = self.request.user.student_profile
 
         return (
             Enrollment.objects.filter(
                 student=student,
-                status__in=["activa", "regular"]   # ajustado a tus valores reales
+                status__in=["activa", "regular"]
             )
             .select_related("subject")
             .order_by("subject__name")
@@ -38,8 +38,7 @@ class MyEnrollmentListView(LoginRequiredMixin, ListView):
 class EnrollmentDropView(LoginRequiredMixin, View):
 
     def post(self, request, pk):
-        student = request.user.student
-
+        student = request.user.student_profile
         try:
             EnrollmentService.unenroll_student(student, pk)
             messages.success(request, "Te has dado de baja correctamente.")

@@ -7,16 +7,6 @@
 
     <h1 class="h4 mb-4">Mis Materias en Curso</h1>
 
-    {% if not enrollments %}
-        <div class="alert alert-info">
-            No estás inscrito en ninguna materia.
-        </div>
-
-        <a href="{% url 'enrollments:enrollment_list' %}" class="btn btn-primary">
-            Ir a Oferta Académica
-        </a>
-    {% else %}
-
         <table class="table table-bordered align-middle">
             <thead class="table-light">
                 <tr>
@@ -62,12 +52,24 @@
                             </button>
                         </td>
                     </tr>
+
+                {% empty %}
+                    <tr>
+                        <td colspan="4" class="text-center">
+                            No estás inscripto en ninguna materia.
+                        </td>
+                    </tr>
+                    <tr>
+                        <td colspan="4" class="text-center">
+                            <a href="{% url 'enrollments:enrollment_list' %}" class="btn btn-primary">
+                                Ir a Oferta Académica
+                            </a>
+                        </td>
+                    </tr>
                 {% endfor %}
             </tbody>
 
         </table>
-
-    {% endif %}
 </div>
 
 
