@@ -2,8 +2,8 @@ from django import forms
 from django.contrib.auth import get_user_model
 from django.utils import timezone
 
-from users.models.teacher import Teacher
-from users.services.teacher_service import TeacherService
+from students.models import Student
+from users.models import Admin, Teacher
 
 User = get_user_model()
 
@@ -103,8 +103,16 @@ class TeacherCreateForm(forms.Form):
         if not dni.isdigit() or not (7 <= len(dni) <= 8):
             raise forms.ValidationError("DNI inválido. Debe tener 7 u 8 dígitos numéricos.")
 
-        if User.objects.filter(dni=dni).exists():
-            raise forms.ValidationError("El DNI ya está registrado.")
+        dni_duplication_message = "Este DNI ya está registrado en el sistema"
+
+        if Teacher.objects.filter(dni=dni).exists():
+            raise forms.ValidationError(f"{dni_duplication_message} como profesor.")
+
+        if Student.objects.filter(dni=dni).exists():
+            raise forms.ValidationError(f"{dni_duplication_message} como estudiante.")
+
+        if Admin.objects.filter(dni=dni).exists():
+            raise forms.ValidationError(f"{dni_duplication_message} como administrador.")
 
         return dni
 
