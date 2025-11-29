@@ -35,6 +35,7 @@ class AdminListView(SuperuserRequiredMixin, ListView):
     template_name = "users/admin_list.html"
     context_object_name = "admins"
     queryset = Admin.objects.select_related('user').all().order_by('-hire_date')
+    paginate_by = 20
 
 
 class AdminCreateView(SuperuserRequiredMixin, FormView):

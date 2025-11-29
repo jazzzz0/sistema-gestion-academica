@@ -25,14 +25,11 @@
         <tbody>
             {% for subject in subjects %}
             <tr>
-                <!-- Materia (link al detalle SGA-89) -->
                 <td>
                     <a href="{% url 'subjects:subject_detail' subject.pk %}">
                         {{ subject.name }}
                     </a>
                 </td>
-
-                <!-- Profesor Titular -->
                 <td>
                     {% if subject.teacher %}
                         {{ subject.teacher.surname }}, {{ subject.teacher.name }}
@@ -40,11 +37,7 @@
                         <span class="text-muted">Sin asignar</span>
                     {% endif %}
                 </td>
-
-                <!-- Cupo -->
                 <td>{{ subject.quota }}</td>
-
-                <!-- Acciones -->
                 <td class="text-end">
                     <a href="{% url 'subjects:subject_update' subject.pk %}" class="btn btn-sm btn-warning">
                         Editar
@@ -59,37 +52,11 @@
     </table>
 </div>
 
-<!-- Paginación -->
 <div class="d-flex justify-content-center">
-    {% if is_paginated %}
-        <nav>
-            <ul class="pagination">
-
-                {% if page_obj.has_previous %}
-                <li class="page-item">
-                    <a class="page-link" href="?page={{ page_obj.previous_page_number }}">Anterior</a>
-                </li>
-                {% endif %}
-
-                {% for i in paginator.page_range %}
-                <li class="page-item {% if page_obj.number == i %}active{% endif %}">
-                    <a class="page-link" href="?page={{ i }}">{{ i }}</a>
-                </li>
-                {% endfor %}
-
-                {% if page_obj.has_next %}
-                <li class="page-item">
-                    <a class="page-link" href="?page={{ page_obj.next_page_number }}">Siguiente</a>
-                </li>
-                {% endif %}
-
-            </ul>
-        </nav>
-    {% endif %}
+    {% include 'pagination.html' %}
 </div>
 
 {% else %}
-<!-- Estado vacío -->
 <div class="text-center py-5">
     <p class="text-muted fs-5 mb-3">No hay materias registradas</p>
     <a href="{% url 'subjects:subject_create' %}" class="btn btn-primary btn-lg">
@@ -98,4 +65,3 @@
 </div>
 {% endif %}
 {% endblock %}
-
