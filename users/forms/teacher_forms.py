@@ -116,16 +116,3 @@ class TeacherCreateForm(forms.Form):
         if hire_date > timezone.now().date():
             raise forms.ValidationError("La fecha de contratación no puede ser futura.")
         return hire_date
-
-    def save(self):
-        if not self.is_valid():
-            return None
-
-        data = self.cleaned_data
-        try:
-            teacher = TeacherService.create_teacher(data)
-            return teacher
-
-        except Exception as e:
-            self.add_error(None, f"Error al crear el profesor: {str(e)}")
-            return None

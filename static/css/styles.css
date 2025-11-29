@@ -1,5 +1,5 @@
 /* ========================================================================== */
-/* Descripción: Hoja de estilos global (SGA) - Adaptada al Manual de Marca    */
+/* Descripción: Hoja de estilos global (SGA).                                 */
 /* ========================================================================== */
 
 /* 0. Importar Fuentes */
@@ -8,7 +8,7 @@
 @import url('https://fonts.googleapis.com/css2?family=Leckerli+One&family=Roboto:wght@300;400;700&display=swap');
 
 /* ========================================================================== */
-/* 1. Variables de marca (Actualizadas según Manual)                          */
+/* 1. Variables de marca                                                      */
 /* ========================================================================== */
 :root {
   /* Colores Principales [cite: 71-73] */
@@ -113,13 +113,16 @@ button:not(.btn):not(.navbar-toggler):hover {
 }
 
 /* ========================================================================== */
-/* 4. Estilos específicos por ROL (Overrides adaptados a la marca)            */
+/* 4. Estilos específicos por ROL (Overrides)                                 */
 /* ========================================================================== */
 /* Admin: Usamos el color de Error/Atención para alta visibilidad */
 .navbar-admin { background-color: var(--color-error) !important; } /* #D64545 */
 
 /* Teacher: Usamos el color Primario (Institucional) */
 .navbar-teacher { background-color: var(--color-primary) !important; } /* #34658A */
+
+/* Student: Usamos el color Secundario (Verde Amigable) */
+.navbar-student { background-color: var(--color-secondary) !important; } /* #58857C */
 
 /* Student: Usamos el color Secundario (Verde Amigable) */
 .navbar-student { background-color: var(--color-secondary) !important; } /* #58857C */
