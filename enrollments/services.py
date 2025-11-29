@@ -62,11 +62,11 @@ class EnrollmentService:
         enrollment = get_object_or_404(Enrollment, pk=enrollment_id)
 
         if enrollment.student != student:
-            raise ValidationError("No puedes darte de baja de una materia que no estás cursando.")
+            raise ValidationError("No tienes permisos para modificar esta inscripción.")
 
         # Estados válidos para darse de baja 
         if enrollment.status not in ["activa", "regular"]:
-            raise ValidationError("Esta inscripción no puede darse de baja.")
+            raise ValidationError("No se puede dar de baja una materia finalizada.")
 
         enrollment.status = "baja"
         enrollment.save()
