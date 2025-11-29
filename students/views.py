@@ -1,6 +1,7 @@
 from django.contrib import messages
 from django.core.exceptions import ValidationError
 from django.contrib.auth.mixins import UserPassesTestMixin
+from django.core.paginator import Paginator
 from django.http import HttpResponseRedirect
 from django.urls import reverse, reverse_lazy
 from django.shortcuts import get_object_or_404, redirect
@@ -75,6 +76,27 @@ class StudentDetailView(AdminRequiredMixin, DetailView):
     def get_queryset(self):
         # Optimización para evitar N+1
         return Student.objects.select_related("user", "career")
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        student = self.object
+
+        # Buscamos las inscripciones ordenadas
+        enrollments_qs = student.enrollments.all().order_by('-enrolled_at')
+
+        # Paginamos (20 por página)
+        paginator = Paginator(enrollments_qs, 20)
+
+        # Obtenemos la página actual del request
+        page_number = self.request.GET.get('page')
+        page_obj = paginator.get_page(page_number)
+
+        # Enviamos 'enrollments_page' al template
+        context['enrollments_page'] = page_obj
+        context['page_obj'] = page_obj
+        context['is_paginated'] = page_obj.has_other_pages()
+
+        return context
 
 
 class StudentUpdateView(AdminRequiredMixin, FormView):
@@ -153,22 +175,30 @@ class StudentCareerUpdateView(AdminRequiredMixin, UpdateView):
 
 class StudentToggleActiveView(AdminRequiredMixin, View):
     """
-        Vista para alternar el estado (Activo/Inactivo) de un alumno.
-        Solo accesible por Admin/Superuser.
+    Vista para alternar el estado (Activo/Inactivo) de un alumno.
+    Delega la lógica transaccional al StudentService.
     """
-    def post(self, request, pk):
-        # Obtener el estudiante o 404
-        student = get_object_or_404(Student, pk=pk)
 
-        # Calcular el nuevo estado
+    def post(self, request, pk):
+        # 1. Obtener el estudiante (necesario para saber su estado actual)
+        # Usamos select_related para no hacer dos queries, ya que necesitamos el user.
+        student = get_object_or_404(Student.objects.select_related('user'), pk=pk)
+
+        # 2. Calcular el nuevo estado deseado (Invertir el actual)
+        # Si está activo (True) -> queremos False.
         new_status = not student.user.is_active
 
-        # Llamar al servicio para actualizar el estado
-        StudentService.toggle_active_status(student.pk, new_status)
+        try:
+            # 3. Llamar a tu servicio existente
+            user_updated = StudentService.toggle_active_status(student.pk, new_status)
 
-        # Feedback al usuario
-        status_msg = "reactivado" if new_status else "dado de baja"
-        messages.success(request, f"El alumno {student.surname} ha sido {status_msg} correctamente.")
+            # 4. Feedback al usuario
+            estado_texto = "reactivado" if user_updated.is_active else "dado de baja"
+            messages.success(request, f"El acceso del alumno ha sido {estado_texto} correctamente.")
 
-        # Redirigir al detalle del alumno
+        except Exception as e:
+            # Capturamos cualquier error inesperado del servicio
+            messages.error(request, f"Ocurrió un error al intentar cambiar el estado: {str(e)}")
+
+        # 5. Volver al perfil
         return redirect("students:student_detail", pk=pk)
