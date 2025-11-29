@@ -11,6 +11,8 @@ class Subject(models.Model):
         related_name="subjects",
         verbose_name="Docente",
         help_text="Docente encargado de la materia",
+        null=True,
+        blank=True,
     )
 
     name = models.CharField(

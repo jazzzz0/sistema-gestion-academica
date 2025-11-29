@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+
+{% block title %}¿Eliminar Materia?{% endblock %}
+
+{% block content %}
+<div class="mb-4">
+    <h1 class="h3">¿Eliminar Materia?</h1>
+</div>
+
+<div class="card">
+    <div class="card-body">
+        <h5 class="card-title">{{ subject.name }}</h5>
+        <p class="card-text">{{ subject.description }}</p>
+
+        {% if has_enrollments %}
+        <div class="alert alert-danger" role="alert">
+            No se puede eliminar la materia porque tiene historial académico (alumnos inscritos).
+        </div>
+        {% else %}
+            {% if careers %}
+            <div class="alert alert-warning" role="alert">
+                ⚠️ Esta materia forma parte del plan de estudios de las siguientes carreras:
+                <ul class="mb-0">
+                    {% for career in careers %}
+                        <li>{{ career.name }}</li>
+                    {% endfor %}
+                </ul>
+                Al eliminarla, se quitará automáticamente de estos planes.
+            </div>
+            {% endif %}
+        {% endif %}
+
+        <form method="post" class="d-inline">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-danger"
+                {% if has_enrollments %}disabled aria-disabled="true"{% endif %}>
+                Confirmar Eliminación
+            </button>
+        </form>
+
+        <a href="{% url 'subjects:subject_list' %}" class="btn btn-secondary ms-2">Cancelar</a>
+    </div>
+</div>
+
+{% endblock %}

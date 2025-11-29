@@ -1,11 +1,15 @@
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
+from django.db import transaction
+from django.http import HttpResponseRedirect
 from django.views.generic import TemplateView, ListView
-from django.views.generic.edit import FormView
+from django.views.generic.edit import FormView, DeleteView
 from django.urls import reverse_lazy
 from django.contrib import messages
 
-from users.models import Admin
-from users.forms import AdminCreateForm
+from .forms.teacher_forms import TeacherCreateForm
+from .mixins import SuperuserRequiredMixin
+from .models import Admin
+from .forms import AdminCreateForm
 
 
 # Vista Home (para usuarios no autenticados)
@@ -26,29 +30,75 @@ class ProfileView(LoginRequiredMixin, TemplateView):
     redirect_field_name = 'next'
 
 
-class AdminListView(LoginRequiredMixin, UserPassesTestMixin, ListView):
+class AdminListView(SuperuserRequiredMixin, ListView):
     model = Admin
     template_name = "users/admin_list.html"
     context_object_name = "admins"
     queryset = Admin.objects.select_related('user').all().order_by('-hire_date')
 
-    def test_func(self):
-        return self.request.user.is_superuser  # Solo superusuarios pueden acceder
 
-
-class AdminCreateView(LoginRequiredMixin, UserPassesTestMixin, FormView):
+class AdminCreateView(SuperuserRequiredMixin, FormView):
     form_class = AdminCreateForm
     template_name = "users/admin_create.html"
     success_url = reverse_lazy("users:admin_list")
-
-    def test_func(self):
-        return self.request.user.is_superuser  # Solo superusuarios pueden acceder
-
-    def handle_no_permission(self):
-        messages.error(self.request, "No tienes permiso para realizar esta acción.")
-        return super().handle_no_permission()
 
     def form_valid(self, form):
         form.save()  # Calls AdminService.create_admin_user()
         messages.success(self.request, "Administrador creado correctamente.")
         return super().form_valid(form)
+
+
+class AdminDeleteView(SuperuserRequiredMixin, DeleteView):
+    model = Admin
+    template_name = "users/admin_confirm_delete.html"
+    success_url = reverse_lazy("users:admin_list")
+    context_object_name = "admin"
+
+    # Lógica de "Borrado" suave (Override delete o form_valid)
+    def delete(self, request, *args, **kwargs):
+        # Obtenemos el objeto Admin a desactivar
+        self.object = self.get_object()
+
+        admin_obj: Admin = self.object
+
+        # Seguridad (Anti-Lockout)
+        # Validamos que no se esté borrando el usuario actual
+        if admin_obj.user == request.user:
+            messages.error(self.request, "No puedes desactivar tu propio usuario.")
+            return HttpResponseRedirect(self.get_success_url())
+
+        # Lógica de borrado suave
+        try:
+            with transaction.atomic():
+                # Desactivar el perfil Admin
+                admin_obj.is_active = False
+                admin_obj.save()
+
+                # Desactivar el Usuario de Django
+                if admin_obj.user:
+                    admin_obj.user.is_active = False
+                    admin_obj.user.save()
+
+            messages.success(request, "Administrador desactivado correctamente.")
+
+        except Exception as e:
+            messages.error(request, f"Error al desactivar el administrador: {str(e)}")
+
+        return HttpResponseRedirect(self.get_success_url())
+
+
+class TeacherCreateView(AdminRequiredMixin, FormView):
+    form_class = TeacherCreateForm
+    template_name = "users/teacher_create.html"
+    success_url = reverse_lazy("users:teacher_list")
+
+    def form_valid(self, form):
+        # El método save() del form ya llama al TeacherService
+        teacher = form.save()
+        if teacher:
+            messages.success(self.request, f"Profesor {teacher.surname}, {teacher.name} creado correctamente.")
+            return super().form_valid(form)
+        else:
+            # Si el servicio falla pero el form era válido (casos raros de DB)
+            messages.error(self.request, "Ocurrió un error interno al guardar el profesor.")
+            return self.form_invalid(form)

@@ -1,8 +1,8 @@
 /* ========================================================================== */
-/* Descripción: Hoja de estilos global (skeleton inicial).                     */
+/* Descripción: Hoja de estilos global (SGA).                                 */
 /* ========================================================================== */
 
-/* 0. Importar Fuentes de Google Fonts */
+/* 0. Importar Fuentes */
 @import url('https://fonts.googleapis.com/css2?family=Leckerli+One&family=Roboto:wght@300;400;700&display=swap');
 
 /* ========================================================================== */
@@ -14,7 +14,6 @@
   --color-accent: #ff9800;    /* Naranja de acento */
   --color-bg: #f5f7fa;        /* Fondo claro general */
   --color-text: #333333;      /* Texto principal */
-  --color-muted: #777777;     /* Texto secundario */
 
   /* Tipografía */
   --font-base: 'Roboto', sans-serif;
@@ -22,8 +21,6 @@
 
   /* Tamaños base */
   --font-size-base: 16px;
-  --font-size-sm: 14px;
-  --font-size-lg: 18px;
   --line-height: 1.6;
 }
 
@@ -36,16 +33,13 @@ body {
   line-height: var(--line-height);
   color: var(--color-text);
   background-color: var(--color-bg);
-  /* Padding top para evitar que el navbar fixed tape contenido */
-  /* Lo muevo aquí para que sea global en lugar de ponerlo en el HTML */
-  padding-top: 80px;
+  padding-top: 80px; /* Espacio para navbar fixed */
 }
 
 h1, h2, h3, h4, h5, h6 {
   font-family: var(--font-headings);
-  margin-top: 0.5em;
-  margin-bottom: 0.5em;
   color: var(--color-primary);
+  margin-bottom: 0.5em;
 }
 
 a {
@@ -57,9 +51,8 @@ a:hover {
   text-decoration: underline;
 }
 
-/* CUIDADO: Esto afecta a TODOS los botones sin clase */
+/* Botones genéricos (para elementos que no sean .btn de bootstrap) */
 button:not(.btn):not(.navbar-toggler) {
-  /* El :not() evita romper los botones de Bootstrap */
   font-family: var(--font-base);
   padding: 0.5em 1em;
   border: none;
@@ -71,11 +64,10 @@ button:not(.btn):not(.navbar-toggler) {
 }
 
 /* ========================================================================== */
-/* 3. Estilos Generales del Navbar (Base)                                     */
-/* NOTA: Movemos esto ANTES de los roles para que los roles puedan sobrescribirlo */
+/* 3. Estilos Generales del Navbar                                            */
 /* ========================================================================== */
 .navbar {
-  background-color: var(--color-primary); /* Color por defecto */
+  background-color: var(--color-primary);
   font-family: var(--font-base);
   padding: 0.5rem 1rem;
   transition: background-color 0.3s ease-in-out;
@@ -83,13 +75,13 @@ button:not(.btn):not(.navbar-toggler) {
 
 .navbar-brand {
   font-family: var(--font-headings);
-  font-size: 1.6rem; /* Un poco más grande para destacar la fuente */
+  font-size: 1.6rem;
   color: #fff !important;
   letter-spacing: 0.5px;
 }
 
 .navbar-nav .nav-link {
-  color: rgba(255, 255, 255, 0.9) !important; /* Blanco suave */
+  color: rgba(255, 255, 255, 0.9) !important;
   font-size: var(--font-size-base);
   margin-left: 0.5rem;
   margin-right: 0.5rem;
@@ -97,34 +89,21 @@ button:not(.btn):not(.navbar-toggler) {
 }
 
 .navbar-nav .nav-link:hover {
-  color: var(--color-accent) !important; /* Naranja al pasar mouse */
+  color: var(--color-accent) !important;
 }
 
 /* ========================================================================== */
-/* 4. Estilos específicos por ROL de usuario (Overrides)                      */
+/* 4. Estilos específicos por ROL (Overrides)                                 */
 /* ========================================================================== */
+.navbar-admin { background-color: #d32f2f !important; }   /* Rojo */
+.navbar-teacher { background-color: #1976d2 !important; } /* Azul */
+.navbar-student { background-color: #388e3c !important; } /* Verde */
 
-/* Admin: Rojo */
-.navbar-admin {
-  background-color: #d32f2f !important;
-}
-
-/* Teacher: Azul (Corregido el typo navar -> navbar) */
-.navbar-teacher {
-  background-color: #1976d2 !important;
-}
-
-/* Student: Verde */
-.navbar-student {
-  background-color: #388e3c !important;
-}
-
-/* Badges visuales */
 .role-badge {
   display: inline-block;
   padding: 0.25em 0.5em;
   border-radius: 4px;
-  font-size: var(--font-size-sm);
+  font-size: 14px;
   color: #fff;
   vertical-align: middle;
 }
@@ -134,10 +113,24 @@ button:not(.btn):not(.navbar-toggler) {
 /* ========================================================================== */
 @media (max-width: 991px) {
   .navbar-nav {
-    /* Fondo ligeramente más oscuro para el menú desplegable en móvil */
     background-color: rgba(0, 0, 0, 0.1);
     border-radius: 8px;
     padding: 1rem;
     margin-top: 10px;
   }
+}
+
+/* ========================================================================== */
+/* 6. Animaciones personalizadas                                              */
+/* ========================================================================== */
+
+/* Animación de pulso para botones de acción requerida */
+.pulse-animation {
+    animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+    0% { box-shadow: 0 0 0 0 rgba(13, 110, 253, 0.7); }
+    70% { box-shadow: 0 0 0 10px rgba(13, 110, 253, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(13, 110, 253, 0); }
 }
