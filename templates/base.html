@@ -108,7 +108,7 @@
                 <div class="d-flex align-items-center">
                     {% if user.is_authenticated %}
                         <span class="me-3 text-light d-none d-lg-block">
-                            Hola, <strong>{{ user.first_name|default:user.username }}</strong>
+                            Hola, <strong>{{ user.first_name|default:user.email }}</strong>
                         </span>
                         <a href="{% url 'profile' %}" class="btn btn-outline-light btn-sm me-2">Mi Perfil</a>
 
