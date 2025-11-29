@@ -1,7 +1,8 @@
 from django.contrib import messages
+from django.db.models import Count
 from django.shortcuts import redirect
 from django.urls import reverse_lazy
-from django.views.generic import CreateView, ListView, UpdateView, DeleteView
+from django.views.generic import CreateView, ListView, UpdateView, DeleteView, DetailView
 
 from users.mixins import AdminRequiredMixin
 from subjects.forms import SubjectForm
@@ -53,6 +54,30 @@ class SubjectListView(AdminRequiredMixin, ListView):
         return context
 
 
+class SubjectDetailView(AdminRequiredMixin, DetailView):
+    """
+    Ficha técnica de la Materia (SGA-89).
+    Solo accesible por Administradores.
+    """
+    model = Subject
+    template_name = "subjects/subject_detail.html"
+    context_object_name = "subject"
+
+    def get_queryset(self):
+        """
+        Optimización aplicada:
+        1. select_related: Trae el profesor en la misma query.
+        2. prefetch_related: Trae las carreras.
+        3. annotate: Cuenta los enrollments directamente en la DB.
+        """
+        return (
+            Subject.objects.all()
+            .select_related("teacher")
+            .prefetch_related("careers")
+            .annotate(enrollment_count=Count('enrollments'))
+        )
+
+
 class SubjectUpdateView(AdminRequiredMixin, UpdateView):
     """
     Vista para editar una Subject existente.
@@ -74,7 +99,7 @@ class SubjectUpdateView(AdminRequiredMixin, UpdateView):
 
 class SubjectDeleteView(AdminRequiredMixin, DeleteView):
     """
-    Vista para eliminar una Subject existente. 
+    Vista para eliminar una Subject existente.
     Solo accesible por Administradores.
     """
     model = Subject

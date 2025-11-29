@@ -1,0 +1,125 @@
+{% extends "base.html" %}
+
+{% block title %}Mis Materias en Curso{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+
+    <h1 class="h4 mb-4">Mis Materias en Curso</h1>
+
+        <table class="table table-bordered align-middle">
+            <thead class="table-light">
+                <tr>
+                    <th>Materia</th>
+                    <th>Profesor</th>
+                    <th>Estado</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                {% for enrollment in enrollments %}
+                    <tr>
+                        <td>
+                            <strong>{{ enrollment.subject.name }}</strong>
+                        </td>
+
+                        <td>
+                            {% if enrollment.subject.teacher %}
+                                {{ enrollment.subject.teacher.last_name }}, {{ enrollment.subject.teacher.first_name }}
+                            {% else %}
+                                <span class="text-muted">Sin asignar</span>
+                            {% endif %}
+                        </td>
+
+                        <td>
+                            {% if enrollment.status == "ACTIVE" %}
+                                <span class="badge bg-success">Cursando</span>
+                            {% else %}
+                                <span class="badge bg-primary">Regular</span>
+                            {% endif %}
+                        </td>
+
+                        <td>
+                            <button 
+                                class="btn btn-outline-danger btn-sm"
+                                data-bs-toggle="modal"
+                                data-bs-target="#dropModal"
+                                data-subject="{{ enrollment.subject.name }}"
+                                data-id="{{ enrollment.id }}"
+                            >
+                                Darse de Baja
+                            </button>
+                        </td>
+                    </tr>
+
+                {% empty %}
+                    <tr>
+                        <td colspan="4" class="text-center">
+                            No estás inscripto en ninguna materia.
+                        </td>
+                    </tr>
+                    <tr>
+                        <td colspan="4" class="text-center">
+                            <a href="{% url 'enrollments:enrollment_list' %}" class="btn btn-primary">
+                                Ir a Oferta Académica
+                            </a>
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+
+        </table>
+</div>
+
+
+<!-- MODAL -->
+<div class="modal fade" id="dropModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">¿Renunciar a la cursada?</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+
+      <div class="modal-body">
+        <p id="modalText">
+          <!-- Se actualizará por JS -->
+        </p>
+      </div>
+
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+          Cancelar
+        </button>
+
+        <form id="dropForm" method="post">
+          {% csrf_token %}
+          <button class="btn btn-danger">Confirmar Baja</button>
+        </form>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+
+<script>
+    const dropModal = document.getElementById('dropModal');
+    dropModal.addEventListener('show.bs.modal', function (event) {
+        const button = event.relatedTarget;
+        const subject = button.getAttribute('data-subject');
+        const id = button.getAttribute('data-id');
+
+        // Texto dinámico del modal
+        document.getElementById("modalText").textContent =
+            `Estás a punto de darte de baja de ${subject}. Esta acción es irreversible.`;
+
+        // Formulario dinámico
+        document.getElementById("dropForm").action =
+            `/enrollments/unenroll/${id}/`;
+    });
+</script>
+
+{% endblock %}
