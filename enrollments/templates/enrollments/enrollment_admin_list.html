@@ -1,0 +1,118 @@
+{% extends "base.html" %}
+
+{% block title %}Reporte de Inscripciones{% endblock %}
+
+{% block content %}
+<h1 class="h4 mb-4">Reporte de Inscripciones</h1>
+
+<form method="get" class="row g-3 mb-4">
+    <div class="col-md-3">
+        <label class="form-label">Carrera</label>
+        <select name="career_id" class="form-select">
+            <option value="">Todas</option>
+            {% for c in careers %}
+                <option value="{{ c.id }}" {% if filters.career_id == c.id|stringformat:"s" %}selected{% endif %}>
+                    {{ c.name }}
+                </option>
+            {% endfor %}
+        </select>
+    </div>
+
+    <div class="col-md-3">
+        <label class="form-label">Materia</label>
+        <select name="subject_id" class="form-select">
+            <option value="">Todas</option>
+            {% for s in subjects %}
+                <option value="{{ s.id }}" {% if filters.subject_id == s.id|stringformat:"s" %}selected{% endif %}>
+                    {{ s.name }}
+                </option>
+            {% endfor %}
+        </select>
+    </div>
+
+    <div class="col-md-2">
+        <label class="form-label">DNI</label>
+        <input type="text" name="student_dni" class="form-control"
+               value="{{ filters.student_dni }}">
+    </div>
+
+    <div class="col-md-2">
+        <label class="form-label">Estado</label>
+        <select name="status" class="form-select">
+            <option value="">Todos</option>
+            {% for key, label in enrollments.model.STATUS_CHOICES %}
+                <option value="{{ key }}" {% if filters.status == key %}selected{% endif %}>{{ label }}</option>
+            {% endfor %}
+        </select>
+    </div>
+
+    <div class="col-md-2 d-flex align-items-end">
+        <button class="btn btn-primary w-100 me-2">Filtrar</button>
+    </div>
+
+    <div class="col-md-2 d-flex align-items-end">
+        <a href="{% url 'enrollment_admin_list' %}" class="btn btn-secondary w-100">Limpiar</a>
+    </div>
+</form>
+
+{% if enrollments %}
+<div class="table-responsive">
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>Fecha</th>
+            <th>Alumno</th>
+            <th>DNI</th>
+            <th>Materia</th>
+            <th>Estado</th>
+            <th>Calificación</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for e in enrollments %}
+        <tr>
+            <td>{{ e.enrolled_at|date:"d/m/Y" }}</td>
+
+            <td>
+                <a href="{% url 'student_detail' e.student.pk %}">
+                    {{ e.student.surname }}, {{ e.student.name }}
+                </a>
+            </td>
+
+            <td>{{ e.student.dni }}</td>
+
+            <td>
+                <a href="{% url 'subject_detail' e.subject.pk %}">
+                    {{ e.subject.name }}
+                </a>
+            </td>
+
+            <td>
+                {% if e.status == "activa" %}
+                    <span class="badge bg-success">Activa</span>
+                {% elif e.status == "regular" %}
+                    <span class="badge bg-primary">Regular</span>
+                {% elif e.status == "aprobada" %}
+                    <span class="badge bg-info text-dark">Aprobada</span>
+                {% elif e.status == "reprobada" %}
+                    <span class="badge bg-danger">Reprobada</span>
+                {% elif e.status == "baja" %}
+                    <span class="badge bg-secondary">Baja</span>
+                {% elif e.status == "ausente" %}
+                    <span class="badge bg-warning text-dark">Ausente</span>
+                {% endif %}
+            </td>
+
+            <td>{{ e.grade|default:"-" }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+</div>
+
+{% include "pagination.html" with page_obj=enrollments %}
+{% else %}
+<p>No se encontraron inscripciones.</p>
+{% endif %}
+
+{% endblock %}
