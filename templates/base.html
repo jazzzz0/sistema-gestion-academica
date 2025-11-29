@@ -62,35 +62,44 @@
                         {% endif %}
 
                         {% if user.is_staff %}
+
                             <li class="nav-item dropdown">
                                 <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                    Gestión Académica
+                                    <i class="bi bi-people"></i> Personas
                                 </a>
                                 <ul class="dropdown-menu">
-                                    <li><h6 class="dropdown-header">Personas</h6></li>
                                     <li><a class="dropdown-item" href="{% url 'students:student_list' %}">Alumnos</a></li>
                                     <li><a class="dropdown-item" href="{% url 'users:teacher_list' %}">Profesores</a></li>
+                                </ul>
+                            </li>
 
-                                    <li><hr class="dropdown-divider"></li>
-
-                                    <li><h6 class="dropdown-header">Académico</h6></li>
+                            <li class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                    <i class="bi bi-mortarboard"></i> Académica
+                                </a>
+                                <ul class="dropdown-menu">
                                     <li><a class="dropdown-item" href="{% url 'careers:career_list' %}">Carreras</a></li>
                                     <li><a class="dropdown-item" href="{% url 'subjects:subject_list' %}">Materias</a></li>
+                                    <li><hr class="dropdown-divider"></li>
                                     <li><a class="dropdown-item" href="{% url 'enrollments:enrollment_list' %}">Inscripciones</a></li>
                                 </ul>
                             </li>
+
                         {% endif %}
 
                         {% if user.groups.all.0.name == 'Docente' %}
                             <li class="nav-item">
-                                <a class="nav-link" href="#">Mis Materias</a> </li>
+                                <a class="nav-link" href="#">Mis Materias</a>
+                            </li>
                         {% endif %}
 
                         {% if not user.is_staff and user.groups.all.0.name != 'Docente' %}
                              <li class="nav-item">
-                                <a class="nav-link" href="#">Oferta Académica</a> </li>
+                                <a class="nav-link" href="#">Oferta Académica</a>
+                            </li>
                              <li class="nav-item">
-                                <a class="nav-link" href="#">Mis Inscripciones</a> </li>
+                                <a class="nav-link" href="#">Mis Inscripciones</a>
+                            </li>
                         {% endif %}
 
                     {% endif %}
