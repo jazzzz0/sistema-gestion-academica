@@ -47,6 +47,7 @@
                                 data-bs-target="#dropModal"
                                 data-subject="{{ enrollment.subject.name }}"
                                 data-id="{{ enrollment.id }}"
+                                data-url="{% url 'enrollments:enrollment_drop' enrollment.pk %}"
                             >
                                 Darse de Baja
                             </button>
@@ -110,15 +111,14 @@
     dropModal.addEventListener('show.bs.modal', function (event) {
         const button = event.relatedTarget;
         const subject = button.getAttribute('data-subject');
-        const id = button.getAttribute('data-id');
+        const url = button.getAttribute('data-url');
 
         // Texto dinámico del modal
         document.getElementById("modalText").textContent =
             `Estás a punto de darte de baja de ${subject}. Esta acción es irreversible.`;
 
         // Formulario dinámico
-        document.getElementById("dropForm").action =
-            `/enrollments/unenroll/${id}/`;
+        document.getElementById("dropForm").action = url;
     });
 </script>
 

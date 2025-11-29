@@ -10,8 +10,9 @@ class EnrollmentService:
     """
     Servicio para gestionar las inscripciones de estudiantes.
     """
+    @staticmethod
     @transaction.atomic
-    def create_enrollment(self, user: User, subject_id: int) -> Enrollment:
+    def create_enrollment(user: User, subject_id: int) -> Enrollment:
         # --- Obtención de datos ---
         # Obtención de estudiante asociado al usuario
         if not hasattr(user, "student_profile"):
@@ -56,6 +57,7 @@ class EnrollmentService:
         )
 
         return enrollment
+
     @staticmethod
     @transaction.atomic
     def unenroll_student(student, enrollment_id):

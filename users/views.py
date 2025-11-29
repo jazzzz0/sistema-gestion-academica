@@ -7,7 +7,7 @@ from django.urls import reverse_lazy
 from django.contrib import messages
 
 from .forms.teacher_forms import TeacherCreateForm
-from .mixins import SuperuserRequiredMixin
+from .mixins import SuperuserRequiredMixin, AdminRequiredMixin
 from .models import Admin
 from .forms import AdminCreateForm
 
@@ -103,3 +103,7 @@ class TeacherCreateView(AdminRequiredMixin, FormView):
             # Si el servicio falla pero el form era válido (casos raros de DB)
             messages.error(self.request, "Ocurrió un error interno al guardar el profesor.")
             return self.form_invalid(form)
+
+
+class TeacherListView(AdminRequiredMixin, ListView):
+    pass
