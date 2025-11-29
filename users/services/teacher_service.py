@@ -54,3 +54,19 @@ class TeacherService:
     @staticmethod
     def validate_email_unique(email: str) -> bool:
         return not User.objects.filter(email=email).exists()
+
+    @staticmethod
+    @transaction.atomic
+    def deactivate_teacher(teacher: Teacher) -> None:
+        """
+        Desactiva (Soft Delete) el perfil del profesor y su usuario asociado.
+        """
+        # Desactivar Usuario de Django (Login)
+        if teacher.user:
+            teacher.user.is_active = False
+            teacher.user.save()
+
+        # Desactivar Perfil Teacher (si tiene el campo is_active)
+        if hasattr(teacher, 'is_active'):
+            teacher.is_active = False
+            teacher.save()
