@@ -9,6 +9,7 @@ from django.contrib import messages
 from .forms import AdminCreateForm, TeacherCreateForm
 from .mixins import SuperuserRequiredMixin, AdminRequiredMixin
 from .models import Admin, Teacher
+from .services.teacher_service import TeacherService
 
 
 # Vista Home (para usuarios no autenticados)
@@ -93,14 +94,17 @@ class TeacherCreateView(AdminRequiredMixin, FormView):
     success_url = reverse_lazy("users:teacher_list")
 
     def form_valid(self, form):
-        # El método save() del form ya llama al TeacherService
-        teacher = form.save()
-        if teacher:
-            messages.success(self.request, f"Profesor {teacher.surname}, {teacher.name} creado correctamente.")
+        try:
+            # Pasamos los datos del formulario al servicio para crear el Teacher
+            TeacherService.create_teacher(form.cleaned_data)
+
+            messages.success(self.request, f"Profesor creado correctamente.")
             return super().form_valid(form)
-        else:
-            # Si el servicio falla pero el form era válido (casos raros de DB)
-            messages.error(self.request, "Ocurrió un error interno al guardar el profesor.")
+
+        except Exception as e:
+            # Si el servicio falla (ej: DNI duplicado que se pasó la validación simple),
+            # lo atrapamos aquí y volvemos a mostrar el formulario con el error.
+            form.add_error(None, f"Error al crear profesor: {str(e)}")
             return self.form_invalid(form)
 
 
@@ -132,16 +136,7 @@ class TeacherDeleteView(AdminRequiredMixin, DeleteView):
         teacher_obj: Teacher = self.object
 
         try:
-            with transaction.atomic():
-                # Desactivar el Usuario de Django (Login)
-                if teacher_obj.user:
-                    teacher_obj.user.is_active = False
-                    teacher_obj.user.save()
-
-                # Desactivar campo is_active del modelo Teacher
-                if hasattr(teacher_obj, "is_active"):
-                    teacher_obj.is_active = False
-                    teacher_obj.save()
+            TeacherService.deactivate_teacher(teacher_obj)
 
             messages.success(
                 request,
