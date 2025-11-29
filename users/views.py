@@ -6,10 +6,9 @@ from django.views.generic.edit import FormView, DeleteView
 from django.urls import reverse_lazy
 from django.contrib import messages
 
-from .forms.teacher_forms import TeacherCreateForm
+from .forms import AdminCreateForm, TeacherCreateForm
 from .mixins import SuperuserRequiredMixin, AdminRequiredMixin
-from .models import Admin
-from .forms import AdminCreateForm
+from .models import Admin, Teacher
 
 
 # Vista Home (para usuarios no autenticados)
@@ -105,5 +104,52 @@ class TeacherCreateView(AdminRequiredMixin, FormView):
             return self.form_invalid(form)
 
 
-class TeacherListView(AdminRequiredMixin, ListView):
-    pass
+class TeacherDeleteView(AdminRequiredMixin, DeleteView):
+    """
+    Vista para desactivar un profesor (SGA-102).
+    Solo accesible por Administradores.
+    """
+    model = Teacher
+    template_name = "users/teacher_confirm_delete.html"
+    context_object_name = "teacher"
+    success_url = reverse_lazy("users:teacher_list")
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        teacher = self.object
+
+        # Consultar las materias asignadas al profesor
+        context["assigned_subjects"] = teacher.subjects.all()
+
+        return context
+
+    def delete(self, request, *args, **kwargs):
+        """
+        Sobreescribimos delete para evitar el borrado físico y
+        aplicar Soft Delete con transacción atómica.
+        """
+        self.object = self.get_object()
+        teacher_obj: Teacher = self.object
+
+        try:
+            with transaction.atomic():
+                # Desactivar el Usuario de Django (Login)
+                if teacher_obj.user:
+                    teacher_obj.user.is_active = False
+                    teacher_obj.user.save()
+
+                # Desactivar campo is_active del modelo Teacher
+                if hasattr(teacher_obj, "is_active"):
+                    teacher_obj.is_active = False
+                    teacher_obj.save()
+
+            messages.success(
+                request,
+                f"El profesor {teacher_obj.surname}, {teacher_obj.name} ha sido desactivado correctamente."
+            )
+
+        except Exception as e:
+            messages.error(request, f"Error al desactivar el profesor: {str(e)}")
+            return HttpResponseRedirect(self.get_success_url())
+
+        return HttpResponseRedirect(self.get_success_url())
