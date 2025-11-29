@@ -5,4 +5,6 @@ app_name = "enrollments"
 
 urlpatterns = [
     path("", views.inicio, name="inicio"),
+    path("my-enrollments/", views.MyEnrollmentListView.as_view(), name="my_enrollments"),
+    path("unenroll/<int:pk>/", views.EnrollmentDropView.as_view(), name="enrollment_drop"),
 ]
