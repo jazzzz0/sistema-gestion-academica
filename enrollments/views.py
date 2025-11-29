@@ -25,6 +25,7 @@ class StudentEnrollmentListView(LoginRequiredMixin, ListView):
     model = Subject
     template_name = "enrollments/enrollment_list.html"
     context_object_name = "subjects"
+    paginate_by = 20
 
     def get_queryset(self):
         student = Student.objects.get(user=self.request.user)
