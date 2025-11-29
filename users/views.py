@@ -6,6 +6,7 @@ from django.views.generic.edit import FormView, DeleteView
 from django.urls import reverse_lazy
 from django.contrib import messages
 
+from .forms.teacher_forms import TeacherCreateForm
 from .mixins import SuperuserRequiredMixin
 from .models import Admin
 from .forms import AdminCreateForm
@@ -84,3 +85,20 @@ class AdminDeleteView(SuperuserRequiredMixin, DeleteView):
             messages.error(request, f"Error al desactivar el administrador: {str(e)}")
 
         return HttpResponseRedirect(self.get_success_url())
+
+
+class TeacherCreateView(SuperuserRequiredMixin, FormView):
+    form_class = TeacherCreateForm
+    template_name = "users/teacher_create.html"
+    success_url = reverse_lazy("users:teacher_list")
+
+    def form_valid(self, form):
+        # El método save() del form ya llama al TeacherService
+        teacher = form.save()
+        if teacher:
+            messages.success(self.request, f"Profesor {teacher.surname}, {teacher.name} creado correctamente.")
+            return super().form_valid(form)
+        else:
+            # Si el servicio falla pero el form era válido (casos raros de DB)
+            messages.error(self.request, "Ocurrió un error interno al guardar el profesor.")
+            return self.form_invalid(form)
