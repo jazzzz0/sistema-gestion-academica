@@ -87,7 +87,7 @@ class AdminDeleteView(SuperuserRequiredMixin, DeleteView):
         return HttpResponseRedirect(self.get_success_url())
 
 
-class TeacherCreateView(SuperuserRequiredMixin, FormView):
+class TeacherCreateView(AdminRequiredMixin, FormView):
     form_class = TeacherCreateForm
     template_name = "users/teacher_create.html"
     success_url = reverse_lazy("users:teacher_list")
