@@ -30,7 +30,7 @@ class MyEnrollmentListView(LoginRequiredMixin, ListView):
         return (
             Enrollment.objects.filter(
                 student=student,
-                status__in=["ACTIVE", "REGULAR"]   # ajustado a tus valores reales
+                status__in=["activa", "regular"]   # ajustado a tus valores reales
             )
             .select_related("subject")
             .order_by("subject__name")
