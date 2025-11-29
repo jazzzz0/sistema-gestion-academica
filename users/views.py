@@ -108,6 +108,18 @@ class TeacherCreateView(AdminRequiredMixin, FormView):
             return self.form_invalid(form)
 
 
+class TeacherListView(AdminRequiredMixin, ListView):
+    model = Teacher
+    template_name = "users/teacher_list.html"
+    context_object_name = "teachers"
+    paginate_by = 20
+
+    def get_queryset(self):
+        # Optimizamos la consulta para traer los datos del Usuario relacionado
+        # en el mismo viaje a la base de datos (evita N+1 queries).
+        return Teacher.objects.select_related('user').all().order_by('surname', 'name')
+
+
 class TeacherDeleteView(AdminRequiredMixin, DeleteView):
     """
     Vista para desactivar un profesor (SGA-102).

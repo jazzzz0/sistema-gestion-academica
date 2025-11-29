@@ -5,7 +5,7 @@ app_name = "users"
 
 urlpatterns = [
     # Vistas de gestión de profesores
-    # path("teachers/", views.TeacherListView.as_view(), name="teacher_list"),
+    path("teachers/", views.TeacherListView.as_view(), name="teacher_list"),
     path("teachers/create/", views.TeacherCreateView.as_view(), name="teacher_create"),
     path("teachers/<int:pk>/delete/", views.TeacherDeleteView.as_view(), name="teacher_delete"),
 
