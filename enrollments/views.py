@@ -163,6 +163,9 @@ class EnrollmentAdminListView(LoginRequiredMixin, ListView):
         context["careers"] = Career.objects.all().order_by("name")
         context["subjects"] = Subject.objects.all().order_by("name")
 
+        # Para llenar el <select> de status
+        context["status_choices"] = Enrollment.STATUS_CHOICES
+
         # Para mantener los filtros en el formulario
         context["filters"] = {
             "career_id": self.request.GET.get("career_id", ""),
