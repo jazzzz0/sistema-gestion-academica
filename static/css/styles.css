@@ -1,5 +1,5 @@
 /* ========================================================================== */
-/* Descripción: Hoja de estilos global (SGA) - Adaptada al Manual de Marca    */
+/* Descripción: Hoja de estilos global (SGA).                                 */
 /* ========================================================================== */
 
 /* 0. Importar Fuentes */
@@ -8,7 +8,7 @@
 @import url('https://fonts.googleapis.com/css2?family=Leckerli+One&family=Roboto:wght@300;400;700&display=swap');
 
 /* ========================================================================== */
-/* 1. Variables de marca (Actualizadas según Manual)                          */
+/* 1. Variables de marca                                                      */
 /* ========================================================================== */
 :root {
   /* Colores Principales [cite: 71-73] */
@@ -113,7 +113,7 @@ button:not(.btn):not(.navbar-toggler):hover {
 }
 
 /* ========================================================================== */
-/* 4. Estilos específicos por ROL (Overrides adaptados a la marca)            */
+/* 4. Estilos específicos por ROL (Overrides)                                 */
 /* ========================================================================== */
 /* Admin: Usamos el color de Error/Atención para alta visibilidad */
 .navbar-admin { background-color: var(--color-error) !important; } /* #D64545 */
@@ -124,14 +124,16 @@ button:not(.btn):not(.navbar-toggler):hover {
 /* Student: Usamos el color Secundario (Verde Amigable) */
 .navbar-student { background-color: var(--color-secondary) !important; } /* #58857C */
 
-.role-badge {
-  display: inline-block;
-  padding: 0.25em 0.5em;
-  border-radius: 4px;
-  font-size: 14px;
-  color: var(--color-white);
-  vertical-align: middle;
-}
+/* Student: Usamos el color Secundario (Verde Amigable) */
+.navbar-student { background-color: var(--color-secondary) !important; } /* #58857C */
+
+/* Guest: Usamos el color de Gris Oscuro */
+.navbar-guest { background-color: var(--color-gray-dark) !important; }
+
+/* Ajuste de Badges para que coincidan con la lógica */
+.badge-admin { background-color: var(--color-white); color: var(--color-error); }
+.badge-teacher { background-color: var(--color-white); color: var(--color-primary); }
+.badge-student { background-color: var(--color-white); color: var(--color-secondary); }
 
 /* ========================================================================== */
 /* 5. Ajustes Responsive                                                      */
