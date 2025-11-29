@@ -1,5 +1,6 @@
 from django.urls import path
 from . import views
+from users.views.teacher_views import TeacherDeleteView # Importar la vista TeacherDeleteView
 
 app_name = "users"
 
@@ -13,4 +14,5 @@ urlpatterns = [
     path("admins/", views.AdminListView.as_view(), name="admin_list"),
     path("admins/create/", views.AdminCreateView.as_view(), name="admin_create"),
     path("admins/<int:pk>/delete/", views.AdminDeleteView.as_view(), name="admin_delete"),
+    
 ]
