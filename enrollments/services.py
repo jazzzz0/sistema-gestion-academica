@@ -1,6 +1,6 @@
 from django.core.exceptions import ValidationError
 from django.db import transaction
-
+from django.shortcuts import get_object_or_404
 from enrollments.models import Enrollment
 from subjects.models import Subject
 from users.models import User
@@ -10,8 +10,9 @@ class EnrollmentService:
     """
     Servicio para gestionar las inscripciones de estudiantes.
     """
+    @staticmethod
     @transaction.atomic
-    def create_enrollment(self, user: User, subject_id: int) -> Enrollment:
+    def create_enrollment(user: User, subject_id: int) -> Enrollment:
         # --- Obtención de datos ---
         # Obtención de estudiante asociado al usuario
         if not hasattr(user, "student_profile"):
@@ -54,5 +55,22 @@ class EnrollmentService:
             subject=subject,
             status="activa"
         )
+
+        return enrollment
+
+    @staticmethod
+    @transaction.atomic
+    def unenroll_student(student, enrollment_id):
+        enrollment = get_object_or_404(Enrollment, pk=enrollment_id)
+
+        if enrollment.student != student:
+            raise ValidationError("No tienes permisos para modificar esta inscripción.")
+
+        # Estados válidos para darse de baja 
+        if enrollment.status not in ["activa", "regular"]:
+            raise ValidationError("No se puede dar de baja una materia finalizada.")
+
+        enrollment.status = "baja"
+        enrollment.save()
 
         return enrollment

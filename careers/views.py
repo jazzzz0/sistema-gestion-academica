@@ -19,15 +19,8 @@ class CareerCreateView(AdminRequiredMixin, CreateView):
     """
     model = Career
     form_class = CareerForm
-    template_name = "careers/career_create.html"
+    template_name = "careers/career_form.html"
     success_url = reverse_lazy("careers:career_list")
-
-    def get_context_data(self, **kwargs):
-        """Añade contexto extra para el template."""
-        context = super().get_context_data(**kwargs)
-        context["title"] = "Crear Nueva Carrera"
-        context["action"] = "Guardar"
-        return context
 
     def form_valid(self, form):
         self.object = form.save(commit=False)
@@ -74,13 +67,6 @@ class CareerUpdateView(AdminRequiredMixin, UpdateView):
     form_class = CareerForm
     template_name = "careers/career_form.html"
     context_object_name = "career"
-
-    def get_context_data(self, **kwargs):
-        """Contexto adicional para el template"""
-        context = super().get_context_data(**kwargs)
-        context["title"] = "Editar Carrera"
-        context["action"] = "Guardar Cambios"
-        return context
 
     def form_valid(self, form):
         """
