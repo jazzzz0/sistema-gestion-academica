@@ -74,10 +74,10 @@
                             {% endif %}
                         </td>
                         <td>
-                            <!-- Placeholder para futuras acciones -->
-                            <button class="btn btn-sm btn-outline-primary" title="Editar">
+                            <!-- Acciones -->
+                            <a href="{% url 'students:student_update' student.id %}" class="btn btn-sm btn-outline-primary" title="Editar">
                                 <i class="bi bi-pencil"></i>
-                            </button>
+                            </a>
                         </td>
                     </tr>
                     {% empty %}
