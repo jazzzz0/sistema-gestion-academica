@@ -1,0 +1,73 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="text-primary">Listado de Profesores</h2>
+        <a href="{% url 'users:teacher_create' %}" class="btn btn-success">
+            <i class="bi bi-person-plus-fill"></i> Nuevo Profesor
+        </a>
+    </div>
+
+    <div class="card shadow-lg">
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover table-striped mb-0">
+                    <thead class="table-primary text-center">
+                        <tr>
+                            <th>Nombre Completo</th>
+                            <th>Título</th>
+                            <th>Email / Usuario</th>
+                            <th>Teléfono</th>
+                            <th>Contratado</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for teacher in teachers %}
+                        <tr>
+                            <td class="align-middle">
+                                <strong>{{ teacher.surname }}, {{ teacher.name }}</strong>
+                            </td>
+                            <td class="align-middle text-center">
+                                <span class="badge bg-info text-dark">{{ teacher.get_academic_degree_display }}</span>
+                            </td>
+                            <td class="align-middle">
+                                {{ teacher.user.email }}
+                            </td>
+                            <td class="align-middle">
+                                {{ teacher.phone|default:"-" }}
+                            </td>
+                            <td class="align-middle text-center">
+                                {{ teacher.hire_date|date:"d/m/Y" }}
+                            </td>
+                            <td class="align-middle text-center">
+                                <div class="btn-group" role="group">
+                                    <a href="#" class="btn btn-sm btn-outline-primary" title="Editar">
+                                        <i class="bi bi-pencil"></i>
+                                    </a>
+                                    <a href="#" class="btn btn-sm btn-outline-danger" title="Eliminar">
+                                        <i class="bi bi-trash"></i>
+                                    </a>
+                                </div>
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="6" class="text-center py-4 text-muted">
+                                No hay profesores registrados aún.
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="card-footer bg-white">
+            {% include 'pagination.html' %}
+        </div>
+
+    </div>
+</div>
+{% endblock %}

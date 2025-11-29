@@ -7,9 +7,9 @@ from django.urls import reverse_lazy
 from django.contrib import messages
 
 from .forms.teacher_forms import TeacherCreateForm
-from .mixins import SuperuserRequiredMixin, AdminRequiredMixin
-from .models import Admin
 from .forms import AdminCreateForm
+from .mixins import SuperuserRequiredMixin, AdminRequiredMixin
+from .models import Admin, Teacher
 
 
 # Vista Home (para usuarios no autenticados)
@@ -106,4 +106,13 @@ class TeacherCreateView(AdminRequiredMixin, FormView):
 
 
 class TeacherListView(AdminRequiredMixin, ListView):
-    pass
+    model = Teacher
+    template_name = "users/teacher_list.html"
+    context_object_name = "teachers"
+    paginate_by = 20
+
+    def get_queryset(self):
+        # Optimizamos la consulta para traer los datos del Usuario relacionado
+        # en el mismo viaje a la base de datos (evita N+1 queries).
+        return Teacher.objects.select_related('user').all().order_by('surname', 'name')
+
