@@ -4,7 +4,8 @@ from . import views
 app_name = "enrollments"
 
 urlpatterns = [
-    path("", views.inicio, name="inicio"),
+    path("list/", views.StudentEnrollmentListView.as_view(), name="enrollment_list"),
+    path("create/", views.EnrollmentActionView.as_view(), name="enrollment_create"),
     path("my-enrollments/", views.MyEnrollmentListView.as_view(), name="my_enrollments"),
     path("unenroll/<int:pk>/", views.EnrollmentDropView.as_view(), name="enrollment_drop"),
 ]
