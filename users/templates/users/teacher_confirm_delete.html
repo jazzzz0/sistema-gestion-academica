@@ -1,50 +1,57 @@
-{% extends "base.html" %}
+{% extends 'base.html' %}
 
-{% block title %}¿Desactivar Profesor?{% endblock %}
+{% block title %}
+  ¿Desactivar Profesor?
+{% endblock %}
 
 {% block content %}
-<div class="container py-4 mt-5 d-flex justify-content-center">
+  <div class="container py-4 mt-5 d-flex justify-content-center">
     <div class="card shadow-lg border-danger w-75">
+      {% if teacher.user.is_active %}
         <div class="card-header bg-danger text-white">
-            <h4 class="mb-0"><i class="bi bi-person-x-fill"></i> ¿Desactivar Profesor?</h4>
+          <h4 class="mb-0"><i class="bi bi-person-x-fill"></i> ¿Desactivar Profesor?</h4>
         </div>
+      {% else %}
+        <h4 class="mb-0">¿Reactivar Profesor?</h4>
+      {% endif %}
 
-        <div class="card-body">
-            <p class="lead text-center">
-                Está a punto de desactivar al profesor
-                <strong>{{ teacher.surname }}, {{ teacher.name }}</strong>.
-            </p>
-            <p class="text-center text-muted mb-4">
-                El usuario perderá acceso al sistema inmediatamente, pero se mantendrá su historial.
-            </p>
+      <div class="card-body">
+        <p class="lead text-center">
+          Está a punto de desactivar al profesor
+          <strong>{{ teacher.surname }}, {{ teacher.name }}</strong>.
+        </p>
+        <p class="text-center text-muted mb-4">El usuario perderá acceso al sistema inmediatamente, pero se mantendrá su historial.</p>
 
-            {% if assigned_subjects %}
-                <div class="alert alert-warning d-flex align-items-start" role="alert">
-                    <i class="bi bi-exclamation-triangle-fill fs-4 me-3"></i>
-                    <div>
-                        <strong>Advertencia Crítica:</strong>
-                        Este profesor figura como titular en las siguientes materias que quedarán sin docente:
-                        <ul class="mt-2 mb-0">
-                            {% for subject in assigned_subjects %}
-                                <li>{{ subject.name }}</li>
-                            {% endfor %}
-                        </ul>
-                    </div>
-                </div>
-            {% endif %}
+        {% if assigned_subjects %}
+          <div class="alert alert-warning d-flex align-items-start" role="alert">
+            <i class="bi bi-exclamation-triangle-fill fs-4 me-3"></i>
+            <div>
+              <strong>Advertencia Crítica:</strong>
+              Este profesor figura como titular en las siguientes materias que quedarán sin docente:<ul class="mt-2 mb-0">
+                {% for subject in assigned_subjects %}
+                  <li>{{ subject.name }}</li>
+                {% endfor %}
+              </ul>
+            </div>
+          </div>
+        {% endif %}
 
-            <form method="post" class="text-center mt-4">
-                {% csrf_token %}
-                <div class="d-flex justify-content-center gap-3">
-                    <a href="{% url 'users:teacher_list' %}" class="btn btn-secondary">
-                        Cancelar
-                    </a>
-                    <button type="submit" class="btn btn-danger">
-                        Confirmar Desactivación
-                    </button>
-                </div>
-            </form>
-        </div>
+        <form method="post" class="text-center mt-4">
+          {% csrf_token %}
+
+          <div class="d-flex justify-content-center gap-3">
+            <a href="{% url 'users:teacher_list' %}" class="btn btn-secondary">Cancelar</a>
+
+            <button type="submit" class="btn btn-danger">
+              {% if teacher.user.is_active %}
+                Confirmar Desactivación
+              {% else %}
+                Confirmar Reactivación
+              {% endif %}
+            </button>
+          </div>
+        </form>
+      </div>
     </div>
-</div>
+  </div>
 {% endblock %}

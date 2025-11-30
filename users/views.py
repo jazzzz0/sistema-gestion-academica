@@ -5,12 +5,13 @@ from django.views.generic import TemplateView, ListView
 from django.views.generic.edit import FormView, DeleteView
 from django.urls import reverse_lazy
 from django.contrib import messages
-
+from django.views import View
 from .forms import AdminCreateForm, TeacherCreateForm
 from .mixins import SuperuserRequiredMixin, AdminRequiredMixin
 from .models import Admin, Teacher
 from .services import AdminService
 from .services.teacher_service import TeacherService
+from django.shortcuts import redirect, get_object_or_404
 
 
 # Vista Home (para usuarios no autenticados)
@@ -134,7 +135,19 @@ class TeacherListView(AdminRequiredMixin, ListView):
         # en el mismo viaje a la base de datos (evita N+1 queries).
         return Teacher.objects.select_related('user').all().order_by('surname', 'name')
 
+class TeacherToggleActiveView(AdminRequiredMixin, View):
+    def post(self, request, pk):
+        new_state = TeacherService.toggle_active(pk)
 
+        teacher = get_object_or_404(Teacher, pk=pk)
+
+        if new_state:
+            messages.success(request, f"El profesor {teacher.get_full_name()} ha sido reactivado.")
+        else:
+            messages.warning(request, f"El profesor {teacher.get_full_name()} ha sido desactivado.")
+
+        return redirect("users:teacher_list")
+    
 class TeacherDeleteView(AdminRequiredMixin, DeleteView):
     """
     Vista para desactivar un profesor (SGA-102).

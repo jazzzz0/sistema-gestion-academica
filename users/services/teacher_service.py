@@ -1,7 +1,7 @@
 from django.db import transaction
 from django.contrib.auth import get_user_model
 from django.core.exceptions import ValidationError
-
+from django.shortcuts import get_object_or_404
 from users.models.teacher import Teacher
 
 
@@ -50,6 +50,29 @@ class TeacherService:
         )
 
         return teacher
+    
+    # SOFT DELETE - TOGGLE
+    @staticmethod
+    @transaction.atomic
+    def toggle_active(teacher_id: int) -> bool:
+        """
+        Alterna el estado activo/inactivo del profesor y su usuario.
+        Devuelve el nuevo estado (True=activo, False=inactivo).
+        """
+        teacher = get_object_or_404(Teacher, pk=teacher_id)
+
+        new_state = not teacher.user.is_active  # si está activo → desactivar, si no → activar
+
+        # Activar/Desactivar usuario
+        teacher.user.is_active = new_state
+        teacher.user.save()
+
+        # Activar/Desactivar perfil Teacher (si tiene campo is_active)
+        if hasattr(teacher, "is_active"):
+            teacher.is_active = new_state
+            teacher.save()
+
+        return new_state
 
     @staticmethod
     @transaction.atomic
