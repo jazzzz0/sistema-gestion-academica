@@ -38,36 +38,42 @@ class DashboardView(LoginRequiredMixin, TemplateView):
 
     def get_context_data(self, **kwargs):
         """
-        Inyectamos 'full_name' al contexto buscando en el perfil asociado (Student/Teacher/Admin).
+        Inyectamos 'full_name' al contexto buscando en el perfil asociado.
         """
         context = super().get_context_data(**kwargs)
         user = self.request.user
 
-        # 1. Fallback inicial: Usar el email si no encontramos perfil
+        # Estado inicial: Usamos email y marcamos que es un email
         full_name = user.email
+        is_email = True
 
-        # 2. Búsqueda inteligente según el ROL
+        # Búsqueda inteligente según el ROL
         try:
             if user.role == 'STUDENT' and hasattr(user, 'student_profile'):
                 full_name = user.student_profile.get_full_name()
+                is_email = False
 
             elif user.role == 'TEACHER' and hasattr(user, 'teacher_profile'):
                 full_name = user.teacher_profile.get_full_name()
+                is_email = False
 
-            elif user.role == 'ADMIN':
-                # Nota: A veces el related_name de Admin es 'admin_profile' o simplemente 'admin'
-                # Probamos ambos por seguridad
-                if hasattr(user, 'admin_profile'):
-                    full_name = user.admin_profile.get_full_name()
-                elif hasattr(user, 'admin'):
-                    full_name = user.admin.get_full_name()
+            elif user.role == 'ADMIN' and hasattr(user, 'admin_profile'):
+                full_name = user.admin_profile.get_full_name()
+                is_email = False
+
+                # Nota: Si es un Superuser creado por consola sin perfil 'Admin' asociado,
+                # is_email seguirá siendo True y full_name seguirá siendo el email.
 
         except Exception:
-            pass  # Si algo falla, degradamos silenciosamente al email
+            pass  # Si falla, nos quedamos con el estado inicial (Email)
 
-        # 3. Formateo y asignación
-        # .title() asegura "Juan Perez" en lugar de "JUAN PEREZ"
-        context['full_name'] = full_name.title() if hasattr(full_name, 'title') else full_name
+        # Formateo Condicional
+        if not is_email:
+            # Si es un nombre real, lo ponemos en título (Juan Perez)
+            context['full_name'] = full_name.title()
+        else:
+            # Si es un email, lo dejamos tal cual o forzamos minúsculas para limpieza
+            context['full_name'] = full_name
 
         return context
 
