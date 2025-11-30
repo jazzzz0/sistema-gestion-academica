@@ -29,6 +29,11 @@ class StudentEnrollmentListView(StudentRequiredMixin, ListView):
 
     def get_queryset(self):
         student = Student.objects.get(user=self.request.user)
+
+        # En caso de que el estudiante no tenga carrera asignada, no se muestran materias
+        if not student.career:
+            return Subject.objects.none()
+
         queryset = (
             Subject.objects.filter(careers=student.career)
             .exclude(enrollments__student=student)
@@ -61,10 +66,8 @@ class EnrollmentActionView(StudentRequiredMixin, View):
             return redirect("enrollments:enrollment_list")
 
         try:
-            student = Student.objects.get(user=request.user)
-            student = student.user
             subject = form.cleaned_data["subject"]
-            EnrollmentService.create_enrollment(user=student, subject_id=subject.id)
+            EnrollmentService.create_enrollment(user=request.user, subject_id=subject.id)
 
         except ValidationError as e:
             messages.error(request, str(e))

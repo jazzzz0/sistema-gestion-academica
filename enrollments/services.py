@@ -27,6 +27,10 @@ class EnrollmentService:
         except Subject.DoesNotExist:
             raise ValidationError("La materia especificada no existe.")
 
+        # -- Validación de Existencia de Carrera --
+        if not student.career:
+            raise ValidationError("No tienes una carrera asignada. Contacta a administración.")
+
         # --- Validación de Carrera ---
         # Verificar que la materia pertenece a la carrera del estudiante
         # Excepción: Lanzar ValidationError si no pertenece
