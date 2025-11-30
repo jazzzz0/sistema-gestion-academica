@@ -61,7 +61,8 @@
                         {% endfor %}
 
                         <div class="d-flex justify-content-between mt-4">
-                            <a href="{% url 'subjects:subject_list' %}" class="btn btn-secondary">
+                            <a href="{% if subject.pk %}{% url 'subjects:subject_detail' subject.pk %}{% else %}{% url 'subjects:subject_list' %}{% endif %}"
+                                class="btn btn-secondary">
                                 Cancelar
                             </a>
 
