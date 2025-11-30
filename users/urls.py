@@ -13,4 +13,7 @@ urlpatterns = [
     path("admins/", views.AdminListView.as_view(), name="admin_list"),
     path("admins/create/", views.AdminCreateView.as_view(), name="admin_create"),
     path("admins/<int:pk>/delete/", views.AdminDeleteView.as_view(), name="admin_delete"),
+
+    # Vistas de auth
+    path("first-login-change-password/", views.FirstLoginChangePasswordView.as_view(), name="first_login_change_password"),
 ]
