@@ -43,11 +43,7 @@
                             </td>
                             <td class="text-center">
                                 {% if subject.teacher %}
-                                    {% if subject.teacher.last_name or subject.teacher.first_name %}
-                                        {{ subject.teacher.last_name }} {{ subject.teacher.first_name }}
-                                    {% else %}
-                                        {{ subject.teacher }}
-                                    {% endif %}
+                                    {{ subject.teacher }}
                                 {% else %}
                                     <span class="text-muted">Sin asignar</span>
                                 {% endif %}
