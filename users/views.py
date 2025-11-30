@@ -1,14 +1,18 @@
-from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
+from django.contrib.auth import update_session_auth_hash
+from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.auth.views import PasswordChangeView
 from django.db import transaction
 from django.http import HttpResponseRedirect
+from django.shortcuts import redirect
 from django.views.generic import TemplateView, ListView
 from django.views.generic.edit import FormView, DeleteView
 from django.urls import reverse_lazy
 from django.contrib import messages
 
-from .forms import AdminCreateForm, TeacherCreateForm
+from .forms import AdminCreateForm, TeacherCreateForm, FirstLoginPasswordChangeForm
 from .mixins import SuperuserRequiredMixin, AdminRequiredMixin
 from .models import Admin, Teacher
+from .services.auth_service import AuthService
 from .services import AdminService
 from .services.teacher_service import TeacherService
 
@@ -175,3 +179,50 @@ class TeacherDeleteView(AdminRequiredMixin, DeleteView):
             return HttpResponseRedirect(self.get_success_url())
 
         return HttpResponseRedirect(self.get_success_url())
+
+
+class FirstLoginChangePasswordView(PasswordChangeView):
+    template_name = "users/first_login_change_password.html"
+    form_class = FirstLoginPasswordChangeForm
+    success_url = reverse_lazy("dashboard")
+
+    def get_context_data(self, **kwargs):
+        """
+        Enriquecemos el contexto buscando el nombre real en el perfil asociado.
+        """
+        context = super().get_context_data(**kwargs)
+        user = self.request.user
+
+        # Valor por defecto: Email (por si falla la relación)
+        full_name = user.email
+
+        try:
+            # Buscamos en los perfiles basándonos en el ROL
+            if user.role == 'STUDENT' and hasattr(user, 'student_profile'):
+                full_name = user.student_profile.get_full_name()
+
+            elif user.role == 'TEACHER' and hasattr(user, 'teacher_profile'):
+                full_name = user.teacher_profile.get_full_name()
+
+        except Exception:
+            pass  # Si falla, se queda con el email
+
+        context['full_name'] = full_name.title() if hasattr(full_name, 'title') else full_name
+        return context
+
+    def form_valid(self, form):
+        try:
+            # Delegamos la lógica transaccional al servicio
+            user = AuthService.complete_first_login_process(self.request.user, form)
+
+            # Actualizar la sesión del usuario para que no se desloguee al cambiar el hash de la contraseña
+            update_session_auth_hash(self.request, user)
+
+            messages.success(self.request, "Contraseña cambiada correctamente.")
+
+            # Redirigir manualmente
+            return redirect(self.get_success_url())
+
+        except Exception as e:
+            messages.error(self.request, f"Ocurrió un error al actualizar la contraseña: {str(e)}")
+            return self.form_invalid(form)
