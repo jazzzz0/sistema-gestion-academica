@@ -130,6 +130,11 @@ button:not(.btn):not(.navbar-toggler):hover {
     background-color: var(--color-role-student) !important;
 }
 
+/* Guest: Usamos el color gris oscuro */
+.navbar-guest {
+    background-color: var(--color-gray-dark) !important;
+}
+
 /* Badges: Fondo blanco, texto del color del rol */
 .badge-admin {
     background-color: var(--color-white);
