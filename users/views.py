@@ -1,6 +1,7 @@
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.db import transaction
 from django.http import HttpResponseRedirect
+from django.shortcuts import redirect
 from django.views.generic import TemplateView, ListView
 from django.views.generic.edit import FormView, DeleteView
 from django.urls import reverse_lazy
@@ -17,12 +18,55 @@ from .services.teacher_service import TeacherService
 class HomeView(TemplateView):
     template_name = "home.html"
 
+    def dispatch(self, request, *args, **kwargs):
+        # Si ya está autenticado, redirigimos a Dashboard
+        if request.user.is_authenticated:
+            return redirect('dashboard')
+
+        # Si es anónimo, continúa con la vista Home
+        return super().dispatch(request, *args, **kwargs)
+
 
 # Vista Dashboard (para usuarios autenticados)
 class DashboardView(LoginRequiredMixin, TemplateView):
     template_name = "dashboard.html"
     login_url = '/login/'  # Redirige a login si no está autenticado
     redirect_field_name = 'next'
+
+    def get_context_data(self, **kwargs):
+        """
+        Inyectamos 'full_name' al contexto buscando en el perfil asociado (Student/Teacher/Admin).
+        """
+        context = super().get_context_data(**kwargs)
+        user = self.request.user
+
+        # 1. Fallback inicial: Usar el email si no encontramos perfil
+        full_name = user.email
+
+        # 2. Búsqueda inteligente según el ROL
+        try:
+            if user.role == 'STUDENT' and hasattr(user, 'student_profile'):
+                full_name = user.student_profile.get_full_name()
+
+            elif user.role == 'TEACHER' and hasattr(user, 'teacher_profile'):
+                full_name = user.teacher_profile.get_full_name()
+
+            elif user.role == 'ADMIN':
+                # Nota: A veces el related_name de Admin es 'admin_profile' o simplemente 'admin'
+                # Probamos ambos por seguridad
+                if hasattr(user, 'admin_profile'):
+                    full_name = user.admin_profile.get_full_name()
+                elif hasattr(user, 'admin'):
+                    full_name = user.admin.get_full_name()
+
+        except Exception:
+            pass  # Si algo falla, degradamos silenciosamente al email
+
+        # 3. Formateo y asignación
+        # .title() asegura "Juan Perez" en lugar de "JUAN PEREZ"
+        context['full_name'] = full_name.title() if hasattr(full_name, 'title') else full_name
+
+        return context
 
 
 class ProfileView(LoginRequiredMixin, TemplateView):

@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="es-ar">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -14,27 +14,31 @@
     {% block head %}{% endblock %}
 </head>
 
-<body>
+<body class="d-flex flex-column min-vh-100">
+
     <nav class="navbar navbar-expand-lg navbar-dark fixed-top shadow-sm
     {% if not user.is_authenticated %}
         navbar-guest
-    {% elif user.is_superuser or user.is_staff %}
+    {% elif user.is_superuser or user.role == 'ADMIN' %}
         navbar-admin
-    {% elif user.groups.all.0.name == 'Docente' %}
+    {% elif user.role == 'TEACHER' %}
         navbar-teacher
-    {% else %}
+    {% elif user.role == 'STUDENT' %}
         navbar-student
+    {% else %}
+        navbar-guest
     {% endif %}
     ">
         <div class="container-fluid">
             <a class="navbar-brand fw-bold d-flex align-items-center" href="{% url 'home' %}">
-                SGA
+                <i class="bi bi-mortarboard-fill me-2"></i> SGA
+
                 {% if user.is_authenticated %}
-                    {% if user.is_superuser or user.is_staff %}
+                    {% if user.is_superuser or user.role == 'ADMIN' %}
                         <span class="badge badge-admin ms-2" style="font-size: 0.7em;">ADMINISTRADOR</span>
-                    {% elif user.groups.all.0.name == 'Docente' %}
+                    {% elif user.role == 'TEACHER' %}
                         <span class="badge badge-teacher ms-2" style="font-size: 0.7em;">DOCENTE</span>
-                    {% else %}
+                    {% elif user.role == 'STUDENT' %}
                         <span class="badge badge-student ms-2" style="font-size: 0.7em;">ESTUDIANTE</span>
                     {% endif %}
                 {% endif %}
@@ -53,15 +57,14 @@
 
                     {% if user.is_authenticated %}
 
-                        {% if user.is_superuser %}
+                        {% if user.role == 'ADMIN' or user.is_superuser %}
+                            {% if user.is_superuser %}
                             <li class="nav-item">
                                 <a class="nav-link fw-bold text-warning" href="{% url 'users:admin_list' %}">
                                     <i class="bi bi-shield-lock-fill"></i> Admins
                                 </a>
                             </li>
-                        {% endif %}
-
-                        {% if user.is_staff %}
+                            {% endif %}
 
                             <li class="nav-item dropdown">
                                 <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
@@ -75,7 +78,7 @@
 
                             <li class="nav-item dropdown">
                                 <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                    <i class="bi bi-mortarboard"></i> Académica
+                                    <i class="bi bi-collection"></i> Académica
                                 </a>
                                 <ul class="dropdown-menu">
                                     <li><a class="dropdown-item" href="{% url 'careers:career_list' %}">Carreras</a></li>
@@ -84,21 +87,26 @@
                                     <li><a class="dropdown-item" href="{% url 'enrollments:enrollment_admin_list' %}">Inscripciones</a></li>
                                 </ul>
                             </li>
-
                         {% endif %}
 
-                        {% if user.groups.all.0.name == 'Docente' %}
+                        {% if user.role == 'TEACHER' %}
                             <li class="nav-item">
-                                <a class="nav-link" href="#">Mis Materias</a>
+                                <a class="nav-link" href="#">
+                                    <i class="bi bi-journal-bookmark"></i> Mis Materias
+                                </a>
                             </li>
                         {% endif %}
 
-                        {% if not user.is_staff and user.groups.all.0.name != 'Docente' %}
+                        {% if user.role == 'STUDENT' %}
                              <li class="nav-item">
-                                <a class="nav-link" href="{% url 'enrollments:enrollment_list' %}">Oferta Académica</a>
+                                <a class="nav-link" href="{% url 'enrollments:enrollment_list' %}">
+                                    <i class="bi bi-search"></i> Oferta Académica
+                                </a>
                             </li>
                              <li class="nav-item">
-                                <a class="nav-link" href="{% url 'enrollments:my_enrollments' %}">Mis Inscripciones</a>
+                                <a class="nav-link" href="{% url 'enrollments:my_enrollments' %}">
+                                    <i class="bi bi-check2-square"></i> Mis Inscripciones
+                                </a>
                             </li>
                         {% endif %}
 
@@ -108,35 +116,63 @@
                 <div class="d-flex align-items-center">
                     {% if user.is_authenticated %}
                         <span class="me-3 text-light d-none d-lg-block">
-                            Hola, <strong>{{ user.first_name|default:user.email }}</strong>
+                            Hola, <strong>
+                                {% if user.first_name %}
+                                    {{ user.first_name }}
+                                {% else %}
+                                    {{ user.email|truncatechars:20 }}
+                                {% endif %}
+                            </strong>
                         </span>
-                        <a href="{% url 'profile' %}" class="btn btn-outline-light btn-sm me-2">Mi Perfil</a>
+
+                        <a href="{% url 'profile' %}" class="btn btn-outline-light btn-sm me-2" title="Mi Perfil">
+                            <i class="bi bi-person-circle"></i>
+                        </a>
 
                         <form action="{% url 'logout' %}" method="post" class="d-inline">
                             {% csrf_token %}
-                            <button type="submit" class="btn btn-outline-light btn-sm">Cerrar sesión</button>
+                            <button type="submit" class="btn btn-outline-light btn-sm" title="Cerrar sesión">
+                                <i class="bi bi-box-arrow-right"></i> Salir
+                            </button>
                         </form>
                     {% else %}
-                        <a href="{% url 'login' %}" class="btn btn-light btn-sm text-primary fw-bold">Iniciar sesión</a>
+                        <a href="{% url 'login' %}" class="btn btn-light btn-sm text-primary fw-bold">
+                            <i class="bi bi-box-arrow-in-right"></i> Iniciar sesión
+                        </a>
                     {% endif %}
                 </div>
             </div>
         </div>
     </nav>
 
-    <main class="container pt-5 mt-5">
+    <main class="container flex-grow-1" style="padding-top: 80px; padding-bottom: 40px;">
             {% if messages %}
-                {% for message in messages %}
-                    <div class="alert alert-{{ message.tags }} alert-dismissible fade show mt-3" role="alert">
-                        {{ message }}
-                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                <div class="row justify-content-center">
+                    <div class="col-md-10">
+                        {% for message in messages %}
+                            <div class="alert alert-{{ message.tags }} alert-dismissible fade show shadow-sm mt-3" role="alert">
+                                {% if message.tags == 'success' %}
+                                    <i class="bi bi-check-circle-fill me-2"></i>
+                                {% elif message.tags == 'error' %}
+                                    <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                                {% endif %}
+                                {{ message }}
+                                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                            </div>
+                        {% endfor %}
                     </div>
-                {% endfor %}
+                </div>
             {% endif %}
 
         {% block content %}
         {% endblock %}
     </main>
+
+    <footer class="bg-light text-center text-muted py-3 mt-auto border-top">
+        <div class="container">
+            <small>&copy; {% now "Y" %} Sistema de Gestión Académica. Todos los derechos reservados.</small>
+        </div>
+    </footer>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
