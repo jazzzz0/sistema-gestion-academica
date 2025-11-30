@@ -17,7 +17,6 @@ class SubjectCreateView(AdminRequiredMixin, CreateView):
     model = Subject
     form_class = SubjectForm
     template_name = "subjects/subject_form.html"
-    success_url = reverse_lazy("subjects:subject_list")
 
     def form_valid(self, form):
         response = super().form_valid(form)
@@ -26,6 +25,9 @@ class SubjectCreateView(AdminRequiredMixin, CreateView):
             f'Materia {form.cleaned_data["name"]} creada correctamente.'
         )
         return response
+    
+    def get_success_url(self):
+        return reverse_lazy("subjects:subject_detail", kwargs={"pk": self.object.pk})
 
 
 class SubjectListView(AdminRequiredMixin, ListView):
@@ -86,15 +88,17 @@ class SubjectUpdateView(AdminRequiredMixin, UpdateView):
     model = Subject
     form_class = SubjectForm
     template_name = "subjects/subject_form.html"
-    success_url = reverse_lazy("subjects:subject_list")
 
     def form_valid(self, form):
         response = super().form_valid(form)
         messages.success(
             self.request,
-            f"La materia '{self.object.name}' ha sido actualizada correctamente."
+            f"La materia ha sido actualizada correctamente."
         )
         return response
+
+    def get_success_url(self):
+        return reverse_lazy("subjects:subject_detail", kwargs={"pk": self.object.pk})
 
 
 class SubjectDeleteView(AdminRequiredMixin, DeleteView):

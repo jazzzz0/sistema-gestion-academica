@@ -265,11 +265,13 @@
                                         <i class="bi bi-journal-text"></i> Gestión de Materias
                                     </a>
                                 </div>
+                                {% if user.is_superuser %}
                                 <div class="col-md-6 mb-3">
                                     <a href="/admin/" class="btn btn-outline-danger w-100" target="_blank">
                                         <i class="bi bi-gear"></i> Panel de Administración
                                     </a>
                                 </div>
+                                {% endif %}
                             </div>
                         </div>
                     </div>

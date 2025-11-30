@@ -95,8 +95,8 @@ class StudentDetailView(AdminRequiredMixin, DetailView):
         # Buscamos las inscripciones ordenadas
         enrollments_qs = student.enrollments.all().order_by('-enrolled_at')
 
-        # Paginamos (20 por página)
-        paginator = Paginator(enrollments_qs, 20)
+        # Paginamos (10 por página)
+        paginator = Paginator(enrollments_qs, 10)
 
         # Obtenemos la página actual del request
         page_number = self.request.GET.get('page')
