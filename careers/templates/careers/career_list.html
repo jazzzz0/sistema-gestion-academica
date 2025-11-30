@@ -2,42 +2,43 @@
 
 {% load static %}
 
-{% block title %} {{ title }} {% endblock %}
+{% block title %} Gestión de Carreras {% endblock %}
 
 {% block content %}
 <div class="card shadow mb-4">
     <div class="card-header py-3 d-flex justify-content-between align-items-center">
-        <h6 class="m-0 font-weight-bold text-primary">{{ title }}</h6>
+        <h4 class="m-0 font-weight-bold text-primary">{{ title }}</h4>
         <a href="{% url 'careers:career_create' %}" class="btn btn-primary btn-sm">
             <i class="bi bi-plus-lg"></i> Nueva Carrera
         </a>
     </div>
+
     <div class="card-body">
-        
         <div class="table-responsive">
             <table class="table table-bordered table-hover" width="100%" cellspacing="0">
                 <thead class="table-light">
-                    <tr>
+                    <tr class="text-center">
                         <th>Nombre</th>
                         <th>Estado</th>
                         <th>Materias</th>
                         <th>Acciones</th>
                     </tr>
                 </thead>
+                
                 <tbody>
                     {% for career in careers %}
                     <tr class="{% if not career.is_active %}table-secondary text-muted{% endif %}">
-                        <td>{{ career.name }}</td>
-                        <td>
+                        <td class="fw-semibold">{{ career.name }}</td>
+                        <td class="text-center">
                             {% if career.is_active %}
-                                <span class="badge bg-success">Activo</span>
+                                <span class="badge bg-success rounded-pill">Activo</span>
                             {% else %}
-                                <span class="badge bg-secondary">Inactivo</span>
+                                <span class="badge bg-secondary rounded-pill">Inactivo</span>
                             {% endif %}
                         </td>
-                        <td>{{ career.subjects.count|default:0 }} materias</td>
+                        <td class="text-center">{{ career.subjects.count|default:0 }} materias</td>
 
-                        <td>
+                        <td class="text-center">
                             <a href="{% url 'careers:career_detail' career.pk %}" class="btn btn-sm btn-outline-info" title="Ver Detalle">
                                 <i class="bi bi-eye"></i>
                             </a>
@@ -52,7 +53,9 @@
 
                     {% empty %}
                     <tr>
-                        <td colspan="4" class="text-center">No hay carreras registradas.</td>
+                        <td colspan="4" class="text-center text-muted">No hay carreras registradas.</td>
+                    </tr>
+                    <tr>
                         <td colspan="4" class="text-center">
                             <a href="{% url 'careers:career_create' %}" class="btn btn-primary btn-lg">
                                 <i class="bi bi-plus-lg"></i> Crear Nueva Carrera
