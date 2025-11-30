@@ -3,32 +3,33 @@
 {% block title %} Oferta Académica {% endblock %}
 
 {% block content %}
-
-<div class="container my-4">
-	<div class="d-flex justify-content-between align-items-center mb-3">
-		<h1 class="h3">Oferta Académica{% if career %} - {{ career.name }}{% endif %}</h1>
-		<a href="" class="btn btn-outline-secondary" onclick="location.reload(); return false;">Recargar</a>
+<div class="card shadow mb-4">
+	<div class="card-header py-3 d-flex justify-content-between align-items-center">
+		<h4 class="m-0 font-weight-bold text-primary">Oferta Académica{% if career %} - {{ career.name }}{% endif %}</h4>
+		<a href="" class="btn btn-outline-secondary btn-sm" onclick="location.reload(); return false;" title="Actualizar Página">
+			<i class="bi bi-arrow-clockwise"></i>
+		</a>
 	</div>
 
-	{% if subjects and subjects|length > 0 %}
+	<div class="card-body">
 		<div class="table-responsive">
-			<table class="table table-hover align-middle">
-				<thead>
-					<tr>
+			<table class="table table-bordered table-hover" width="100%" cellspacing="0">
+				<thead class="table-light">
+					<tr class="text-center">
 						<th>Materia</th>
 						<th>Profesor</th>
-						<th class="text-center">Cupo</th>
-						<th class="text-center">Acciones</th>
+						<th>Cupo</th>
+						<th>Acciones</th>
 					</tr>
 				</thead>
 				<tbody>
 					{% for subject in subjects %}
 						<tr>
-							<td style="min-width: 320px;">
+							<td>
 								<div class="fw-semibold">{{ subject.name }}</div>
 								<div class="text-muted small">{{ subject.description|default:''|truncatechars:120 }}</div>
 							</td>
-							<td>
+							<td class="text-center">
 								{% if subject.teacher %}
 									{% if subject.teacher.last_name or subject.teacher.first_name %}
 										{{ subject.teacher.last_name }} {{ subject.teacher.first_name }}
@@ -42,23 +43,31 @@
 							<td class="text-center">
 								{# Comparación directa para mayor claridad. Asumimos que `active_enrollments_count` y `quota` son enteros o null. #}
 								{% if subject.quota and subject.active_enrollments_count >= subject.quota %}
-									<span class="badge bg-danger">AGOTADO</span>
+									<span class="badge bg-danger rounded-pill">AGOTADO</span>
 								{% else %}
-									<span class="badge bg-success">Cupo Disponible</span>
+									<span class="badge bg-success rounded-pill">Cupo Disponible</span>
 								{% endif %}
 								<div class="small text-muted">({{ subject.active_enrollments_count|default:0 }} / {{ subject.quota|default:0 }})</div>
 							</td>
 							<td class="text-center">
-								<form method="post" action="{% url 'enrollment_create' %}">
+								<form method="post" action="{% url 'enrollments:enrollment_create' %}">
 									{% csrf_token %}
 									<input type="hidden" name="subject" value="{{ subject.id }}">
 									{# Comparación directa en el botón: si hay cuota y ya está llena, deshabilitar. #}
 									{% if subject.quota and subject.active_enrollments_count >= subject.quota %}
 										<button type="submit" class="btn btn-secondary" disabled>Completo</button>
 									{% else %}
-										<button type="submit" class="btn btn-primary">Inscribirse</button>
+										<button type="submit" class="btn btn-outline-primary" title="Inscribirse">
+											<i class="bi bi-person-add"></i>
+										</button>
 									{% endif %}
 								</form>
+							</td>
+						</tr>
+					{% empty %}
+						<tr>
+							<td colspan="4" class="text-center text-muted">
+								No hay materias disponibles para tu carrera en este momento.
 							</td>
 						</tr>
 					{% endfor %}
@@ -67,15 +76,8 @@
 		</div>
 		
 		{% include 'pagination.html' %}
-	
-	{% else %}
-		<div class="card">
-			<div class="card-body">
-				<p class="mb-0">No hay materias disponibles para tu carrera en este momento.</p>
-			</div>
-		</div>
-	{% endif %}
 
+	</div>
 </div>
 
 {% endblock %}
