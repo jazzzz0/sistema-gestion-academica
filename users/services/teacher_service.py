@@ -1,7 +1,11 @@
 from django.db import transaction
+from django.contrib.auth import get_user_model
+from django.core.exceptions import ValidationError
 
 from users.models.teacher import Teacher
-from users.models import User
+
+
+User = get_user_model()
 
 
 class TeacherService:
@@ -15,24 +19,24 @@ class TeacherService:
         """
         Crea un User (con rol Teacher) y un Teacher (Person)
         en una transacción atómica.
-
-        La contraseña inicial será el DNI.
         """
-        # Validaciones
+        # Validaciones de Negocio
         if not TeacherService.validate_email_unique(data["email"]):
-            raise ValueError("El email ya está registrado en el sistema.")
+            raise ValidationError("El email ya está registrado en el sistema.")
 
+        # Validación Robusta (Revisa Admin, Student y Teacher)
         if not TeacherService.validate_dni_unique(data["dni"]):
-            raise ValueError("El DNI ya está registrado en el sistema.")
+            raise ValidationError("El DNI ya está registrado en el sistema (puede ser Alumno o Admin).")
 
         # Crear User
+        # Pasamos DNI al manager para que lo use como password inicial
         user = User.objects.create_user(
             email=data["email"],
             dni=data["dni"],
             role="TEACHER",
         )
 
-        # Crear Teacher con el User y los datos de Person
+        # Crear Teacher
         teacher = Teacher.objects.create(
             user=user,
             name=data["name"],
@@ -40,20 +44,12 @@ class TeacherService:
             dni=data["dni"],
             academic_degree=data["academic_degree"],
             hire_date=data["hire_date"],
-            address=data["address"],
-            birth_date=data["birth_date"],
-            phone=data["phone"],
+            address=data.get("address"),
+            birth_date=data.get("birth_date"),
+            phone=data.get("phone"),
         )
 
         return teacher
-
-    @staticmethod
-    def validate_dni_unique(dni: str) -> bool:
-        return not Teacher.objects.filter(dni=dni).exists()
-
-    @staticmethod
-    def validate_email_unique(email: str) -> bool:
-        return not User.objects.filter(email=email).exists()
 
     @staticmethod
     @transaction.atomic
@@ -61,12 +57,46 @@ class TeacherService:
         """
         Desactiva (Soft Delete) el perfil del profesor y su usuario asociado.
         """
-        # Desactivar Usuario de Django (Login)
         if teacher.user:
             teacher.user.is_active = False
             teacher.user.save()
 
-        # Desactivar Perfil Teacher (si tiene el campo is_active)
         if hasattr(teacher, 'is_active'):
             teacher.is_active = False
             teacher.save()
+
+    # === MÉTODOS DE VALIDACIÓN ===
+
+    @staticmethod
+    def validate_dni_unique(dni: str, exclude_teacher_id: int = None) -> bool:
+        """
+        Valida que el DNI sea único en TODO el sistema.
+        Retorna True si es válido (no existe), False si ya existe.
+        """
+        # Importaciones locales para evitar Circular Import Error
+        from users.models import Admin
+        from students.models import Student
+
+        # Verificar colisión con otros roles
+        if Admin.objects.filter(dni=dni).exists():
+            return False
+        if Student.objects.filter(dni=dni).exists():
+            return False
+
+        # Verificar colisión con Teachers
+        qs = Teacher.objects.filter(dni=dni)
+
+        if exclude_teacher_id:
+            qs = qs.exclude(pk=exclude_teacher_id)
+
+        if qs.exists():
+            return False
+
+        return True
+
+    @staticmethod
+    def validate_email_unique(email: str, exclude_user_id: int = None) -> bool:
+        qs = User.objects.filter(email=email)
+        if exclude_user_id:
+            qs = qs.exclude(id=exclude_user_id)
+        return not qs.exists()

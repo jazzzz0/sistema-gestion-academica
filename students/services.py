@@ -14,15 +14,17 @@ class StudentService:
 
     @staticmethod
     @transaction.atomic
-    def create_user_and_student(data):
+    def create_student(data):
         """
         Crea un nuevo usuario (User) con rol STUDENT y el Student asociado.
-        La carrera inicia en None por defecto, ya que tenemos una vista única para esto.
-        Args:
-            data (dict): Diccionario con los datos necesarios para crear el usuario y el estudiante.
-        Returns:
-            Student: El objeto Student creado.
         """
+        # Validaciones Previas
+        if not StudentService.validate_email_unique(data["email"]):
+            raise ValidationError("El email ya está registrado en el sistema.")
+
+        if not StudentService.validate_dni_unique(data["dni"]):
+            raise ValidationError("El DNI ya está registrado en el sistema (puede ser Admin o Docente).")
+
         # Crear User con rol STUDENT
         user = User.objects.create_user(
             email=data["email"],
@@ -30,7 +32,7 @@ class StudentService:
             dni=data["dni"],
         )
 
-        # Crear Student (con campos de Person)
+        # Crear Student
         student = Student.objects.create(
             user=user,
             dni=data["dni"],
@@ -45,38 +47,24 @@ class StudentService:
 
     @staticmethod
     @transaction.atomic
-    def toggle_active_status(student_id: int, is_active: bool):
-        """
-        Activa o desactiva la cuenta del Student a través de su User.
-
-        Args:
-            student_id (int): ID del estudiante.
-            is_active (bool): Nuevo estado para el usuario.
-        """
-        student = Student.objects.select_related("user").get(pk=student_id)
-
-        user = student.user
-        user.is_active = is_active
-        user.save(update_fields=["is_active"])
-
-        return user
-
-    @staticmethod
-    @transaction.atomic
-    def update_student_and_user(student: Student, *, email, dni, name, surname, career, address=None, birth_date=None, phone=None):
+    def update_student(student: Student, *, email, dni, name, surname, career, address=None, birth_date=None,
+                       phone=None):
         """
         Actualiza de manera atómica los datos del Student y su User asociado.
         """
         user = student.user
 
         # --- Validaciones de unicidad ---
-        # Email
-        if User.objects.exclude(id=user.id).filter(email=email).exists():
-            raise ValidationError({"email": "Ya existe un usuario con este email."})
 
-        # DNI
-        if Student.objects.exclude(id=student.id).filter(dni=dni).exists():
-            raise ValidationError({"dni": "Ya existe otro estudiante con este DNI."})
+        # Email (Excluyendo al propio usuario)
+        if not StudentService.validate_email_unique(email, exclude_user_id=user.id):
+            raise ValidationError({"email": "Ya existe otro usuario con este email."})
+
+        # 2. DNI (Global + Excluyendo al propio estudiante)
+        # Usamos el método robusto que chequea Admin y Teacher también.
+        if not StudentService.validate_dni_unique(dni, exclude_student_id=student.id):
+            raise ValidationError(
+                {"dni": "El DNI ya está registrado en el sistema (puede ser otro Alumno, Admin o Docente)."})
 
         # --- Actualizar datos del STUDENT ---
         student.dni = dni
@@ -92,6 +80,7 @@ class StudentService:
         # --- Actualizar datos del USER ---
         user.email = email
 
+        # Si el modelo User tuviera DNI, se actualizaría aquí.
         if hasattr(user, "dni"):
             user.dni = dni
 
@@ -99,4 +88,56 @@ class StudentService:
         user.save()
 
         return student
-    
+
+    @staticmethod
+    @transaction.atomic
+    def toggle_active_status(student_id: int, is_active: bool):
+        """
+        Activa o desactiva la cuenta del Student a través de su User.
+        """
+        student = Student.objects.select_related("user").get(pk=student_id)
+        user = student.user
+        user.is_active = is_active
+        user.save(update_fields=["is_active"])
+        return user
+
+    # === MÉTODOS DE VALIDACIÓN ===
+
+    @staticmethod
+    def validate_dni_unique(dni: str, exclude_student_id: int = None) -> bool:
+        """
+        Valida que el DNI sea único en el sistema (Student, Teacher, Admin).
+        Retorna True si es válido (no existe), False si ya existe.
+        """
+        # Importaciones locales para evitar Circular Import Error
+        from users.models import Admin, Teacher
+
+        # Verificar colisión con otros roles
+        if Admin.objects.filter(dni=dni).exists():
+            return False
+        if Teacher.objects.filter(dni=dni).exists():
+            return False
+
+        # Verificar colisión con Students
+        qs = Student.objects.filter(dni=dni)
+
+        if exclude_student_id:
+            # Si estamos editando, exclúyeme a mí mismo
+            qs = qs.exclude(pk=exclude_student_id)
+
+        if qs.exists():
+            return False
+
+        return True
+
+    @staticmethod
+    def validate_email_unique(email: str, exclude_user_id: int = None) -> bool:
+        """
+        Valida unicidad del email en la tabla User.
+        """
+        qs = User.objects.filter(email=email)
+
+        if exclude_user_id:
+            qs = qs.exclude(id=exclude_user_id)
+
+        return not qs.exists()
