@@ -81,7 +81,7 @@
                                     <li><a class="dropdown-item" href="{% url 'careers:career_list' %}">Carreras</a></li>
                                     <li><a class="dropdown-item" href="{% url 'subjects:subject_list' %}">Materias</a></li>
                                     <li><hr class="dropdown-divider"></li>
-                                    <li><a class="dropdown-item" href="{% url 'enrollments:enrollment_list' %}">Inscripciones</a></li>
+                                    <li><a class="dropdown-item" href="{% url 'enrollments:enrollment_admin_list' %}">Inscripciones</a></li>
                                 </ul>
                             </li>
 
@@ -95,10 +95,10 @@
 
                         {% if not user.is_staff and user.groups.all.0.name != 'Docente' %}
                              <li class="nav-item">
-                                <a class="nav-link" href="#">Oferta Académica</a>
+                                <a class="nav-link" href="{% url 'enrollments:enrollment_list' %}">Oferta Académica</a>
                             </li>
                              <li class="nav-item">
-                                <a class="nav-link" href="#">Mis Inscripciones</a>
+                                <a class="nav-link" href="{% url 'enrollments:my_enrollments' %}">Mis Inscripciones</a>
                             </li>
                         {% endif %}
 
