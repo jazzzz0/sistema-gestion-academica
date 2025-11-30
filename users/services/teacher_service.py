@@ -20,7 +20,7 @@ class TeacherService:
         Crea un User (con rol Teacher) y un Teacher (Person)
         en una transacción atómica.
         """
-        # Validaciones de Negocio (Gatekeeper)
+        # Validaciones de Negocio
         if not TeacherService.validate_email_unique(data["email"]):
             raise ValidationError("El email ya está registrado en el sistema.")
 

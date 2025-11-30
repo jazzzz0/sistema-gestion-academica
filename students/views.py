@@ -170,7 +170,7 @@ class StudentCareerUpdateView(AdminRequiredMixin, UpdateView):
 
         # Verificar si el estudiante tiene inscripciones activas
         context["has_enrollments"] = self.object.enrollments.exists()
-        context["title"] = f"Actualizar Carrera del Estudiante {self.object.full_name}"
+        context["title"] = f"Actualizar Carrera del Estudiante {self.object.get_full_name()}"
 
         return context
 
@@ -178,7 +178,7 @@ class StudentCareerUpdateView(AdminRequiredMixin, UpdateView):
         response = super().form_valid(form)
         messages.success(
             self.request,
-            f"Carrera actualizada correctamente para {self.object.full_name}."
+            f"Carrera actualizada correctamente para {self.object.get_full_name()}."
         )
         return response
 
