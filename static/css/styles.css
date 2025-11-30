@@ -3,9 +3,7 @@
 /* ========================================================================== */
 
 /* 0. Importar Fuentes */
-/* NOTA: El manual no especifica fuente, pero sugiere "claridad".
-   'Leckerli One' es muy decorativa; considera usar solo Roboto para más seriedad. */
-@import url('https://fonts.googleapis.com/css2?family=Leckerli+One&family=Roboto:wght@300;400;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Merriweather:wght@300;400;700;900&family=Roboto:wght@300;400;700&display=swap');
 
 /* ========================================================================== */
 /* 1. Variables de marca                                                      */
@@ -33,7 +31,7 @@
 
   /* Tipografía */
   --font-base: 'Roboto', sans-serif;
-  --font-headings: 'Leckerli One', cursive;
+  --font-headings: 'Merriweather', cursive;
 
   /* Tamaños base */
   --font-size-base: 16px;

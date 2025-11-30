@@ -56,15 +56,14 @@ class StudentForm(forms.Form):
 
     def __init__(self, *args, student: Student = None, **kwargs):
         """
-        student (None o Student):
-            - Si None → Modo creación
-            - Si Student → Modo edición (precargar valores y validar distinto)
+        Se usa SOLO para excluir el ID actual en validaciones de unicidad
+        y para pre-cargar datos iniciales.
         """
         super().__init__(*args, **kwargs)
         self.student = student
 
         if student:
-            # Precargar datos existentes para edición
+            # Pre-cargar datos
             self.initial["email"] = student.user.email
             self.initial["dni"] = student.dni
             self.initial["name"] = student.name
@@ -98,30 +97,6 @@ class StudentForm(forms.Form):
             raise forms.ValidationError("Este DNI ya está registrado.")
 
         return dni
-
-    # === Guardado genérico ===
-    def save(self):
-        if not self.is_valid():
-            return None
-
-        data = self.cleaned_data
-
-        if self.student:
-            # --- Modo actualización ---
-            return StudentService.update_student_and_user(
-                self.student,
-                email=data["email"],
-                dni=data["dni"],
-                name=data["name"],
-                surname=data["surname"],
-                career=self.student.career,  # Mantenemos la carrera, hay un formulario separado
-                address=data.get("address"),
-                birth_date=data.get("birth_date"),
-                phone=data.get("phone"),
-            )
-        else:
-            # --- Modo creación ---
-            return StudentService.create_user_and_student(data)
 
 
 class StudentCareerForm(forms.ModelForm):
