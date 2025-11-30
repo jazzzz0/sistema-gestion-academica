@@ -62,8 +62,9 @@ class EnrollmentActionView(StudentRequiredMixin, View):
 
         try:
             student = Student.objects.get(user=request.user)
+            student = student.user
             subject = form.cleaned_data["subject"]
-            EnrollmentService.create_enrollment(student=student, subject=subject)
+            EnrollmentService.create_enrollment(user=student, subject_id=subject.id)
 
         except ValidationError as e:
             messages.error(request, str(e))
