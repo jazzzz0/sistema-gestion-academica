@@ -1,9 +1,20 @@
 from django import forms
 
 from subjects.models import Subject
+from users.models import Teacher
 
 
 class SubjectForm(forms.ModelForm):
+    teacher = forms.ModelChoiceField(
+        queryset=Teacher.objects.filter(user__is_active=True),
+        required=False,
+        widget=forms.Select(attrs={
+            'class': 'form-select'
+        }),
+        label="Docente",
+        empty_label="-- Sin asignar --"
+    )
+
     class Meta:
         model = Subject
         fields = ["name", "teacher", "quota", "description"]
@@ -12,11 +23,6 @@ class SubjectForm(forms.ModelForm):
                 attrs={
                     "class": "form-control",
                     "placeholder": "Ej. Introducción a la programación",
-                }
-            ),
-            "teacher": forms.TextInput(
-                attrs={
-                    "class": "form-control",
                 }
             ),
             "quota": forms.NumberInput(
@@ -41,8 +47,6 @@ class SubjectForm(forms.ModelForm):
         name = self.cleaned_data.get("name")
 
         if name:
-            # 1. Transformación: Convertimos a Title Case
-            # .strip() elimina espacios accidentales al inicio o final
             name = name.strip().title()
 
             # 2. Validación: Verificamos que no exista un registro con el mismo nombre
