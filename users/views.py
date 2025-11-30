@@ -9,6 +9,7 @@ from django.contrib import messages
 from .forms import AdminCreateForm, TeacherCreateForm
 from .mixins import SuperuserRequiredMixin, AdminRequiredMixin
 from .models import Admin, Teacher
+from .services import AdminService
 from .services.teacher_service import TeacherService
 
 
@@ -44,9 +45,23 @@ class AdminCreateView(SuperuserRequiredMixin, FormView):
     success_url = reverse_lazy("users:admin_list")
 
     def form_valid(self, form):
-        form.save()  # Calls AdminService.create_admin_user()
-        messages.success(self.request, "Administrador creado correctamente.")
-        return super().form_valid(form)
+        # Obtenemos datos del formulario
+        data = form.cleaned_data
+
+        try:
+            # Llamar al servicio para crear el Admin
+            admin_user = AdminService.create_admin(data)
+
+            messages.success(
+                self.request,
+                f"Administrador {admin_user.surname}, {admin_user.name} creado correctamente."
+                )
+
+            return HttpResponseRedirect(self.get_success_url())
+
+        except Exception as e:
+            form.add_error(None, f"Error al crear administrador: {str(e)}")
+            return self.form_invalid(form)
 
 
 class AdminDeleteView(SuperuserRequiredMixin, DeleteView):
@@ -94,16 +109,16 @@ class TeacherCreateView(AdminRequiredMixin, FormView):
     success_url = reverse_lazy("users:teacher_list")
 
     def form_valid(self, form):
+        data = form.cleaned_data
+
         try:
             # Pasamos los datos del formulario al servicio para crear el Teacher
-            TeacherService.create_teacher(form.cleaned_data)
+            teacher = TeacherService.create_teacher(data)
 
-            messages.success(self.request, f"Profesor creado correctamente.")
-            return super().form_valid(form)
+            messages.success(self.request, f"Profesor {teacher.surname}, {teacher.name} creado correctamente.")
+            return HttpResponseRedirect(self.get_success_url())
 
         except Exception as e:
-            # Si el servicio falla (ej: DNI duplicado que se pasó la validación simple),
-            # lo atrapamos aquí y volvemos a mostrar el formulario con el error.
             form.add_error(None, f"Error al crear profesor: {str(e)}")
             return self.form_invalid(form)
 

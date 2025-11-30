@@ -147,7 +147,3 @@ class AdminCreateForm(forms.Form):
             raise forms.ValidationError("La fecha de incorporación es requerida.")
 
         return hire_date
-
-    def save(self):
-        """Delega la creación al AdminService."""
-        return AdminService.create_admin_user(self.cleaned_data)

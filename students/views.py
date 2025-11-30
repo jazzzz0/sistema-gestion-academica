@@ -26,9 +26,20 @@ class StudentCreateView(AdminRequiredMixin, FormView):
         return kwargs
 
     def form_valid(self, form):
-        student = form.save()
-        messages.success(self.request, f"Estudiante {student.get_full_name()} creado correctamente.")
-        return HttpResponseRedirect(self.get_success_url())
+        # Obtener datos limpios del formulario
+        data = form.cleaned_data
+
+        try:
+            # Llamar al servicio
+            student = StudentService.create_student(data)
+
+            messages.success(self.request, f"Estudiante {student.get_full_name()} creado correctamente.")
+            return HttpResponseRedirect(self.get_success_url())
+
+        except Exception as e:
+            # Capturar errores de negocio que se hayan pasado (ej. carrera cerrada)
+            form.add_error(None, str(e))
+            return self.form_invalid(form)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -110,33 +121,32 @@ class StudentUpdateView(AdminRequiredMixin, FormView):
 
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
-        kwargs["instance"] = self.student
+        kwargs["student"] = self.student
         return kwargs
 
     def form_valid(self, form):
-        # OJO: No llamamos a form.save() aquí.
-        # Extraemos los datos limpios del formulario (cleaned_data)
         data = form.cleaned_data
 
         try:
-            # Delegamos la lógica "pesada" al servicio
-            StudentService.update_student_and_user(
+            # Llamamos al servicio
+            StudentService.update_student(
                 student=self.student,
                 email=data.get('email'),
                 dni=data.get('dni'),
                 name=data.get('name'),
                 surname=data.get('surname'),
-                career=data.get('career'),
+                career=self.student.career,
                 address=data.get('address'),
                 birth_date=data.get('birth_date'),
                 phone=data.get('phone')
             )
             messages.success(self.request, f"Estudiante {self.student.get_full_name()} actualizado correctamente.")
+
+            # Redirigimos al detalle para ver los cambios
             return redirect("students:student_detail", pk=self.student.pk)
 
         except ValidationError as e:
-            # Si el servicio lanza un error de validación (ej. email duplicado)
-            # lo agregamos al formulario y volvemos a renderizar
+            # Manejo de errores de validación del servicio
             form.add_error(None, e)
             return self.form_invalid(form)
 

@@ -1,8 +1,11 @@
+from django.contrib.auth import get_user_model
 from django.core.exceptions import ValidationError
 from django.db import transaction
 from django.utils import timezone
 
-from users.models import Admin, User
+from users.models import Admin
+
+User = get_user_model()
 
 
 class AdminService:
@@ -13,29 +16,11 @@ class AdminService:
 
     @staticmethod
     @transaction.atomic
-    def create_admin_user(data: dict) -> Admin:
+    def create_admin(data: dict) -> Admin:
         """
         Crea un usuario con rol ADMIN y su perfil de Admin asociado de forma atómica.
         Recibe un diccionario con los datos necesarios para crear ambos objetos.
         Retorna el objeto Admin creado.
-        Args:
-            data (dict): Diccionario con los datos para crear el User y Admin.
-                Campos obligatorios:
-                    - name (str)
-                    - surname (str)
-                    - dni (str)
-                    - email (str)
-                    - hire_date (date)
-                    - password (str): Contraseña manual para el usuario ADMIN.
-                Campos opcionales:
-                    - address (str)
-                    - birth_date (date)
-                    - phone (str)
-                    - department (str)
-        Raises:
-            ValidationError: Si alguna validación falla.
-        Returns:
-            Admin: Objeto Admin creado.
         """
         # Validar campos obligatorios
         required_fields = ['name', 'surname', 'dni', 'email', 'hire_date', 'password']
@@ -88,17 +73,15 @@ class AdminService:
         Person es abstracto, así que chequeamos las entidades concretas.
         Retorna True si el DNI no existe, False si ya está en uso.
         """
-        # Importamos aquí para evitar dependencias circulares
-        # TODO: Agregar las otras entidades cuando estén disponibles
-        from users.models import Admin
+        # Importaciones locales para evitar dependencias circulares
         from students.models import Student
-        # from teachers.models import Teacher
+        from users.models import Teacher
 
         exists_in_admin = Admin.objects.filter(dni=dni).exists()
         exists_in_student = Student.objects.filter(dni=dni).exists()
-        # exists_in_teacher = Teacher.objects.filter(dni=dni).exists()
+        exists_in_teacher = Teacher.objects.filter(dni=dni).exists()
 
-        return not (exists_in_admin or exists_in_student)
+        return not (exists_in_admin or exists_in_student or exists_in_teacher)
 
     @staticmethod
     def validate_email_unique(email: str) -> bool:

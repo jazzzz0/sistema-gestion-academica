@@ -83,35 +83,26 @@ class TeacherCreateForm(forms.Form):
     )
 
     def clean_email(self):
-        """
-        Valida que el email no esté ya registrado.
-        """
         email = self.cleaned_data["email"]
-
-        if User.objects.filter(email=email).exists():
+        # Delegamos al servicio para mantener la lógica centralizada
+        if not TeacherService.validate_email_unique(email):
             raise forms.ValidationError("El correo electrónico ya está registrado.")
-
         return email
 
     def clean_dni(self):
-        """
-        Valida que el DNI sea numérico y tenga entre 7 y 8 dígitos.
-        Valida que el DNI no esté ya registrado.
-        """
         dni = self.cleaned_data["dni"]
 
+        # Validación de formato
         if not dni.isdigit() or not (7 <= len(dni) <= 8):
             raise forms.ValidationError("DNI inválido. Debe tener 7 u 8 dígitos numéricos.")
 
-        if User.objects.filter(dni=dni).exists():
-            raise forms.ValidationError("El DNI ya está registrado.")
+        # Validación de Negocio (Cross-Table Check)
+        if not TeacherService.validate_dni_unique(dni):
+            raise forms.ValidationError("El DNI ya está registrado en el sistema (Alumno, Admin o Docente).")
 
         return dni
 
     def clean_hire_date(self):
-        """
-        Valida que la fecha de contratación no sea futura.
-        """
         hire_date = self.cleaned_data["hire_date"]
         if hire_date > timezone.now().date():
             raise forms.ValidationError("La fecha de contratación no puede ser futura.")
