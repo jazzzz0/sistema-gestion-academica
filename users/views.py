@@ -21,12 +21,61 @@ from .services.teacher_service import TeacherService
 class HomeView(TemplateView):
     template_name = "home.html"
 
+    def dispatch(self, request, *args, **kwargs):
+        # Si ya está autenticado, redirigimos a Dashboard
+        if request.user.is_authenticated:
+            return redirect('dashboard')
+
+        # Si es anónimo, continúa con la vista Home
+        return super().dispatch(request, *args, **kwargs)
+
 
 # Vista Dashboard (para usuarios autenticados)
 class DashboardView(LoginRequiredMixin, TemplateView):
     template_name = "dashboard.html"
     login_url = '/login/'  # Redirige a login si no está autenticado
     redirect_field_name = 'next'
+
+    def get_context_data(self, **kwargs):
+        """
+        Inyectamos 'full_name' al contexto buscando en el perfil asociado.
+        """
+        context = super().get_context_data(**kwargs)
+        user = self.request.user
+
+        # Estado inicial: Usamos email y marcamos que es un email
+        full_name = user.email
+        is_email = True
+
+        # Búsqueda inteligente según el ROL
+        try:
+            if user.role == 'STUDENT' and hasattr(user, 'student_profile'):
+                full_name = user.student_profile.get_full_name()
+                is_email = False
+
+            elif user.role == 'TEACHER' and hasattr(user, 'teacher_profile'):
+                full_name = user.teacher_profile.get_full_name()
+                is_email = False
+
+            elif user.role == 'ADMIN' and hasattr(user, 'admin_profile'):
+                full_name = user.admin_profile.get_full_name()
+                is_email = False
+
+                # Nota: Si es un Superuser creado por consola sin perfil 'Admin' asociado,
+                # is_email seguirá siendo True y full_name seguirá siendo el email.
+
+        except Exception:
+            pass  # Si falla, nos quedamos con el estado inicial (Email)
+
+        # Formateo Condicional
+        if not is_email:
+            # Si es un nombre real, lo ponemos en título (Juan Perez)
+            context['full_name'] = full_name.title()
+        else:
+            # Si es un email, lo dejamos tal cual o forzamos minúsculas para limpieza
+            context['full_name'] = full_name
+
+        return context
 
 
 class ProfileView(LoginRequiredMixin, TemplateView):

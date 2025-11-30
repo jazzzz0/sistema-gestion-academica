@@ -4,29 +4,78 @@
 
 {% block content %}
     <div class="container mt-5">
-        <h1 class="fw-bold mb-4">Dashboard</h1>
+        <h1 class="fw-bold mb-4">Panel de Control</h1>
 
         {% if user.role == 'ADMIN' %}
-            <div class="alert alert-danger" role="alert">
-                Bienvenido, <strong>Administrador</strong>.
+            <div class="alert shadow-sm text-white" role="alert" style="background-color: var(--color-role-admin);">
+                <i class="bi bi-shield-lock-fill me-2"></i>
+                Bienvenido, <strong>{{ full_name }}</strong> (Administrador).
             </div>
-            <p>Accesos directos:</p>
-            <ul>
-                <li><a href="{% url 'students:student_list' %}" class="text-decoration-none">Gestión de Alumnos</a></li>
-                <li><a href="#" class="text-decoration-none">Gestión de Materias</a></li>
-            </ul>
+
+            <div class="card mt-4 shadow-sm border-0">
+                <div class="card-header text-white" style="background-color: var(--color-role-admin);">
+                    Accesos Rápidos
+                </div>
+                <div class="card-body">
+                    <ul class="list-group list-group-flush">
+                        <li class="list-group-item">
+                            <a href="{% url 'students:student_list' %}" class="text-decoration-none stretched-link" style="color: var(--color-role-admin);">
+                                <i class="bi bi-people-fill me-2"></i> Gestión de Alumnos
+                            </a>
+                        </li>
+                        <li class="list-group-item">
+                            <a href="{% url 'users:teacher_list' %}" class="text-decoration-none stretched-link" style="color: var(--color-role-admin);">
+                                <i class="bi bi-person-video3 me-2"></i> Gestión de Profesores
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
 
         {% elif user.role == 'STUDENT' %}
-            <div class="alert alert-primary" role="alert">
-                Bienvenido, <strong>{{ user.first_name }}</strong>.
+            <div class="alert shadow-sm text-white" role="alert" style="background-color: var(--color-role-student);">
+                <i class="bi bi-person-badge-fill me-2"></i>
+                Hola, <strong>{{ full_name }}</strong>.
             </div>
-            <p>En este panel próximamente podrás consultar tus calificaciones e inscripciones.</p>
+
+            <div class="row mt-4">
+                <div class="col-md-6">
+                    <div class="card shadow-sm h-100 border-0">
+                        <div class="card-body">
+                            <h5 class="card-title text-muted">Estado Académico</h5>
+                            <p class="card-text">Consulta tus inscripciones y calificaciones recientes.</p>
+                            <a href="{% url 'enrollments:my_enrollments' %}" class="btn text-white" style="background-color: var(--color-role-student);">
+                                Ver Inscripciones
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        {% elif user.role == 'TEACHER' %}
+            <div class="alert shadow-sm text-white" role="alert" style="background-color: var(--color-role-teacher);">
+                <i class="bi bi-journal-bookmark-fill me-2"></i>
+                Profesor/a <strong>{{ full_name }}</strong>.
+            </div>
+
+            <div class="row mt-4">
+                <div class="col-md-6">
+                    <div class="card shadow-sm h-100 border-0">
+                        <div class="card-body">
+                            <h5 class="card-title text-muted">Mis Cátedras</h5>
+                            <p class="card-text">Administra tus materias y alumnos asignados.</p>
+                            <a href="#" class="btn text-white" style="background-color: var(--color-role-teacher);">
+                                Ver mis materias
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
 
         {% else %}
             <div class="alert alert-secondary" role="alert">
-                Bienvenido al sistema.
+                Bienvenido, <strong>{{ full_name }}</strong>.
             </div>
         {% endif %}
     </div>
 {% endblock %}
-

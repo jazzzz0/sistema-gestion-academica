@@ -5,47 +5,45 @@
 {% block content %}
 <div class="container mt-5">
     <div class="row">
-        <!-- Columna principal del perfil -->
         <div class="col-lg-8 mx-auto">
-            <!-- Encabezado del perfil -->
-            <div class="card shadow mb-4">
-                <div class="card-header
-                    {% if user.is_superuser or user.role == 'ADMIN' %}
-                        bg-danger
-                    {% elif user.role == 'TEACHER' %}
-                        bg-primary
-                    {% else %}
-                        bg-success
-                    {% endif %}
-                    text-white">
-                    <h3 class="mb-0">
-                        <i class="bi bi-person-circle"></i> Mi Perfil
+
+            <div class="card shadow mb-4 border-0">
+                <div class="card-header border-0 py-3"
+                     style="background-color:
+                        {% if user.is_superuser or user.role == 'ADMIN' %}var(--color-role-admin)
+                        {% elif user.role == 'TEACHER' %}var(--color-role-teacher)
+                        {% else %}var(--color-role-student){% endif %};">
+
+                    <h3 class="mb-0 text-white" style="font-family: var(--font-base);">
+                        <i class="bi bi-person-circle me-2"></i>Mi Perfil
                     </h3>
                 </div>
+
                 <div class="card-body">
                     <div class="row">
-                        <!-- Avatar placeholder -->
                         <div class="col-md-4 text-center mb-3 mb-md-0">
-                            <div class="bg-light rounded-circle d-inline-flex align-items-center justify-content-center"
+                            <div class="bg-light rounded-circle d-inline-flex align-items-center justify-content-center shadow-sm"
                                  style="width: 150px; height: 150px; font-size: 4rem;">
-                                {% if user.is_superuser or user.role == 'ADMIN' %}
-                                    <span style="color: #d32f2f;">👤</span>
-                                {% elif user.role == 'TEACHER' %}
-                                    <span style="color: #1976d2;">👨‍🏫</span>
-                                {% else %}
-                                    <span style="color: #388e3c;">👨‍🎓</span>
-                                {% endif %}
+                                <span style="color:
+                                    {% if user.is_superuser or user.role == 'ADMIN' %}var(--color-role-admin)
+                                    {% elif user.role == 'TEACHER' %}var(--color-role-teacher)
+                                    {% else %}var(--color-role-student){% endif %};">
+                                    {% if user.is_superuser or user.role == 'ADMIN' %}
+                                        <i class="bi bi-shield-lock"></i>
+                                    {% elif user.role == 'TEACHER' %}
+                                        <i class="bi bi-person-video3"></i>
+                                    {% else %}
+                                        <i class="bi bi-person-badge"></i>
+                                    {% endif %}
+                                </span>
                             </div>
                             <div class="mt-3">
-                                <span class="badge
-                                    {% if user.is_superuser or user.role == 'ADMIN' %}
-                                        bg-danger
-                                    {% elif user.role == 'TEACHER' %}
-                                        bg-primary
-                                    {% else %}
-                                        bg-success
-                                    {% endif %}
-                                    fs-6">
+                                <span class="badge fs-6 shadow-sm"
+                                      style="background-color:
+                                        {% if user.is_superuser or user.role == 'ADMIN' %}var(--color-role-admin)
+                                        {% elif user.role == 'TEACHER' %}var(--color-role-teacher)
+                                        {% else %}var(--color-role-student){% endif %};">
+
                                     {% if user.is_superuser %}
                                         ADMINISTRADOR
                                     {% elif user.role == 'TEACHER' %}
@@ -59,9 +57,8 @@
                             </div>
                         </div>
 
-                        <!-- Información básica -->
                         <div class="col-md-8">
-                            <h4 class="mb-3">Información de Usuario</h4>
+                            <h4 class="mb-3 text-muted border-bottom pb-2">Información de Usuario</h4>
 
                             <div class="mb-2">
                                 <strong>Correo electrónico:</strong>
@@ -97,32 +94,32 @@
                                 </div>
                             {% endif %}
 
-                            <div class="mb-2">
-                                <strong>Miembro desde:</strong>
-                                <p class="text-muted mb-1">{{ user.date_joined|date:"d/m/Y" }}</p>
-                            </div>
-
-                            <div class="mb-2">
-                                <strong>Último acceso:</strong>
-                                <p class="text-muted mb-1">
-                                    {% if user.last_login %}
-                                        {{ user.last_login|date:"d/m/Y H:i" }}
-                                    {% else %}
-                                        Nunca
-                                    {% endif %}
-                                </p>
+                            <div class="row mt-3">
+                                <div class="col-6">
+                                    <small class="text-muted d-block">Miembro desde</small>
+                                    <span>{{ user.date_joined|date:"d/m/Y" }}</span>
+                                </div>
+                                <div class="col-6">
+                                    <small class="text-muted d-block">Último acceso</small>
+                                    <span>
+                                        {% if user.last_login %}
+                                            {{ user.last_login|date:"d/m/Y H:i" }}
+                                        {% else %}
+                                            Nunca
+                                        {% endif %}
+                                    </span>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <!-- Información adicional según el rol -->
             {% if user.role == 'STUDENT' and user.student_profile %}
-                <div class="card shadow mb-4">
-                    <div class="card-header bg-success text-white">
-                        <h5 class="mb-0">
-                            <i class="bi bi-mortarboard"></i> Información Académica
+                <div class="card shadow mb-4 border-0">
+                    <div class="card-header py-3" style="background-color: var(--color-role-student);">
+                        <h5 class="mb-0 text-white" style="font-family: var(--font-base);">
+                            <i class="bi bi-mortarboard me-2"></i>Información Académica
                         </h5>
                     </div>
                     <div class="card-body">
@@ -141,58 +138,24 @@
                                 <p class="text-muted">{{ user.student_profile.address }}</p>
                             </div>
                             {% endif %}
-                            {% if user.student_profile.birth_date %}
-                            <div class="col-md-6 mb-3">
-                                <strong>Fecha de nacimiento:</strong>
-                                <p class="text-muted">{{ user.student_profile.birth_date|date:"d/m/Y" }}</p>
-                            </div>
-                            {% endif %}
-                            {% if user.student_profile.phone %}
-                            <div class="col-md-6 mb-3">
-                                <strong>Teléfono:</strong>
-                                <p class="text-muted">{{ user.student_profile.phone }}</p>
-                            </div>
-                            {% endif %}
                         </div>
                     </div>
                 </div>
 
             {% elif user.role == 'TEACHER' and user.teacher_profile %}
-                <div class="card shadow mb-4">
-                    <div class="card-header bg-primary text-white">
-                        <h5 class="mb-0">
-                            <i class="bi bi-book"></i> Información Docente
+                <div class="card shadow mb-4 border-0">
+                    <div class="card-header py-3" style="background-color: var(--color-role-teacher);">
+                        <h5 class="mb-0 text-white" style="font-family: var(--font-base);">
+                            <i class="bi bi-book me-2"></i>Información Docente
                         </h5>
                     </div>
                     <div class="card-body">
-                        <div class="row">
-                            {% if user.teacher_profile.address %}
-                            <div class="col-md-12 mb-3">
-                                <strong>Domicilio:</strong>
-                                <p class="text-muted">{{ user.teacher_profile.address }}</p>
-                            </div>
-                            {% endif %}
-                            {% if user.teacher_profile.birth_date %}
-                            <div class="col-md-6 mb-3">
-                                <strong>Fecha de nacimiento:</strong>
-                                <p class="text-muted">{{ user.teacher_profile.birth_date|date:"d/m/Y" }}</p>
-                            </div>
-                            {% endif %}
-                            {% if user.teacher_profile.phone %}
-                            <div class="col-md-6 mb-3">
-                                <strong>Teléfono:</strong>
-                                <p class="text-muted">{{ user.teacher_profile.phone }}</p>
-                            </div>
-                            {% endif %}
-                        </div>
-
-                        <!-- Materias que dicta -->
                         <div class="mt-4">
                             <h6 class="mb-3"><strong>Materias a Cargo:</strong></h6>
                             {% if user.teacher_profile.subjects.all %}
                                 <div class="table-responsive">
-                                    <table class="table table-striped table-hover">
-                                        <thead class="table-primary">
+                                    <table class="table table-striped table-hover align-middle">
+                                        <thead class="text-white" style="background-color: var(--color-role-teacher);">
                                             <tr>
                                                 <th>Materia</th>
                                                 <th>Código</th>
@@ -222,78 +185,50 @@
                 </div>
 
             {% elif user.is_superuser or user.role == 'ADMIN' %}
-                <div class="card shadow mb-4">
-                    <div class="card-header bg-danger text-white">
-                        <h5 class="mb-0">
-                            <i class="bi bi-shield-check"></i> Panel de Administración
+                <div class="card shadow mb-4 border-0">
+                    <div class="card-header py-3" style="background-color: var(--color-role-admin);">
+                        <h5 class="mb-0 text-white" style="font-family: var(--font-base);">
+                            <i class="bi bi-shield-check me-2"></i>Panel de Administración
                         </h5>
                     </div>
                     <div class="card-body">
-                        {% if user.admin_profile %}
-                            <div class="row">
-                                {% if user.admin_profile.address %}
-                                <div class="col-md-12 mb-3">
-                                    <strong>Domicilio:</strong>
-                                    <p class="text-muted">{{ user.admin_profile.address }}</p>
-                                </div>
-                                {% endif %}
-                                {% if user.admin_profile.birth_date %}
-                                <div class="col-md-6 mb-3">
-                                    <strong>Fecha de nacimiento:</strong>
-                                    <p class="text-muted">{{ user.admin_profile.birth_date|date:"d/m/Y" }}</p>
-                                </div>
-                                {% endif %}
-                                {% if user.admin_profile.phone %}
-                                <div class="col-md-6 mb-3">
-                                    <strong>Teléfono:</strong>
-                                    <p class="text-muted">{{ user.admin_profile.phone }}</p>
-                                </div>
-                                {% endif %}
-                            </div>
-                        {% endif %}
 
                         <div class="mt-4">
-                            <h6 class="mb-3"><strong>Accesos Rápidos:</strong></h6>
+                            <h6 class="mb-3 border-bottom pb-2"><strong>Accesos Rápidos:</strong></h6>
                             <div class="row">
                                 <div class="col-md-6 mb-3">
-                                    <a href="{% url 'students:student_list' %}" class="btn btn-outline-danger w-100">
+                                    <a href="{% url 'students:student_list' %}" class="btn btn-outline-dark w-100">
                                         <i class="bi bi-people"></i> Gestión de Estudiantes
                                     </a>
                                 </div>
                                 <div class="col-md-6 mb-3">
-                                    <a href="{% url 'subjects:subject_list' %}" class="btn btn-outline-danger w-100">
+                                    <a href="{% url 'subjects:subject_list' %}" class="btn btn-outline-dark w-100">
                                         <i class="bi bi-journal-text"></i> Gestión de Materias
                                     </a>
                                 </div>
-                                {% if user.is_superuser %}
                                 <div class="col-md-6 mb-3">
-                                    <a href="/admin/" class="btn btn-outline-danger w-100" target="_blank">
-                                        <i class="bi bi-gear"></i> Panel de Administración
+                                    <a href="/admin/" class="btn btn-outline-dark w-100" target="_blank">
+                                        <i class="bi bi-gear"></i> Django Admin
                                     </a>
                                 </div>
-                                {% endif %}
                             </div>
                         </div>
                     </div>
                 </div>
             {% endif %}
 
-            <!-- Acciones del perfil -->
-            <div class="card shadow mb-4">
-                <div class="card-header bg-secondary text-white">
-                    <h5 class="mb-0">
-                        <i class="bi bi-gear-fill"></i> Acciones
+            <div class="card shadow mb-4 border-0">
+                <div class="card-header bg-secondary text-white py-3">
+                    <h5 class="mb-0 text-white" style="font-family: var(--font-base);">
+                        <i class="bi bi-gear-fill me-2"></i>Acciones
                     </h5>
                 </div>
                 <div class="card-body">
                     <div class="d-grid gap-2">
-                        <a href="#" class="btn btn-outline-primary">
+                        <a href="{% url 'users:first_login_change_password' %}" class="btn btn-outline-primary">
                             <i class="bi bi-key"></i> Cambiar Contraseña
                         </a>
-                        <a href="#" class="btn btn-outline-secondary">
-                            <i class="bi bi-pencil"></i> Editar Perfil
-                        </a>
-                        <a href="{% url 'dashboard' %}" class="btn btn-outline-info">
+                        <a href="{% url 'dashboard' %}" class="btn btn-outline-secondary">
                             <i class="bi bi-house-door"></i> Volver al Dashboard
                         </a>
                     </div>

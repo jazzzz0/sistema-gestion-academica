@@ -5,35 +5,37 @@
 /* 0. Importar Fuentes */
 @import url('https://fonts.googleapis.com/css2?family=Merriweather:wght@300;400;700;900&family=Roboto:wght@300;400;700&display=swap');
 
-/* ========================================================================== */
-/* 1. Variables de marca                                                      */
-/* ========================================================================== */
 :root {
-  /* Colores Principales [cite: 71-73] */
-  --color-primary: #34658A;   /* Azul Institucional  */
-  --color-secondary: #58857C; /* Verde Amigable  */
+  /* --- PALETA DE COLORES BASE (La pintura) --- */
+  /* Colores Principales */
+  --color-primary: #34658A;   /* Azul Institucional */
+  --color-secondary: #58857C; /* Verde Amigable */
+  --color-tertiary: #5D5C8D;  /* Violeta Autoridad */
 
-  /* Colores de Estado/Feedback [cite: 79-82] */
-  --color-success: #3C9D55;   /* Éxito [cite: 29] */
-  --color-error: #D64545;     /* Error  */
-  --color-warning: #FFC72C;   /* Advertencia [cite: 35] */
-  --color-info: #5D9FCE;      /* Información [cite: 38] */
+  /* Colores de Estado/Feedback */
+  --color-success: #3C9D55;   /* Éxito */
+  --color-error: #D64545;     /* Error (Rojo intenso) */
+  --color-warning: #FFC72C;   /* Advertencia */
+  --color-info: #5D9FCE;      /* Información */
 
-  /* Colores Neutros [cite: 74-78] */
-  --color-text-dark: #4A4A4A; /* Negro para texto  */
-  --color-gray-dark: #7B7B7B; /* Gris oscuro [cite: 18] */
-  --color-bg: #F7F9FB;        /* Gris de fondo  */
-  --color-white: #FFFFFF;     /* Blanco [cite: 24] */
+  /* Colores Neutros */
+  --color-text-dark: #4A4A4A;
+  --color-gray-dark: #7B7B7B;
+  --color-bg: #F7F9FB;
+  --color-white: #FFFFFF;
 
-  /* Mapeo a variables funcionales del sistema anterior */
+  /* --- VARIABLES SEMÁNTICAS (El significado) --- */
+  /* Aquí asignamos "quién usa qué color". */
+  /* Si mañana quieres que el alumno sea Naranja, solo cambias aquí. */
+
+  --color-role-admin: var(--color-tertiary);    /* Admin usa Violeta */
+  --color-role-teacher: var(--color-primary);   /* Teacher usa Azul */
+  --color-role-student: var(--color-secondary); /* Student usa Verde */
+
+  /* Mapeos funcionales */
   --color-text: var(--color-text-dark);
-  --color-accent: var(--color-warning); /* Usamos el amarillo de advertencia como acento */
-
-  /* Tipografía */
   --font-base: 'Roboto', sans-serif;
   --font-headings: 'Merriweather', cursive;
-
-  /* Tamaños base */
   --font-size-base: 16px;
   --line-height: 1.6;
 }
@@ -47,7 +49,6 @@ body {
   line-height: var(--line-height);
   color: var(--color-text);
   background-color: var(--color-bg);
-  padding-top: 80px;
 }
 
 h1, h2, h3, h4, h5, h6 {
@@ -113,25 +114,40 @@ button:not(.btn):not(.navbar-toggler):hover {
 /* ========================================================================== */
 /* 4. Estilos específicos por ROL (Overrides)                                 */
 /* ========================================================================== */
-/* Admin: Usamos el color de Error/Atención para alta visibilidad */
-.navbar-admin { background-color: var(--color-error) !important; } /* #D64545 */
 
-/* Teacher: Usamos el color Primario (Institucional) */
-.navbar-teacher { background-color: var(--color-primary) !important; } /* #34658A */
+/* Admin: Usamos la variable semántica (Violeta) en lugar de Error */
+.navbar-admin {
+    background-color: var(--color-role-admin) !important;
+}
 
-/* Student: Usamos el color Secundario (Verde Amigable) */
-.navbar-student { background-color: var(--color-secondary) !important; } /* #58857C */
+/* Teacher: Usamos la variable semántica */
+.navbar-teacher {
+    background-color: var(--color-role-teacher) !important;
+}
 
-/* Student: Usamos el color Secundario (Verde Amigable) */
-.navbar-student { background-color: var(--color-secondary) !important; } /* #58857C */
+/* Student: Usamos la variable semántica */
+.navbar-student {
+    background-color: var(--color-role-student) !important;
+}
 
-/* Guest: Usamos el color de Gris Oscuro */
-.navbar-guest { background-color: var(--color-gray-dark) !important; }
+/* Guest: Usamos el color gris oscuro */
+.navbar-guest {
+    background-color: var(--color-gray-dark) !important;
+}
 
-/* Ajuste de Badges para que coincidan con la lógica */
-.badge-admin { background-color: var(--color-white); color: var(--color-error); }
-.badge-teacher { background-color: var(--color-white); color: var(--color-primary); }
-.badge-student { background-color: var(--color-white); color: var(--color-secondary); }
+/* Badges: Fondo blanco, texto del color del rol */
+.badge-admin {
+    background-color: var(--color-white);
+    color: var(--color-role-admin);
+}
+.badge-teacher {
+    background-color: var(--color-white);
+    color: var(--color-role-teacher);
+}
+.badge-student {
+    background-color: var(--color-white);
+    color: var(--color-role-student);
+}
 
 /* ========================================================================== */
 /* 5. Ajustes Responsive                                                      */
