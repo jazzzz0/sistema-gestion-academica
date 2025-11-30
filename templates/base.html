@@ -145,7 +145,8 @@
         </div>
     </nav>
 
-    <main class="container flex-grow-1" style="padding-top: 80px; padding-bottom: 40px;">
+    <main class="container flex-grow-1 {% block main_classes %}{% endblock %}"
+          style="padding-top: 80px; {% block main_styles %}padding-bottom: 40px;{% endblock %}">
             {% if messages %}
                 <div class="row justify-content-center">
                     <div class="col-md-10">
