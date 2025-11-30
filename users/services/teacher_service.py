@@ -18,7 +18,7 @@ class TeacherService:
 
         La contraseña inicial será el DNI.
         """
-        # VALIDACIÓN PREVIA (DEBE AGREGARSE)
+        # Validaciones
         if not TeacherService.validate_email_unique(data["email"]):
             raise ValueError("El email ya está registrado en el sistema.")
 
