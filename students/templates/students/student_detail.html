@@ -6,11 +6,13 @@
 <div class="container mt-4">
 
     <div class="d-flex justify-content-between align-items-center mb-4">
-        <h1 class="h3 text-primary">
-            <i class="bi bi-person-badge me-2"></i>{{ student.surname }}, {{ student.name }}
-        </h1>
+        
+            <a href="{% url 'students:student_list' %}" class="btn btn-outline-secondary btn-sm ms-3">
+                <i class="bi bi-arrow-left"></i> Volver
+            </a>
 
-        <div class="d-flex align-items-center gap-2">
+            <h1 class="h2 text-primary">Detalle de Alumno</h1>
+
             {% if student.user.is_active %}
                 <span class="badge bg-success shadow-sm p-2">
                     <i class="bi bi-check-circle me-1"></i>ACTIVO
@@ -21,10 +23,6 @@
                 </span>
             {% endif %}
 
-            <a href="{% url 'students:student_list' %}" class="btn btn-outline-secondary btn-sm ms-3">
-                <i class="bi bi-arrow-left"></i> Volver
-            </a>
-        </div>
     </div>
 
     <div class="row">
@@ -64,7 +62,7 @@
 
                     {% if student.user.is_active %}
                     <div class="d-grid mt-3">
-                        <a href="{% url 'students:student_update' student.id %}" class="btn btn-outline-primary btn-sm">
+                        <a href="{% url 'students:student_update' student.id %}" class="btn btn-primary btn-sm">
                             <i class="bi bi-pencil-square me-2"></i>Editar Datos
                         </a>
                     </div>
@@ -72,37 +70,11 @@
                 </div>
             </div>
 
-            <div class="card mb-4 shadow-sm border-start border-4 border-warning">
-                <div class="card-header bg-light fw-bold text-warning">
-                    <i class="bi bi-shield-lock me-2"></i>Gestión de Cuenta
-                </div>
-                <div class="card-body">
-                    <p class="small text-muted mb-3">
-                        Acciones sensibles sobre el acceso del usuario al sistema.
-                    </p>
-
-                    <form action="{% url 'students:student_toggle_active' student.pk %}" method="POST">
-                        {% csrf_token %}
-
-                        {% if student.user.is_active %}
-                            <button type="submit" class="btn btn-outline-danger w-100"
-                                    onclick="return confirm('¿Estás seguro? El alumno perderá acceso al sistema.');">
-                                <i class="bi bi-person-x-fill me-2"></i>Desactivar Alumno
-                            </button>
-                        {% else %}
-                            <button type="submit" class="btn btn-outline-success w-100"
-                                    onclick="return confirm('¿Reactivar acceso al alumno?');">
-                                <i class="bi bi-person-check-fill me-2"></i>Reactivar Alumno
-                            </button>
-                        {% endif %}
-                    </form>
-                </div>
-            </div>
         </div>
 
         <div class="col-md-7">
 
-            <div class="card mb-4 shadow-sm border-start border-4 border-info">
+            <div class="card mb-4 shadow-sm">
                 <div class="card-header bg-light fw-bold text-primary d-flex justify-content-between align-items-center">
                     <span><i class="bi bi-mortarboard me-2"></i>Situación Académica</span>
                 </div>
@@ -114,14 +86,14 @@
                                 {% if student.career %}
                                     {{ student.career.name }}
                                 {% else %}
-                                    <span class="text-danger fst-italic">Sin carrera asignada</span>
+                                    <span class="text-muted fst-italic">Sin carrera asignada</span>
                                 {% endif %}
                             </h4>
                         </div>
                         <div class="col-4 text-end">
                             {% if student.user.is_active %}
                                 <a href="{% url 'students:student_update_career' student.id %}"
-                                   class="btn {% if student.career %}btn-sm btn-outline-primary{% else %}btn-primary pulse-animation{% endif %}">
+                                   class="btn {% if student.career %}btn-sm btn-primary{% else %}btn-primary pulse-animation{% endif %}">
                                     {% if student.career %}
                                         <i class="bi bi-arrow-repeat"></i> Cambiar
                                     {% else %}
@@ -134,20 +106,51 @@
                 </div>
             </div>
 
-            <div class="card shadow-sm mb-4">
+            <div class="card mb-4 shadow-sm">
+                <div class="card-header bg-light fw-bold text-warning">
+                    <i class="bi bi-shield-lock me-2"></i>Gestión de Cuenta
+                </div>
+                <div class="card-body">
+                    <p class="small text-muted mb-3">
+                        Acciones sensibles sobre el acceso del usuario al sistema.
+                    </p>
+
+                    <form action="{% url 'students:student_toggle_active' student.pk %}" method="POST">
+                        {% csrf_token %}
+
+                        {% if student.user.is_active %}
+                            <button type="submit" class="btn btn-danger w-100"
+                                    onclick="return confirm('¿Estás seguro? El alumno perderá acceso al sistema.');">
+                                <i class="bi bi-person-x-fill me-2"></i>Desactivar Alumno
+                            </button>
+                        {% else %}
+                            <button type="submit" class="btn btn-outline-success w-100"
+                                    onclick="return confirm('¿Reactivar acceso al alumno?');">
+                                <i class="bi bi-person-check-fill me-2"></i>Reactivar Alumno
+                            </button>
+                        {% endif %}
+                    </form>
+                </div>
+            </div>
+
+            
+
+        </div>
+
+        <div class="card shadow-sm mb-4">
                 <div class="card-header bg-light fw-bold d-flex justify-content-between align-items-center">
                     <span><i class="bi bi-journal-bookmark me-2"></i>Historial de Materias</span>
-                    <button class="btn btn-sm btn-outline-secondary" disabled title="Próximamente">
-                        <i class="bi bi-plus-lg"></i> Nueva Inscripción
+                    <button class="btn btn-sm btn-outline-secondary" title="Próximamente" disabled>
+                        <i class="bi bi-plus-lg"></i> Nueva Inscripción (Próximamente)
                     </button>
                 </div>
 
                 {% if enrollments_page %}
                     <div class="table-responsive">
-                        <table class="table table-hover align-middle mb-0">
+                        <table class="table table-hover align-middle mb-0 text-center">
                             <thead class="table-light">
                                 <tr>
-                                    <th>Materia</th>
+                                    <th class="text-start">Materia</th>
                                     <th>Estado</th>
                                     <th>Fecha</th>
                                 </tr>
@@ -155,20 +158,20 @@
                             <tbody>
                                 {% for enrollment in enrollments_page %}
                                 <tr>
-                                    <td>{{ enrollment.subject.name }}</td>
-                                    <td>
+                                    <td class="text-start">{{ enrollment.subject.name }}</td>
+                                    <td class="text-center">
                                         {% if enrollment.status == 'aprobada' %}
-                                            <span class="badge bg-success">Aprobada</span>
+                                            <span class="badge bg-success rounded-pill">Aprobada</span>
                                         {% elif enrollment.status == 'activa' %}
-                                            <span class="badge bg-primary">Activa</span>
+                                            <span class="badge bg-primary rounded-pill">Activa</span>
                                         {% elif enrollment.status == 'regular' %}
-                                            <span class="badge bg-info text-dark">Regular</span>
+                                            <span class="badge bg-info text-dark rounded-pill">Regular</span>
                                         {% elif enrollment.status == 'reprobada' %}
-                                            <span class="badge bg-danger">Reprobada</span>
+                                            <span class="badge bg-danger rounded-pill">Reprobada</span>
                                         {% elif enrollment.status == 'baja' %}
-                                            <span class="badge bg-dark">Baja</span>
+                                            <span class="badge bg-dark rounded-pill">Baja</span>
                                         {% else %}
-                                            <span class="badge bg-secondary">{{ enrollment.get_status_display }}</span>
+                                            <span class="badge bg-secondary rounded-pill">{{ enrollment.get_status_display }}</span>
                                         {% endif %}
                                     </td>
                                     <td class="text-muted small">{{ enrollment.enrolled_at|date:"d/m/Y" }}</td>
@@ -189,8 +192,6 @@
                     </div>
                 {% endif %}
             </div>
-
-        </div>
     </div>
 </div>
 {% endblock %}
