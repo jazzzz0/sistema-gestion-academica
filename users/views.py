@@ -182,3 +182,16 @@ class FirstLoginChangePasswordView(PasswordChangeView):
         except Exception as e:
             messages.error(self.request, f"Ocurrió un error al actualizar la contraseña: {str(e)}")
             return self.form_invalid(form)
+
+
+class UserPasswordChangeView(LoginRequiredMixin, PasswordChangeView):
+    """
+    Vista para que un usuario logueado cambie su contraseña voluntariamente.
+    """
+    template_name = 'users/password_change.html'
+    success_url = reverse_lazy('profile')
+
+    def form_valid(self, form):
+        # Agregamos un mensaje de éxito para mejorar la UX
+        messages.success(self.request, "Tu contraseña ha sido actualizada correctamente.")
+        return super().form_valid(form)
