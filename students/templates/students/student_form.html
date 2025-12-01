@@ -87,11 +87,11 @@
                             {% endfor %}
                         </div>
                         <div class="col-md-6 mb-3">
-                            <label for="{{ form.career.id_for_label }}" class="form-label">
-                                {{ form.career.label }} <span class="text-danger">*</span>
+                            <label for="{{ form.address.id_for_label }}" class="form-label">
+                                {{ form.address.label }}
                             </label>
-                            {{ form.career }}
-                            {% for error in form.career.errors %}
+                            {{ form.address }}
+                            {% for error in form.address.errors %}
                                 <div class="invalid-feedback d-block">{{ error }}</div>
                             {% endfor %}
                         </div>
@@ -117,23 +117,12 @@
                             {% endfor %}
                         </div>
                     </div>
-
-                    <div class="mb-3">
-                        <label for="{{ form.address.id_for_label }}" class="form-label">
-                            {{ form.address.label }}
-                        </label>
-                        {{ form.address }}
-                        {% for error in form.address.errors %}
-                            <div class="invalid-feedback d-block">{{ error }}</div>
-                        {% endfor %}
-                    </div>
-
                 </div>
             </div>
 
-            <div class="d-flex justify-content-end gap-2 mb-5">
+            <div class="d-flex justify-content-between mt-4">
                 <a href="{% if form.student %}{% url 'students:student_detail' form.student.pk %}{% else %}{% url 'students:student_list' %}{% endif %}"
-                    class="btn btn-secondary">
+                    class="btn btn-outline-secondary text-decoration-none">
                     Cancelar
                 </a>
                 <button type="submit" class="btn btn-primary px-4">
