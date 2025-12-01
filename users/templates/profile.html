@@ -65,29 +65,22 @@
                                 <p class="text-muted mb-1">{{ user.email }}</p>
                             </div>
 
+                            <div class="mb-2">
+                                <strong>Nombre completo:</strong>
+                                <p class="text-muted mb-1">{{ user.full_name_display }}</p>
+                            </div>
+
                             {% if user.role == 'STUDENT' and user.student_profile %}
-                                <div class="mb-2">
-                                    <strong>Nombre completo:</strong>
-                                    <p class="text-muted mb-1">{{ user.student_profile.name }} {{ user.student_profile.surname }}</p>
-                                </div>
                                 <div class="mb-2">
                                     <strong>DNI:</strong>
                                     <p class="text-muted mb-1">{{ user.student_profile.dni }}</p>
                                 </div>
                             {% elif user.role == 'TEACHER' and user.teacher_profile %}
                                 <div class="mb-2">
-                                    <strong>Nombre completo:</strong>
-                                    <p class="text-muted mb-1">{{ user.teacher_profile.name }} {{ user.teacher_profile.surname }}</p>
-                                </div>
-                                <div class="mb-2">
                                     <strong>DNI:</strong>
                                     <p class="text-muted mb-1">{{ user.teacher_profile.dni }}</p>
                                 </div>
                             {% elif user.role == 'ADMIN' and user.admin_profile %}
-                                <div class="mb-2">
-                                    <strong>Nombre completo:</strong>
-                                    <p class="text-muted mb-1">{{ user.admin_profile.name }} {{ user.admin_profile.surname }}</p>
-                                </div>
                                 <div class="mb-2">
                                     <strong>DNI:</strong>
                                     <p class="text-muted mb-1">{{ user.admin_profile.dni }}</p>

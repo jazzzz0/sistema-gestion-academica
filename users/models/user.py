@@ -57,3 +57,33 @@ class User(AbstractUser):
 
     def __str__(self):
         return f"{self.email} ({self.role})"
+
+    @property
+    def full_name_display(self):
+        """
+        Retorna el nombre real desde el perfil asociado.
+        Si no existe, retorna el email.
+        """
+        name = self.email
+        is_email = True
+
+        try:
+            if self.role == 'STUDENT' and hasattr(self, 'student_profile'):
+                name = self.student_profile.get_full_name()
+                is_email = False
+
+            elif self.role == 'TEACHER' and hasattr(self, 'teacher_profile'):
+                name = self.teacher_profile.get_full_name()
+                is_email = False
+
+            elif self.role == 'ADMIN' and hasattr(self, 'admin_profile'):
+                name = self.admin_profile.get_full_name()
+                is_email = False
+
+        except Exception:
+            pass
+
+        if is_email:
+            return name
+
+        return name.title()
