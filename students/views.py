@@ -43,7 +43,7 @@ class StudentCreateView(AdminRequiredMixin, FormView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context["title"] = "Crear Estudiante"
+        context["title"] = "Nuevo Estudiante"
         context["action"] = "Crear"
         return context
 
@@ -153,7 +153,7 @@ class StudentUpdateView(AdminRequiredMixin, FormView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["title"] = "Editar Estudiante"
-        context["action"] = "Guardar Cambios"
+        context["action"] = "Editar"
         return context
 
 

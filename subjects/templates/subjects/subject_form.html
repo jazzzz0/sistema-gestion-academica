@@ -2,82 +2,95 @@
 
 {% block title %}
   {% if form.instance.pk %}
-    Editar Materia | SGA
+    Editar Materia
   {% else %}
-    Nueva Materia | SGA
+    Nueva Materia
   {% endif %}
 {% endblock %}
 
 {% block content %}
-<div class="container mt-4">
-    <div class="row justify-content-center">
-        <div class="col-md-6">
-            <div class="card shadow">
-                <div class="card-header text-center">
-                    <h4 class="mb-0">
-                        {% if form.instance.pk %}
-                            Editar Materia: {{ form.instance.name }}
-                        {% else %}
-                            Nueva Materia
-                        {% endif %}
-                    </h4>
+<div class="row justify-content-center mt-4">
+    <div class="col-md-8 col-lg-6">
+        <h1 class="h4 mb-4 fw-bold">
+            {% if form.instance.pk %}
+                Editar Materia: {{ form.instance.name }}
+            {% else %}
+                Nueva Materia
+            {% endif %}
+        </h1>
+
+        <p class="text-muted small mb-4">
+            {% if form.instance.pk %}
+                Modifica los datos de la materia y guarda los cambios.
+            {% else %}
+                Completa los datos para registrar una nueva materia.
+            {% endif %}
+        </p>
+
+        {% if form.non_field_errors %}
+            <div class="alert alert-danger py-2 mb-4">
+                {% for err in form.non_field_errors %}
+                    <div><i class="bi bi-exclamation-circle me-2"></i>{{ err }}</div>
+                {% endfor %}
+            </div>
+        {% endif %}
+
+        <form method="POST" novalidate>
+            {% csrf_token %}
+
+            <div class="card mb-4 shadow-sm">
+                <div class="card-header bg-light">
+                    <h2 class="h6 fw-bold mb-0 text-primary">Datos de Materia</h2>
                 </div>
-
                 <div class="card-body">
-                    <form method="POST">
-                        {% csrf_token %}
+                    {# Campos generados dinámicamente #}
+                    {# Nota: Django pre-llenará los values automáticamente en modo Edición #}
+                    {% for field in form %}
+                        <div class="mb-3">
+                            <label for="{{ field.id_for_label }}" class="form-label">
+                                {{ field.label }}
+                                {% if field.field.required %}
+                                    <span class="text-danger">*</span>
+                                {% endif %}
+                            </label>
 
-                        {# Errores globales (non_field_errors) #}
-                        {% if form.non_field_errors %}
-                            <div class="alert alert-danger">
-                                {{ form.non_field_errors }}
-                            </div>
-                        {% endif %}
+                            {{ field }}
 
-                        {# Campos generados dinámicamente #}
-                        {# Nota: Django pre-llenará los values automáticamente en modo Edición #}
-                        {% for field in form %}
-                            <div class="mb-3">
-                                <label for="{{ field.id_for_label }}" class="form-label">
-                                    <strong>{{ field.label }}</strong>
-                                </label>
-
-                                {{ field }}
-
-                                {# Ayuda visual del campo (help_text) #}
+                            {# Ayuda visual del campo (help_text) #}
+                            {% if field.name == "name" %}
                                 {% if field.help_text %}
                                     <div class="form-text text-muted">{{ field.help_text }}</div>
                                 {% endif %}
+                            {% endif %}
 
-                                {# Errores específicos del campo #}
-                                {% if field.errors %}
-                                    <div class="text-danger small mt-1">
-                                        {% for error in field.errors %}
-                                            {{ error }}
-                                        {% endfor %}
-                                    </div>
-                                {% endif %}
-                            </div>
-                        {% endfor %}
-
-                        <div class="d-flex justify-content-between mt-4">
+                            {# Errores específicos del campo #}
+                            {% if field.errors %}
+                                <div class="text-danger small mt-1">
+                                    {% for error in field.errors %}
+                                        {{ error }}
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+            <div class="d-flex justify-content-between mt-4">
                             <a href="{% if subject.pk %}{% url 'subjects:subject_detail' subject.pk %}{% else %}{% url 'subjects:subject_list' %}{% endif %}"
-                                class="btn btn-secondary">
+                                class="btn btn-outline-secondary text-decoration-none">
                                 Cancelar
                             </a>
 
-                            <button type="submit" class="btn btn-primary">
+                            <button type="submit" class="btn btn-primary px-4">
                                 {% if form.instance.pk %}
-                                    Guardar Cambios
+                                    Editar
                                 {% else %}
-                                    Guardar Materia
+                                    Crear
                                 {% endif %}
                             </button>
                         </div>
-                    </form>
-                </div>
-            </div>
-        </div>
+
+        </form>
     </div>
 </div>
 {% endblock %}
