@@ -1,0 +1,98 @@
+{% extends "base.html" %}
+
+{% block title %}Listado de Alumnos{% endblock %}
+
+{% block content %}
+<div class="card shadow mb-4">
+    <div class="card-header py-3 d-flex justify-content-between align-items-center">
+        <div>
+            <h4 class="m-0 font-weight-bold text-primary">Listado de Alumnos</h4>
+            <h6 class="text-muted mb-0 mt-1">
+                Materia: <strong class="text-dark">{{ subject.name }}</strong>
+            </h6>
+        </div>
+        <a href="{% url 'subjects:my_subjects' %}" class="btn btn-outline-secondary btn-sm">
+            <i class="bi bi-arrow-left"></i> Volver a Mis Materias
+        </a>
+    </div>
+
+    <div class="card-body">
+
+        <div class="table-responsive">
+            <table class="table table-bordered table-hover" width="100%" cellspacing="0">
+                <thead class="table-light">
+                    <tr>
+                        <th>Apellido y Nombre</th>
+
+                        <th>DNI / Legajo</th>
+
+                        <th class="text-center">Estado</th>
+
+                        <th class="text-center">Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for enrollment in enrollments %}
+                        <tr>
+                            <td class="fw-bold align-middle">
+                                {{ enrollment.student.surname }}, {{ enrollment.student.name }}
+                                <br>
+                                <small class="text-muted fw-normal">
+                                    <i class="bi bi-envelope"></i> {{ enrollment.student.user.email }}
+                                </small>
+                            </td>
+
+                            <td class="align-middle">
+                                <span class="d-block">{{ enrollment.student.dni }}</span>
+                                {% if enrollment.student.file_number %}
+                                    <small class="text-muted">Leg: {{ enrollment.student.file_number }}</small>
+                                {% endif %}
+                            </td>
+
+                            <td class="text-center align-middle">
+                                {% if enrollment.status == "activa" %}
+                                    <span class="badge bg-primary rounded-pill">Cursando</span>
+                                {% elif enrollment.status == "regular" %}
+                                    <span class="badge bg-info text-dark rounded-pill">Regular</span>
+                                {% elif enrollment.status == "aprobada" %}
+                                    <span class="badge bg-success rounded-pill">Aprobada</span>
+                                {% elif enrollment.status == "reprobada" %}
+                                    <span class="badge bg-danger rounded-pill">Reprobada</span>
+                                {% elif enrollment.status == "ausente" %}
+                                    <span class="badge bg-secondary rounded-pill">Ausente</span>
+                                {% elif enrollment.status == "baja" %}
+                                    <span class="badge bg-warning text-dark rounded-pill">Baja</span>
+                                {% else %}
+                                    <span class="badge bg-secondary">{{ enrollment.get_status_display }}</span>
+                                {% endif %}
+                            </td>
+
+                            <td class="text-center align-middle">
+                                <div class="btn-group">
+                                    <button class="btn btn-sm btn-outline-primary" title="Ver Ficha Alumno">
+                                        <i class="bi bi-person-lines-fill"></i>
+                                    </button>
+
+                                    <button class="btn btn-sm btn-outline-secondary" title="Cargar Notas">
+                                        <i class="bi bi-pencil-square"></i>
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                    {% empty %}
+                        <tr>
+                            <td colspan="4" class="text-center py-5">
+                                <div class="text-muted mb-3">
+                                    <i class="bi bi-people display-4"></i>
+                                </div>
+                                <h5>No hay alumnos inscriptos.</h5>
+                                <p class="small text-muted">Cuando los alumnos se inscriban, aparecerán aquí.</p>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

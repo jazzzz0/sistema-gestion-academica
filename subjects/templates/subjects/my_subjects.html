@@ -1,0 +1,92 @@
+{% extends "base.html" %}
+
+{% block title %}Mis Materias{% endblock %}
+
+{% block content %}
+<div class="card shadow mb-4">
+    <div class="card-header py-3 d-flex justify-content-between align-items-center">
+        <h4 class="m-0 font-weight-bold text-primary">Panel Docente: Mis Materias</h4>
+    </div>
+
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-bordered table-hover" width="100%" cellspacing="0">
+                <thead class="table-light">
+                    <tr>
+                        <th>Materia</th>
+                        <th>Carrera(s)</th> <th>Descripción</th>
+                        <th class="text-center">Cupo</th>
+                        <th class="text-center">Estado</th>
+                        <th class="text-center">Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for subject in subjects %}
+                        <tr>
+                            <td class="fw-bold align-middle text-primary">
+                                {{ subject.name }}
+                            </td>
+
+                            <td class="align-middle">
+                                {% for career in subject.careers.all %}
+                                    <span class="badge bg-light text-dark border border-secondary mb-1">
+                                        {{ career.name }}
+                                    </span>
+                                    <br>
+                                {% empty %}
+                                    <span class="badge bg-warning text-dark" title="Esta materia no está asignada a ninguna carrera">
+                                        Sin Asignar
+                                    </span>
+                                {% endfor %}
+                            </td>
+
+                            <td class="align-middle">
+                                {% if subject.description %}
+                                    <small class="text-muted">{{ subject.description|truncatechars:50 }}</small>
+                                {% else %}
+                                    <span class="text-muted small fst-italic">--</span>
+                                {% endif %}
+                            </td>
+
+                            <td class="text-center align-middle">
+                                {{ subject.quota }}
+                            </td>
+
+                            <td class="text-center align-middle">
+                                {% with count=subject.enrollments.count %}
+                                    <div class="d-flex flex-column align-items-center">
+                                        <span class="badge {% if count >= subject.quota %}bg-danger{% else %}bg-success{% endif %} rounded-pill mb-1">
+                                            {{ count }} Inscriptos
+                                        </span>
+                                        <small class="text-muted" style="font-size: 0.75rem;">
+                                            Disponibles: {{ subject.quota|add:count|add:"-"|add:count }}
+                                            </small>
+                                    </div>
+                                {% endwith %}
+                            </td>
+
+                            <td class="text-center align-middle">
+                                <a href="{% url 'subjects:subject_enrollment_list' subject.pk %}"
+                                   class="btn btn-sm btn-outline-primary"
+                                   title="Gestionar Alumnos">
+                                    <i class="bi bi-people-fill"></i> Lista
+                                </a>
+                            </td>
+                        </tr>
+                    {% empty %}
+                        <tr>
+                            <td colspan="6" class="text-center text-muted py-5">
+                                <div class="mb-3">
+                                    <i class="bi bi-journal-x" style="font-size: 3rem;"></i>
+                                </div>
+                                <h5>No tienes materias asignadas.</h5>
+                                <p class="small">Contacta al administrador si crees que esto es un error.</p>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

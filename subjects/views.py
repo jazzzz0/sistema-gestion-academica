@@ -1,12 +1,13 @@
 from django.contrib import messages
 from django.db.models import Count
-from django.shortcuts import redirect
+from django.shortcuts import redirect, get_object_or_404
 from django.urls import reverse_lazy
 from django.views.generic import CreateView, ListView, UpdateView, DeleteView, DetailView
 
-from users.mixins import AdminRequiredMixin
+from users.mixins import AdminRequiredMixin, TeacherRequiredMixin
 from subjects.forms import SubjectForm
 from subjects.models import Subject
+from enrollments.models import Enrollment
 
 
 class SubjectCreateView(AdminRequiredMixin, CreateView):
@@ -129,10 +130,62 @@ class SubjectDeleteView(AdminRequiredMixin, DeleteView):
                 request,
                 "No se puede eliminar la materia porque tiene historial académico (alumnos inscritos)."
             )
-            return redirect(self.success_url)
+            return redirect(self.get_success_url())
 
         # No hay inscripciones: proceder a borrar. Las relaciones M2M con carreras
         # serán limpiadas automáticamente por Django.
         response = super().delete(request, *args, **kwargs)
         messages.success(request, "Materia eliminada correctamente.")
         return response
+
+
+class MySubjectsListView(TeacherRequiredMixin, ListView):
+    model = Subject
+    template_name = "subjects/my_subjects.html"
+    context_object_name = "subjects"
+
+    def get_queryset(self):
+        # Obtenemos el perfil del profesor del usuario logueado
+        teacher = self.request.user.teacher_profile
+
+        # Filtramos las materias donde este profesor es el titular
+        return (
+            Subject.objects.filter(teacher=teacher)
+            .prefetch_related('careers', 'enrollments')
+            .order_by('name')
+        )
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['title'] = "Mis Materias Asignadas"
+        return context
+
+
+class SubjectEnrollmentListView(TeacherRequiredMixin, ListView):
+    model = Enrollment
+    template_name = "subjects/subject_enrollment_list.html"
+    context_object_name = "enrollments"
+
+    def get_queryset(self):
+        # Capturamos el ID de la materia de la URL
+        subject_id = self.kwargs['pk']
+
+        # Obtenemos el perfil del profesor actual
+        teacher = self.request.user.teacher_profile
+
+        # Buscamos la materia, pero filtrando por el profesor.
+        # Si la materia existe pero es de otro profesor, lanzará 404 Not Found.
+        self.subject = get_object_or_404(Subject, pk=subject_id, teacher=teacher)
+
+        # 4. Retornamos las inscripciones de esa materia
+        return (
+            Enrollment.objects.filter(subject=self.subject)
+            .select_related('student')
+            .order_by('student__surname', 'student__name')
+        )
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['subject'] = self.subject
+        return context
+

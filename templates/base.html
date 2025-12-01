@@ -91,7 +91,7 @@
 
                         {% if user.role == 'TEACHER' %}
                             <li class="nav-item">
-                                <a class="nav-link" href="#">
+                                <a class="nav-link" href="{% url 'subjects:my_subjects' %}">
                                     <i class="bi bi-journal-bookmark"></i> Mis Materias
                                 </a>
                             </li>
