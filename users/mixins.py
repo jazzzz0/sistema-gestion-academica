@@ -94,3 +94,28 @@ class StudentRequiredMixin(LoginRequiredMixin, UserPassesTestMixin):
         else:
             # Usuario no logueado, redirige al login
             return super().handle_no_permission()
+
+
+class TeacherRequiredMixin(LoginRequiredMixin, UserPassesTestMixin):
+    """
+    Mixin para verificar que el usuario sea un Profesor.
+    """
+    request: HttpRequest
+
+    def test_func(self):
+        """
+        Validamos contra el rol 'TEACHER' en el modelo User.
+        """
+        return self.request.user.role == "TEACHER"
+
+    def handle_no_permission(self):
+        """
+        Manejo amigable del error de permisos.
+        """
+        if self.request.user.is_authenticated:
+            # Si está logueado pero no es Profesor, lo redirigimos al dashboard con mensaje
+            messages.error(self.request, "No tienes permisos de profesor para ver esta sección.")
+            return redirect('dashboard')
+
+        # Si no está logueado, lo manda al login
+        return super().handle_no_permission()

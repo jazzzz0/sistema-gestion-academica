@@ -12,40 +12,84 @@
                 Bienvenido, <strong>{{ user.full_name_display }}</strong> (Administrador).
             </div>
 
-            <div class="card mt-4 shadow-sm border-0">
-                <div class="card-header text-white" style="background-color: var(--color-role-admin);">
-                    Accesos Rápidos
+            <div class="row">
+                <div class="col-md-6 mb-4">
+                    <div class="card shadow-sm border-0 h-100">
+                        <div class="card-header text-white fw-bold" style="background-color: var(--color-role-admin);">
+                            <i class="bi bi-people me-2"></i> Personas
+                        </div>
+                        <div class="card-body p-0">
+                            <ul class="list-group list-group-flush">
+                                <li class="list-group-item list-group-item-action">
+                                    <a href="{% url 'students:student_list' %}" class="text-decoration-none d-block stretched-link" style="color: var(--color-role-admin);">
+                                        <i class="bi bi-person-badge me-2"></i> Gestión de Alumnos
+                                    </a>
+                                </li>
+                                <li class="list-group-item list-group-item-action">
+                                    <a href="{% url 'users:teacher_list' %}" class="text-decoration-none d-block stretched-link" style="color: var(--color-role-admin);">
+                                        <i class="bi bi-person-video3 me-2"></i> Gestión de Profesores
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
                 </div>
-                <div class="card-body">
-                    <ul class="list-group list-group-flush">
-                        <li class="list-group-item">
-                            <a href="{% url 'students:student_list' %}" class="text-decoration-none stretched-link" style="color: var(--color-role-admin);">
-                                <i class="bi bi-people-fill me-2"></i> Gestión de Alumnos
-                            </a>
-                        </li>
-                        <li class="list-group-item">
-                            <a href="{% url 'users:teacher_list' %}" class="text-decoration-none stretched-link" style="color: var(--color-role-admin);">
-                                <i class="bi bi-person-video3 me-2"></i> Gestión de Profesores
-                            </a>
-                        </li>
-                    </ul>
+
+                <div class="col-md-6 mb-4">
+                    <div class="card shadow-sm border-0 h-100">
+                        <div class="card-header text-white fw-bold" style="background-color: var(--color-role-admin);">
+                            <i class="bi bi-bank me-2"></i> Académica
+                        </div>
+                        <div class="card-body p-0">
+                            <ul class="list-group list-group-flush">
+                                <li class="list-group-item list-group-item-action">
+                                    <a href="{% url 'careers:career_list' %}" class="text-decoration-none d-block stretched-link" style="color: var(--color-role-admin);">
+                                        <i class="bi bi-signpost-2 me-2"></i> Carreras
+                                    </a>
+                                </li>
+                                <li class="list-group-item list-group-item-action">
+                                    <a href="{% url 'subjects:subject_list' %}" class="text-decoration-none d-block stretched-link" style="color: var(--color-role-admin);">
+                                        <i class="bi bi-journal-bookmark me-2"></i> Materias
+                                    </a>
+                                </li>
+                                <li class="list-group-item list-group-item-action">
+                                    <a href="{% url 'enrollments:enrollment_admin_list' %}" class="text-decoration-none d-block stretched-link" style="color: var(--color-role-admin);">
+                                        <i class="bi bi-card-checklist me-2"></i> Inscripciones
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
                 </div>
             </div>
 
         {% elif user.role == 'STUDENT' %}
             <div class="alert shadow-sm text-white" role="alert" style="background-color: var(--color-role-student);">
-                <i class="bi bi-person-badge-fill me-2"></i>
+                <i class="bi bi-backpack-fill me-2"></i>
                 Hola, <strong>{{ user.full_name_display }}</strong>.
             </div>
 
             <div class="row mt-4">
-                <div class="col-md-6">
+                <div class="col-md-6 mb-3">
                     <div class="card shadow-sm h-100 border-0">
                         <div class="card-body">
-                            <h5 class="card-title text-muted">Estado Académico</h5>
-                            <p class="card-text">Consulta tus inscripciones y calificaciones recientes.</p>
+                            <h5 class="card-title text-muted"><i class="bi bi-check2-square me-2"></i>Estado Académico</h5>
+                            <p class="card-text">Consulta tus materias en curso, regularidades y notas.</p>
                             <a href="{% url 'enrollments:my_enrollments' %}" class="btn text-white" style="background-color: var(--color-role-student);">
-                                Ver Inscripciones
+                                Ver Mis Inscripciones
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-6 mb-3">
+                    <div class="card shadow-sm h-100 border-0">
+                        <div class="card-body">
+                            <h5 class="card-title text-muted"><i class="bi bi-search me-2"></i>Inscripciones</h5>
+                            <p class="card-text">Busca nuevas materias para cursar este semestre.</p>
+
+                            <a href="{% url 'enrollments:enrollment_list' %}" class="btn text-white" style="background-color: var(--color-role-student);">
+                                Ir a Oferta Académica
                             </a>
                         </div>
                     </div>
@@ -62,10 +106,13 @@
                 <div class="col-md-6">
                     <div class="card shadow-sm h-100 border-0">
                         <div class="card-body">
-                            <h5 class="card-title text-muted">Mis Cátedras</h5>
-                            <p class="card-text">Administra tus materias y alumnos asignados.</p>
-                            <a href="#" class="btn text-white" style="background-color: var(--color-role-teacher);">
-                                Ver mis materias
+                            <h5 class="card-title text-muted">
+                                <i class="bi bi-easel2 me-2"></i>Mis Cátedras
+                            </h5>
+                            <p class="card-text">Administra tus materias, revisa listas de alumnos y carga notas.</p>
+
+                            <a href="{% url 'subjects:my_subjects' %}" class="btn text-white" style="background-color: var(--color-role-teacher);">
+                                <i class="bi bi-arrow-right-circle me-1"></i> Ver mis materias
                             </a>
                         </div>
                     </div>
