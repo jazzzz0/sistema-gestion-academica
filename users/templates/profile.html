@@ -121,10 +121,6 @@
                                 <strong>Carrera:</strong>
                                 <p class="text-muted">{{ user.student_profile.career.name }}</p>
                             </div>
-                            <div class="col-md-6 mb-3">
-                                <strong>Código de carrera:</strong>
-                                <p class="text-muted">{{ user.student_profile.career.code }}</p>
-                            </div>
                             {% if user.student_profile.address %}
                             <div class="col-md-12 mb-3">
                                 <strong>Domicilio:</strong>
@@ -151,18 +147,12 @@
                                         <thead class="text-white" style="background-color: var(--color-role-teacher);">
                                             <tr>
                                                 <th>Materia</th>
-                                                <th>Código</th>
-                                                <th>Carrera</th>
-                                                <th>Año</th>
                                             </tr>
                                         </thead>
                                         <tbody>
                                             {% for subject in user.teacher_profile.subjects.all %}
                                             <tr>
                                                 <td>{{ subject.name }}</td>
-                                                <td>{{ subject.code }}</td>
-                                                <td>{{ subject.career.name }}</td>
-                                                <td>{{ subject.year }}°</td>
                                             </tr>
                                             {% endfor %}
                                         </tbody>

@@ -27,8 +27,6 @@
                         <th>DNI / Legajo</th>
 
                         <th class="text-center">Estado</th>
-
-                        <th class="text-center">Acciones</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -65,18 +63,6 @@
                                 {% else %}
                                     <span class="badge bg-secondary">{{ enrollment.get_status_display }}</span>
                                 {% endif %}
-                            </td>
-
-                            <td class="text-center align-middle">
-                                <div class="btn-group">
-                                    <button class="btn btn-sm btn-outline-primary" title="Ver Ficha Alumno">
-                                        <i class="bi bi-person-lines-fill"></i>
-                                    </button>
-
-                                    <button class="btn btn-sm btn-outline-secondary" title="Cargar Notas">
-                                        <i class="bi bi-pencil-square"></i>
-                                    </button>
-                                </div>
                             </td>
                         </tr>
                     {% empty %}
