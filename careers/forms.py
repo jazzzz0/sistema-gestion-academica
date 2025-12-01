@@ -35,25 +35,23 @@ class CareerForm(forms.ModelForm):
 
         return name
 
+
 class CareerSubjectsForm(forms.ModelForm):
     class Meta:
         model = Career
         fields = ["subjects"]
 
         widgets = {
-            "subjects": forms.CheckboxSelectMultiple(
+            "subjects": forms.SelectMultiple(
                 attrs={
-                    "class": "form-check",
+                    "class": "form-control select2-subjects",
+                    "style": "width: 100%",
+                    "data-placeholder": "Buscar materias para agregar...",
                 },
             )
         }
 
-        help_texts = {
-            "subjects": "Seleccione las materias que forman parte del plan de estudios de esta carrera.",
-        }
-
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-
-        # Mostrar todas las materias ordenadas por nombre
         self.fields["subjects"].queryset = Subject.objects.all().order_by("name")
+        self.fields["subjects"].label = "Plan de Estudios"
