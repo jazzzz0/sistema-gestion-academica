@@ -3,131 +3,144 @@
 {% block title %}Mis Inscripciones{% endblock %}
 
 {% block content %}
-<div class="card shadow mb-4">
-    <div class="card-header py-3 d-flex justify-content-between align-items-center">
-        <h4 class="m-0 font-weight-bold text-primary">Mis Materias en Curso</h4>
-    </div>
+    <div class="card shadow mb-4">
+        <div class="card-header py-3 d-flex justify-content-between align-items-center">
+            <h4 class="m-0 font-weight-bold text-primary">Mis Materias en Curso</h4>
+        </div>
 
-    <div class="card-body">
-        
-        <div class="table-responsive">
-            <table class="table table-bordered table-hover" width="100%" cellspacing="0">
-                <thead class="table-light">
+        <div class="card-body">
+
+            <div class="table-responsive">
+                <table class="table table-bordered table-hover" width="100%" cellspacing="0">
+                    <thead class="table-light">
                     <tr class="text-center">
                         <th>Materia</th>
                         <th>Profesor</th>
                         <th>Estado</th>
                         <th>Acciones</th>
                     </tr>
-                </thead>
+                    </thead>
 
-                <tbody>
+                    <tbody>
                     {% for enrollment in enrollments %}
                         <tr>
-                            <td class="fw-semibold">{{ enrollment.subject.name }}</td>
+                            <td class="fw-semibold align-middle">{{ enrollment.subject.name }}</td>
 
-                            <td class="text-center">
+                            <td class="text-center align-middle">
                                 {% if enrollment.subject.teacher %}
                                     {{ enrollment.subject.teacher }}
                                 {% else %}
-                                    <span class="text-muted">Sin asignar</span>
+                                    <span class="text-muted fst-italic">Sin asignar</span>
                                 {% endif %}
                             </td>
 
-                            <td class="text-center">
-                                {% if enrollment.status == "ACTIVE" %}
-                                    <span class="badge bg-success rounded-pill">Cursando</span>
+                            <td class="text-center align-middle">
+                                {% if enrollment.status == "activa" %}
+                                    <span class="badge bg-primary rounded-pill">Cursando</span>
+                                {% elif enrollment.status == "regular" %}
+                                    <span class="badge bg-info text-dark rounded-pill">Regular</span>
+                                {% elif enrollment.status == "aprobada" %}
+                                    <span class="badge bg-success rounded-pill">Aprobada</span>
+                                {% elif enrollment.status == "reprobada" %}
+                                    <span class="badge bg-danger rounded-pill">Reprobada</span>
+                                {% elif enrollment.status == "ausente" %}
+                                    <span class="badge bg-secondary rounded-pill">Ausente</span>
+                                {% elif enrollment.status == "baja" %}
+                                    <span class="badge bg-warning text-dark rounded-pill">Baja</span>
                                 {% else %}
-                                    <span class="badge bg-primary rounded-pill">Regular</span>
+                                    <span class="badge bg-secondary rounded-pill">{{ enrollment.get_status_display }}</span>
                                 {% endif %}
                             </td>
 
-                            <td class="text-center">
-                                <button 
-                                    class="btn btn-outline-danger btn-sm"
-                                    data-bs-toggle="modal"
-                                    data-bs-target="#dropModal"
-                                    data-subject="{{ enrollment.subject.name }}"
-                                    data-id="{{ enrollment.id }}"
-                                    data-url="{% url 'enrollments:enrollment_drop' enrollment.pk %}"
-                                    title="Darse de Baja"
-                                >
-                                    <i class="bi bi-person-dash"></i>
-                                </button>
+                            <td class="text-center align-middle">
+                                {% if enrollment.status == "activa" %}
+                                    <button
+                                            class="btn btn-outline-danger btn-sm"
+                                            data-bs-toggle="modal"
+                                            data-bs-target="#dropModal"
+                                            data-subject="{{ enrollment.subject.name }}"
+                                            data-id="{{ enrollment.id }}"
+                                            data-url="{% url 'enrollments:enrollment_drop' enrollment.pk %}"
+                                            title="Darse de Baja"
+                                    >
+                                        <i class="bi bi-person-dash"></i> Darse de Baja
+                                    </button>
+                                {% else %}
+                                    <button class="btn btn-secondary btn-sm" disabled
+                                            title="Acción no disponible en este estado">
+                                        <i class="bi bi-slash-circle"></i>
+                                    </button>
+                                {% endif %}
                             </td>
                         </tr>
 
                     {% empty %}
                         <tr>
-                            <td colspan="4" class="text-center text-muted">
-                                No estás inscripto en ninguna materia.
-                            </td>
-                        </tr>
-                        <tr>
-                            <td colspan="4" class="text-center">
+                            <td colspan="4" class="text-center py-4">
+                                <p class="text-muted mb-3">No estás inscripto en ninguna materia actualmente.</p>
                                 <a href="{% url 'enrollments:enrollment_list' %}" class="btn btn-primary">
-                                    Ir a Oferta Académica
+                                    <i class="bi bi-search"></i> Ver Oferta Académica
                                 </a>
                             </td>
                         </tr>
                     {% endfor %}
-                </tbody>
+                    </tbody>
 
-            </table>
+                </table>
+            </div>
+
+            {% include 'pagination.html' %}
+
         </div>
-
-        {% include 'pagination.html' %}
-        
-    </div>
-</div>
-
-
-<!-- MODAL -->
-<div class="modal fade" id="dropModal" tabindex="-1" aria-hidden="true">
-  <div class="modal-dialog modal-dialog-centered">
-
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title">¿Renunciar a la cursada?</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-      </div>
-
-      <div class="modal-body">
-        <p id="modalText">
-          <!-- Se actualizará por JS -->
-        </p>
-      </div>
-
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
-          Cancelar
-        </button>
-
-        <form id="dropForm" method="post">
-          {% csrf_token %}
-          <button class="btn btn-danger">Confirmar Baja</button>
-        </form>
-      </div>
     </div>
 
-  </div>
-</div>
+
+    <!-- MODAL -->
+    <div class="modal fade" id="dropModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">¿Renunciar a la cursada?</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+
+                <div class="modal-body">
+                    <p id="modalText">
+                        <!-- Se actualizará por JS -->
+                    </p>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        Cancelar
+                    </button>
+
+                    <form id="dropForm" method="post">
+                        {% csrf_token %}
+                        <button class="btn btn-danger">Confirmar Baja</button>
+                    </form>
+                </div>
+            </div>
+
+        </div>
+    </div>
 
 
-<script>
-    const dropModal = document.getElementById('dropModal');
-    dropModal.addEventListener('show.bs.modal', function (event) {
-        const button = event.relatedTarget;
-        const subject = button.getAttribute('data-subject');
-        const url = button.getAttribute('data-url');
+    <script>
+        const dropModal = document.getElementById('dropModal');
+        dropModal.addEventListener('show.bs.modal', function (event) {
+            const button = event.relatedTarget;
+            const subject = button.getAttribute('data-subject');
+            const url = button.getAttribute('data-url');
 
-        // Texto dinámico del modal
-        document.getElementById("modalText").textContent =
-            `Estás a punto de darte de baja de ${subject}. Esta acción es irreversible.`;
+            // Texto dinámico del modal
+            document.getElementById("modalText").textContent =
+                `Estás a punto de darte de baja de ${subject}. Esta acción es irreversible.`;
 
-        // Formulario dinámico
-        document.getElementById("dropForm").action = url;
-    });
-</script>
+            // Formulario dinámico
+            document.getElementById("dropForm").action = url;
+        });
+    </script>
 
 {% endblock %}

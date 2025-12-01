@@ -89,11 +89,10 @@ class MyEnrollmentListView(StudentRequiredMixin, ListView):
 
         return (
             Enrollment.objects.filter(
-                student=student,
-                status__in=["activa", "regular"]
+                student=student
             )
             .select_related("subject")
-            .order_by("subject__name")
+            .order_by("-enrolled_at")
         )
 
 
