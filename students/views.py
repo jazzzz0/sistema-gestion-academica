@@ -18,7 +18,6 @@ from .services import StudentService
 class StudentCreateView(AdminRequiredMixin, FormView):
     form_class = StudentForm
     template_name = 'students/student_form.html'
-    success_url = reverse_lazy('students:student_list')
 
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
@@ -34,7 +33,7 @@ class StudentCreateView(AdminRequiredMixin, FormView):
             student = StudentService.create_student(data)
 
             messages.success(self.request, f"Estudiante {student.get_full_name()} creado correctamente.")
-            return HttpResponseRedirect(self.get_success_url())
+            return redirect('students:student_detail', pk=student.pk)
 
         except Exception as e:
             # Capturar errores de negocio que se hayan pasado (ej. carrera cerrada)
