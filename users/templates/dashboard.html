@@ -9,7 +9,7 @@
         {% if user.role == 'ADMIN' %}
             <div class="alert shadow-sm text-white" role="alert" style="background-color: var(--color-role-admin);">
                 <i class="bi bi-shield-lock-fill me-2"></i>
-                Bienvenido, <strong>{{ full_name }}</strong> (Administrador).
+                Bienvenido, <strong>{{ user.full_name_display }}</strong> (Administrador).
             </div>
 
             <div class="card mt-4 shadow-sm border-0">
@@ -35,7 +35,7 @@
         {% elif user.role == 'STUDENT' %}
             <div class="alert shadow-sm text-white" role="alert" style="background-color: var(--color-role-student);">
                 <i class="bi bi-person-badge-fill me-2"></i>
-                Hola, <strong>{{ full_name }}</strong>.
+                Hola, <strong>{{ user.full_name_display }}</strong>.
             </div>
 
             <div class="row mt-4">
@@ -55,7 +55,7 @@
         {% elif user.role == 'TEACHER' %}
             <div class="alert shadow-sm text-white" role="alert" style="background-color: var(--color-role-teacher);">
                 <i class="bi bi-journal-bookmark-fill me-2"></i>
-                Profesor/a <strong>{{ full_name }}</strong>.
+                Profesor/a <strong>{{ user.full_name_display }}</strong>.
             </div>
 
             <div class="row mt-4">
@@ -74,7 +74,7 @@
 
         {% else %}
             <div class="alert alert-secondary" role="alert">
-                Bienvenido, <strong>{{ full_name }}</strong>.
+                Bienvenido, <strong>{{ user.full_name_display }}</strong>.
             </div>
         {% endif %}
     </div>

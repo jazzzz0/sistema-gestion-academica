@@ -117,11 +117,7 @@
                     {% if user.is_authenticated %}
                         <span class="me-3 text-light d-none d-lg-block">
                             Hola, <strong>
-                                {% if user.first_name %}
-                                    {{ user.first_name }}
-                                {% else %}
-                                    {{ user.email|truncatechars:20 }}
-                                {% endif %}
+                                {{ user.full_name_display}}
                             </strong>
                         </span>
 

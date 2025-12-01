@@ -33,54 +33,13 @@ class HomeView(TemplateView):
 # Vista Dashboard (para usuarios autenticados)
 class DashboardView(LoginRequiredMixin, TemplateView):
     template_name = "dashboard.html"
-    login_url = '/login/'  # Redirige a login si no está autenticado
+    login_url = '/login/'
     redirect_field_name = 'next'
-
-    def get_context_data(self, **kwargs):
-        """
-        Inyectamos 'full_name' al contexto buscando en el perfil asociado.
-        """
-        context = super().get_context_data(**kwargs)
-        user = self.request.user
-
-        # Estado inicial: Usamos email y marcamos que es un email
-        full_name = user.email
-        is_email = True
-
-        # Búsqueda inteligente según el ROL
-        try:
-            if user.role == 'STUDENT' and hasattr(user, 'student_profile'):
-                full_name = user.student_profile.get_full_name()
-                is_email = False
-
-            elif user.role == 'TEACHER' and hasattr(user, 'teacher_profile'):
-                full_name = user.teacher_profile.get_full_name()
-                is_email = False
-
-            elif user.role == 'ADMIN' and hasattr(user, 'admin_profile'):
-                full_name = user.admin_profile.get_full_name()
-                is_email = False
-
-                # Nota: Si es un Superuser creado por consola sin perfil 'Admin' asociado,
-                # is_email seguirá siendo True y full_name seguirá siendo el email.
-
-        except Exception:
-            pass  # Si falla, nos quedamos con el estado inicial (Email)
-
-        # Formateo Condicional
-        if not is_email:
-            # Si es un nombre real, lo ponemos en título (Juan Perez)
-            context['full_name'] = full_name.title()
-        else:
-            # Si es un email, lo dejamos tal cual o forzamos minúsculas para limpieza
-            context['full_name'] = full_name
-
-        return context
 
 
 class ProfileView(LoginRequiredMixin, TemplateView):
     template_name = "profile.html"
-    login_url = '/login/'  # Redirige a login si no está autenticado
+    login_url = '/login/'
     redirect_field_name = 'next'
 
 
@@ -98,20 +57,14 @@ class AdminCreateView(SuperuserRequiredMixin, FormView):
     success_url = reverse_lazy("users:admin_list")
 
     def form_valid(self, form):
-        # Obtenemos datos del formulario
         data = form.cleaned_data
-
         try:
-            # Llamar al servicio para crear el Admin
             admin_user = AdminService.create_admin(data)
-
             messages.success(
                 self.request,
                 f"Administrador {admin_user.surname}, {admin_user.name} creado correctamente."
                 )
-
             return HttpResponseRedirect(self.get_success_url())
-
         except Exception as e:
             form.add_error(None, f"Error al crear administrador: {str(e)}")
             return self.form_invalid(form)
@@ -123,33 +76,22 @@ class AdminDeleteView(SuperuserRequiredMixin, DeleteView):
     success_url = reverse_lazy("users:admin_list")
     context_object_name = "admin"
 
-    # Lógica de "Borrado" suave (Override delete o form_valid)
     def delete(self, request, *args, **kwargs):
-        # Obtenemos el objeto Admin a desactivar
         self.object = self.get_object()
-
         admin_obj: Admin = self.object
 
-        # Seguridad (Anti-Lockout)
-        # Validamos que no se esté borrando el usuario actual
         if admin_obj.user == request.user:
             messages.error(self.request, "No puedes desactivar tu propio usuario.")
             return HttpResponseRedirect(self.get_success_url())
 
-        # Lógica de borrado suave
         try:
             with transaction.atomic():
-                # Desactivar el perfil Admin
                 admin_obj.is_active = False
                 admin_obj.save()
-
-                # Desactivar el Usuario de Django
                 if admin_obj.user:
                     admin_obj.user.is_active = False
                     admin_obj.user.save()
-
             messages.success(request, "Administrador desactivado correctamente.")
-
         except Exception as e:
             messages.error(request, f"Error al desactivar el administrador: {str(e)}")
 
@@ -163,14 +105,10 @@ class TeacherCreateView(AdminRequiredMixin, FormView):
 
     def form_valid(self, form):
         data = form.cleaned_data
-
         try:
-            # Pasamos los datos del formulario al servicio para crear el Teacher
             teacher = TeacherService.create_teacher(data)
-
             messages.success(self.request, f"Profesor {teacher.surname}, {teacher.name} creado correctamente.")
             return HttpResponseRedirect(self.get_success_url())
-
         except Exception as e:
             form.add_error(None, f"Error al crear profesor: {str(e)}")
             return self.form_invalid(form)
@@ -183,16 +121,10 @@ class TeacherListView(AdminRequiredMixin, ListView):
     paginate_by = 20
 
     def get_queryset(self):
-        # Optimizamos la consulta para traer los datos del Usuario relacionado
-        # en el mismo viaje a la base de datos (evita N+1 queries).
         return Teacher.objects.select_related('user').all().order_by('surname', 'name')
 
 
 class TeacherDeleteView(AdminRequiredMixin, DeleteView):
-    """
-    Vista para desactivar un profesor (SGA-102).
-    Solo accesible por Administradores.
-    """
     model = Teacher
     template_name = "users/teacher_confirm_delete.html"
     context_object_name = "teacher"
@@ -201,32 +133,21 @@ class TeacherDeleteView(AdminRequiredMixin, DeleteView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         teacher = self.object
-
-        # Consultar las materias asignadas al profesor
         context["assigned_subjects"] = teacher.subjects.all()
-
         return context
 
     def delete(self, request, *args, **kwargs):
-        """
-        Sobreescribimos delete para evitar el borrado físico y
-        aplicar Soft Delete con transacción atómica.
-        """
         self.object = self.get_object()
         teacher_obj: Teacher = self.object
-
         try:
             TeacherService.deactivate_teacher(teacher_obj)
-
             messages.success(
                 request,
                 f"El profesor {teacher_obj.surname}, {teacher_obj.name} ha sido desactivado correctamente."
             )
-
         except Exception as e:
             messages.error(request, f"Error al desactivar el profesor: {str(e)}")
             return HttpResponseRedirect(self.get_success_url())
-
         return HttpResponseRedirect(self.get_success_url())
 
 
@@ -235,43 +156,12 @@ class FirstLoginChangePasswordView(PasswordChangeView):
     form_class = FirstLoginPasswordChangeForm
     success_url = reverse_lazy("dashboard")
 
-    def get_context_data(self, **kwargs):
-        """
-        Enriquecemos el contexto buscando el nombre real en el perfil asociado.
-        """
-        context = super().get_context_data(**kwargs)
-        user = self.request.user
-
-        # Valor por defecto: Email (por si falla la relación)
-        full_name = user.email
-
-        try:
-            # Buscamos en los perfiles basándonos en el ROL
-            if user.role == 'STUDENT' and hasattr(user, 'student_profile'):
-                full_name = user.student_profile.get_full_name()
-
-            elif user.role == 'TEACHER' and hasattr(user, 'teacher_profile'):
-                full_name = user.teacher_profile.get_full_name()
-
-        except Exception:
-            pass  # Si falla, se queda con el email
-
-        context['full_name'] = full_name.title() if hasattr(full_name, 'title') else full_name
-        return context
-
     def form_valid(self, form):
         try:
-            # Delegamos la lógica transaccional al servicio
             user = AuthService.complete_first_login_process(self.request.user, form)
-
-            # Actualizar la sesión del usuario para que no se desloguee al cambiar el hash de la contraseña
             update_session_auth_hash(self.request, user)
-
             messages.success(self.request, "Contraseña cambiada correctamente.")
-
-            # Redirigir manualmente
             return redirect(self.get_success_url())
-
         except Exception as e:
             messages.error(self.request, f"Ocurrió un error al actualizar la contraseña: {str(e)}")
             return self.form_invalid(form)
