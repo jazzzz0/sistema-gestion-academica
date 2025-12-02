@@ -16,4 +16,5 @@ urlpatterns = [
 
     # Vistas de auth
     path("first-login-change-password/", views.FirstLoginChangePasswordView.as_view(), name="first_login_change_password"),
+    path('password-change/', views.UserPasswordChangeView.as_view(), name='password_change'),
 ]
